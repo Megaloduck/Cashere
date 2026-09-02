@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="Cashere.Android/Cashere.Android.csproj" />
+  <Project Path="Cashere.Desktop/Cashere.Desktop.csproj" />
+  <Project Path="Cashere.iOS/Cashere.iOS.csproj" />
+  <Project Path="Cashere/Cashere.csproj" />
+</Solution>
