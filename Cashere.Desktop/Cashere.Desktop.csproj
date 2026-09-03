@@ -23,5 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cashere\Cashere.csproj" />
+	  <ProjectReference Include="..\\Cashere.Data\\Cashere.Data.csproj" />
   </ItemGroup>
 </Project>
