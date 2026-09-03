@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Cashere.Models;
 
 // Audit trail of every stock change, whatever caused it.
