@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cashere\Cashere.csproj" />
-	  <ProjectReference Include="..\\Cashere.Data\\Cashere.Data.csproj" />
+    <ProjectReference Include="..\Cashere.Data\Cashere.Data.csproj" />
+    <ProjectReference Include="..\Cashere.Server\Cashere.Server.csproj" />
   </ItemGroup>
 </Project>

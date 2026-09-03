@@ -6,5 +6,7 @@
   <Project Path="Cashere.Desktop/Cashere.Desktop.csproj" />
   <Project Path="Cashere.iOS/Cashere.iOS.csproj" />
   <Project Path="Cashere.Data/Cashere.Data.csproj" />
+  <Project Path="Cashere.Server/Cashere.Server.csproj" />
+  <Project Path="Cashere.Sync/Cashere.Sync.csproj" />
   <Project Path="Cashere/Cashere.csproj" />
 </Solution>
