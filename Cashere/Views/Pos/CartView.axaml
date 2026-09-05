@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
+             x:Class="Cashere.Views.Pos.CartView"
+             x:DataType="vm:CartViewModel">
+  <Border Background="#F3F4F6" CornerRadius="8" Padding="12">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+        <TextBlock Grid.Column="0" Text="Current Order" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
+        <Button Grid.Column="1" Content="Clear" Command="{Binding ClearCartCommand}" IsEnabled="{Binding HasItems}"/>
+      </Grid>
+
+      <ScrollViewer Grid.Row="1">
+        <ItemsControl ItemsSource="{Binding Lines}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CartLineViewModel">
+              <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="0,8">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  <Button Grid.Column="1" Content="-" Width="28" Command="{Binding DecrementCommand}"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Quantity}" Width="28" TextAlignment="Center" VerticalAlignment="Center"/>
+                  <Button Grid.Column="3" Content="+" Width="28" Command="{Binding IncrementCommand}"/>
+                  <Button Grid.Column="4" Content="X" Width="28" Margin="8,0,0,0" Click="OnRemoveLineClick"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <StackPanel Grid.Row="2" Margin="0,12,0,0" Spacing="4">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="Subtotal"/>
+          <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="Tax"/>
+          <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="Total" FontWeight="Bold" FontSize="16"/>
+          <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold" FontSize="16"/>
+        </Grid>
+      </StackPanel>
+    </Grid>
+  </Border>
+</UserControl>

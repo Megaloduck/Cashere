@@ -1,12 +1,20 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Cashere.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:Cashere.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
         x:Class="Cashere.Views.MainWindow"
+        x:CompileBindings="False"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Cashere">
-        <views:MainView />
+        Title="Cashere"
+        WindowState="Maximized">
+  <!--
+    Content is bound with an empty path so it's just whatever DataContext
+    App.axaml.cs assigns (PosViewModel normally, MainViewModel as a fallback).
+    The globally-registered ViewLocator (see App.axaml) then resolves the
+    matching View and sets it as that View's DataContext automatically -
+    this is what lets the same Window host different screens without
+    MainWindow needing to know about them.
+  -->
+  <ContentControl Content="{Binding}"/>
 </Window>

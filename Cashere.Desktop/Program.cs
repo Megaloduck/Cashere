@@ -3,6 +3,10 @@ using Avalonia;
 using Cashere.Data;
 using Cashere.Server;
 using Microsoft.EntityFrameworkCore;
+using Cashere.Data.Services;
+using Cashere.Server;
+using Cashere.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cashere.Desktop;
 
@@ -18,7 +22,13 @@ sealed class Program
     {
         var dbPath = CashereDbContext.GetDefaultDbPath();
 
-        ApplyMigrations(dbPath);
+        ApplyMigrationsAndSeed(dbPath);
+
+        var dbContextFactory = new SqliteDbContextFactory(dbPath);
+        AppServices.ProductCatalog = new ProductCatalogService(dbContextFactory);
+        AppServices.SaleService = new SaleService(dbContextFactory);
+        AppServices.ShopContext = new ShopContextService(dbContextFactory);
+
         ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
 
         try
@@ -31,12 +41,13 @@ sealed class Program
         }
     }
 
-    private static void ApplyMigrations(string dbPath)
+    private static void ApplyMigrationsAndSeed(string dbPath)
     {
         using var db = new CashereDbContext(new DbContextOptionsBuilder<CashereDbContext>()
             .UseSqlite($"Data Source={dbPath}")
             .Options);
         db.Database.Migrate();
+        SeedData.EnsureSeedDataAsync(db).GetAwaiter().GetResult();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

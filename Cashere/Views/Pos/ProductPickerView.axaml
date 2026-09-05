@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+             xmlns:models="clr-namespace:Cashere.Models"
+             mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="600"
+             x:Class="Cashere.Views.Pos.ProductPickerView"
+             x:DataType="vm:ProductPickerViewModel">
+  <Grid RowDefinitions="Auto,Auto,*">
+    <TextBox Grid.Row="0"
+             Watermark="Search by name, SKU or barcode..."
+             Text="{Binding SearchText}"
+             Margin="0,0,0,8"/>
+
+    <WrapPanel Grid.Row="1" Margin="0,0,0,8">
+      <Button Content="All" Margin="0,0,6,6" Padding="10,4" Click="OnAllCategoriesClick"/>
+      <ItemsControl ItemsSource="{Binding Categories}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Category">
+            <Button Content="{Binding Name}" Margin="0,0,6,6" Padding="10,4" Click="OnCategoryClick"/>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </WrapPanel>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl ItemsSource="{Binding FilteredProducts}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Product">
+            <Button Width="150" Height="110" Margin="0,0,10,10" Padding="10" Click="OnProductClick">
+              <StackPanel>
+                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding StockQuantity, StringFormat='Stock: {0}'}" Foreground="Gray" FontSize="11"/>
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>
