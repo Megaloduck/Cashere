@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Cashere.Sync.Dtos;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;

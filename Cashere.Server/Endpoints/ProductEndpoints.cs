@@ -3,6 +3,12 @@ using Cashere.Sync.Dtos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace Cashere.Server.Endpoints;
 
