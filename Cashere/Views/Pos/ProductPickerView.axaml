@@ -4,17 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="600"
              x:Class="Cashere.Views.Pos.ProductPickerView"
              x:DataType="vm:ProductPickerViewModel">
+  <UserControl.Resources>
+    <converters:BauhausAccentConverter x:Key="BauhausAccent"/>
+  </UserControl.Resources>
+
   <Grid RowDefinitions="Auto,Auto,*">
     <TextBox Grid.Row="0"
-             Watermark="Search by name, SKU or barcode..."
+             Watermark="SEARCH BY NAME, SKU OR BARCODE..."
              Text="{Binding SearchText}"
-             Margin="0,0,0,8"/>
+             Margin="0,0,0,10"/>
 
-    <WrapPanel Grid.Row="1" Margin="0,0,0,8">
-      <Button Content="All" Margin="0,0,6,6" Padding="10,4" Click="OnAllCategoriesClick"/>
+    <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+      <Button Content="ALL" Classes="chip" Margin="0,0,8,8" Click="OnAllCategoriesClick"/>
       <ItemsControl ItemsSource="{Binding Categories}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -23,7 +28,9 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Category">
-            <Button Content="{Binding Name}" Margin="0,0,6,6" Padding="10,4" Click="OnCategoryClick"/>
+            <Button Content="{Binding Name}" Classes="chip"
+                    BorderBrush="{Binding Id, Converter={StaticResource BauhausAccent}}"
+                    Margin="0,0,8,8" Click="OnCategoryClick"/>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
@@ -38,12 +45,15 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Product">
-            <Button Width="150" Height="110" Margin="0,0,10,10" Padding="10" Click="OnProductClick">
-              <StackPanel>
-                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap"/>
-                <TextBlock Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" Margin="0,4,0,0"/>
-                <TextBlock Text="{Binding StockQuantity, StringFormat='Stock: {0}'}" Foreground="Gray" FontSize="11"/>
-              </StackPanel>
+            <Button Width="160" Height="130" Margin="0,0,12,12" Padding="0" Classes="product-tile" Click="OnProductClick">
+              <Grid RowDefinitions="6,*">
+                <Border Grid.Row="0" Background="{Binding CategoryId, Converter={StaticResource BauhausAccent}}"/>
+                <StackPanel Grid.Row="1" Margin="12,10" Spacing="4">
+                  <TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" FontWeight="Black"/>
+                  <TextBlock Text="{Binding StockQuantity, StringFormat='STOCK: {0}'}" Classes="eyebrow"/>
+                </StackPanel>
+              </Grid>
             </Button>
           </DataTemplate>
         </ItemsControl.ItemTemplate>

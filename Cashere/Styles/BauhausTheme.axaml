@@ -1,0 +1,152 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    Bauhaus theme: primary triad (red/yellow/blue) + ink/paper neutrals,
+    flat color blocking, square corners, thick borders instead of shadows.
+    Loaded in App.axaml after FluentTheme so these setters win.
+  -->
+  <Styles.Resources>
+    <Color x:Key="BauhausInk">#141414</Color>
+    <Color x:Key="BauhausPaper">#F5F1E6</Color>
+    <Color x:Key="BauhausRed">#D7263D</Color>
+    <Color x:Key="BauhausBlue">#1D4E89</Color>
+    <Color x:Key="BauhausYellow">#F2B705</Color>
+    <Color x:Key="BauhausGray">#8A8A8A</Color>
+    <Color x:Key="BauhausGrayLight">#E2DED2</Color>
+
+    <SolidColorBrush x:Key="InkBrush" Color="{StaticResource BauhausInk}"/>
+    <SolidColorBrush x:Key="PaperBrush" Color="{StaticResource BauhausPaper}"/>
+    <SolidColorBrush x:Key="RedBrush" Color="{StaticResource BauhausRed}"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="{StaticResource BauhausBlue}"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="{StaticResource BauhausYellow}"/>
+    <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource BauhausGray}"/>
+    <SolidColorBrush x:Key="GrayLightBrush" Color="{StaticResource BauhausGrayLight}"/>
+  </Styles.Resources>
+
+  <!-- Surfaces -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="FontFamily" Value="Inter"/>
+  </Style>
+  <Style Selector="UserControl">
+    <Setter Property="FontFamily" Value="Inter"/>
+  </Style>
+
+  <!-- Typography -->
+  <Style Selector="TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+  </Style>
+  <Style Selector="TextBlock.headline">
+    <Setter Property="FontWeight" Value="Black"/>
+    <Setter Property="FontSize" Value="20"/>
+    <Setter Property="LetterSpacing" Value="1"/>
+  </Style>
+  <Style Selector="TextBlock.eyebrow">
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="FontSize" Value="11"/>
+    <Setter Property="LetterSpacing" Value="2"/>
+    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
+  </Style>
+
+  <!-- Buttons: flat, square, thick ink border, invert on hover -->
+  <Style Selector="Button">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="Padding" Value="12,8"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+  </Style>
+  <Style Selector="Button:pointerover">
+    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+  </Style>
+  <Style Selector="Button:disabled">
+    <Setter Property="Opacity" Value="0.4"/>
+  </Style>
+
+  <Style Selector="Button.accent-blue">
+    <Setter Property="Background" Value="{StaticResource BlueBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+  </Style>
+  <Style Selector="Button.accent-blue:pointerover">
+    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+  </Style>
+
+  <Style Selector="Button.accent-red">
+    <Setter Property="Background" Value="{StaticResource RedBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+  </Style>
+  <Style Selector="Button.accent-red:pointerover">
+    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+  </Style>
+
+  <Style Selector="Button.accent-yellow">
+    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+  </Style>
+  <Style Selector="Button.accent-yellow:pointerover">
+    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+  </Style>
+
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
+  </Style>
+  <Style Selector="Button.ghost:pointerover">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="Foreground" Value="{StaticResource RedBrush}"/>
+  </Style>
+
+  <Style Selector="Button.chip">
+    <Setter Property="CornerRadius" Value="999"/>
+    <Setter Property="Padding" Value="14,6"/>
+    <Setter Property="BorderThickness" Value="2"/>
+  </Style>
+
+  <Style Selector="Button.product-tile">
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  </Style>
+
+  <!-- Inputs -->
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+  </Style>
+
+  <!-- Cards & rules -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
+    <Setter Property="CornerRadius" Value="0"/>
+  </Style>
+
+  <Style Selector="Border.rule-thick">
+    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Height" Value="3"/>
+  </Style>
+
+</Styles>

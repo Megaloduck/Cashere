@@ -3,43 +3,46 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
-             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="440"
+             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="460"
              x:Class="Cashere.Views.Pos.CheckoutView"
              x:DataType="vm:CheckoutViewModel">
-  <StackPanel Spacing="12">
-    <TextBlock Text="Checkout" FontSize="18" FontWeight="Bold"/>
+  <StackPanel Spacing="14">
+    <TextBlock Text="CHECKOUT" Classes="headline" FontSize="20"/>
+    <Border Classes="rule-thick"/>
 
-    <Grid ColumnDefinitions="*,Auto">
-      <TextBlock Grid.Column="0" Text="Total due" FontWeight="Bold"/>
-      <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
-    </Grid>
+    <Border Background="{StaticResource BlueBrush}" Padding="12,10">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="TOTAL DUE" FontWeight="Bold" Foreground="White"/>
+        <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="White"/>
+      </Grid>
+    </Border>
 
     <StackPanel Spacing="4">
-      <TextBlock Text="Payment method"/>
+      <TextBlock Text="PAYMENT METHOD" Classes="eyebrow"/>
       <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod}" HorizontalAlignment="Stretch"/>
     </StackPanel>
 
     <StackPanel Spacing="4" IsVisible="{Binding IsCashPayment}">
-      <TextBlock Text="Amount tendered"/>
+      <TextBlock Text="AMOUNT TENDERED" Classes="eyebrow"/>
       <TextBox Text="{Binding AmountTendered}" Watermark="0"/>
       <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-        <TextBlock Grid.Column="0" Text="Change due" FontWeight="Bold"/>
+        <TextBlock Grid.Column="0" Text="CHANGE DUE" FontWeight="Bold"/>
         <TextBlock Grid.Column="1" Text="{Binding ChangeDue, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
       </Grid>
     </StackPanel>
 
     <StackPanel Spacing="4" IsVisible="{Binding IsNonCashPayment}">
-      <TextBlock Text="Reference / transaction number"/>
+      <TextBlock Text="REFERENCE / TRANSACTION NUMBER" Classes="eyebrow"/>
       <TextBox Text="{Binding ReferenceNumber}"/>
     </StackPanel>
 
-    <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" TextWrapping="Wrap"/>
+    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
 
     <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
-      <Button Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"
+      <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelCommand}"
               Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
-      <Button Grid.Column="1" Content="Complete Sale" Command="{Binding CompleteCommand}" IsEnabled="{Binding CanComplete}"
-              Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+      <Button Grid.Column="1" Content="COMPLETE SALE" Classes="accent-blue" Command="{Binding CompleteCommand}" IsEnabled="{Binding CanComplete}"
+              Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
     </Grid>
   </StackPanel>
 </UserControl>

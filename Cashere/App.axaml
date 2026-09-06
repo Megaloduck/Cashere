@@ -11,5 +11,7 @@
 
     <Application.Styles>
         <FluentTheme />
+        <!-- Loaded after FluentTheme so the Bauhaus setters take precedence. -->
+        <StyleInclude Source="avares://Cashere/Styles/BauhausTheme.axaml"/>
     </Application.Styles>
 </Application>

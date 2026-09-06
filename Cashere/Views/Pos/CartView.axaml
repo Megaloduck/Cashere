@@ -6,24 +6,26 @@
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
              x:Class="Cashere.Views.Pos.CartView"
              x:DataType="vm:CartViewModel">
-  <Border Background="#F3F4F6" CornerRadius="8" Padding="12">
-    <Grid RowDefinitions="Auto,*,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
-        <TextBlock Grid.Column="0" Text="Current Order" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
-        <Button Grid.Column="1" Content="Clear" Command="{Binding ClearCartCommand}" IsEnabled="{Binding HasItems}"/>
+  <Border Classes="card" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+        <TextBlock Grid.Column="0" Text="CURRENT ORDER" Classes="headline" FontSize="16"/>
+        <Button Grid.Column="1" Content="CLEAR" Classes="ghost" Command="{Binding ClearCartCommand}" IsEnabled="{Binding HasItems}"/>
       </Grid>
 
-      <ScrollViewer Grid.Row="1">
+      <Border Grid.Row="1" Classes="rule-thick" Margin="0,0,0,8"/>
+
+      <ScrollViewer Grid.Row="2">
         <ItemsControl ItemsSource="{Binding Lines}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:CartLineViewModel">
-              <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1" Padding="0,8">
+              <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
-                  <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                  <Button Grid.Column="1" Content="-" Width="28" Command="{Binding DecrementCommand}"/>
-                  <TextBlock Grid.Column="2" Text="{Binding Quantity}" Width="28" TextAlignment="Center" VerticalAlignment="Center"/>
-                  <Button Grid.Column="3" Content="+" Width="28" Command="{Binding IncrementCommand}"/>
-                  <Button Grid.Column="4" Content="X" Width="28" Margin="8,0,0,0" Click="OnRemoveLineClick"/>
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold"/>
+                  <Button Grid.Column="1" Content="-" Width="30" Classes="accent-red" Padding="0" Command="{Binding DecrementCommand}"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Quantity}" Width="32" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                  <Button Grid.Column="3" Content="+" Width="30" Classes="accent-yellow" Padding="0" Command="{Binding IncrementCommand}"/>
+                  <Button Grid.Column="4" Content="X" Width="30" Classes="ghost" Margin="10,0,0,0" Click="OnRemoveLineClick"/>
                 </Grid>
               </Border>
             </DataTemplate>
@@ -31,19 +33,23 @@
         </ItemsControl>
       </ScrollViewer>
 
-      <StackPanel Grid.Row="2" Margin="0,12,0,0" Spacing="4">
+      <Border Grid.Row="3" Classes="rule-thick" Margin="0,8,0,10"/>
+
+      <StackPanel Grid.Row="4" Spacing="6">
         <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Grid.Column="0" Text="Subtotal"/>
-          <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}"/>
+          <TextBlock Grid.Column="0" Text="SUBTOTAL" Classes="eyebrow"/>
+          <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
         </Grid>
         <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Grid.Column="0" Text="Tax"/>
-          <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}"/>
+          <TextBlock Grid.Column="0" Text="TAX" Classes="eyebrow"/>
+          <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
         </Grid>
-        <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Grid.Column="0" Text="Total" FontWeight="Bold" FontSize="16"/>
-          <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold" FontSize="16"/>
-        </Grid>
+        <Border Background="{StaticResource YellowBrush}" Padding="10,8" Margin="0,4,0,0">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" FontSize="16" Foreground="{StaticResource InkBrush}"/>
+            <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="{StaticResource InkBrush}"/>
+          </Grid>
+        </Border>
       </StackPanel>
     </Grid>
   </Border>
