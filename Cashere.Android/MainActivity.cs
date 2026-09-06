@@ -2,6 +2,8 @@
 using Android.Content.PM;
 using Avalonia;
 using Avalonia.Android;
+using Cashere.Android.Services;
+using Cashere.Services;
 
 namespace Cashere.Android;
 
@@ -15,6 +17,10 @@ public class MainActivity : AvaloniaMainActivity<App>
 {
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
+        // Wired here (mirrors Cashere.Desktop/Program.cs) so it's set before
+        // App.OnFrameworkInitializationCompleted builds the pairing screen.
+        AppServices.SyncClient = new SignalRPosSyncClientService();
+
         return base.CustomizeAppBuilder(builder)
             .WithInterFont();
     }
