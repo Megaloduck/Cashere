@@ -1,6 +1,8 @@
-﻿using Android.App;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Android.App;
 using Android.Content.PM;
-using Android.Hardware;
 using AndroidX.Camera.Core;
 using AndroidX.Camera.Lifecycle;
 using AndroidX.Core.App;
@@ -11,20 +13,21 @@ using Avalonia.Threading;
 using Cashere.Android.Controls;
 using Cashere.Services;
 using Java.Util.Concurrent;
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;`
 using ZXing;
+using CameraPreview = AndroidX.Camera.Core.Preview;
 
 namespace Cashere.Android.Services;
 
-public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysis.IAnalyzer
+public class CameraXBarcodeScannerService : IBarcodeScannerService
 {
     private const int CameraPermissionRequestCode = 4242;
 
     private readonly Activity _activity;
-    private readonly BarcodeReader _reader = new()
+
+    // BarcodeReaderGeneric (not BarcodeReader<T>) because we hand it a
+    // LuminanceSource we built ourselves - no platform Bitmap conversion
+    // needed, so the generic bitmap-adapter reader doesn't apply here.
+    private readonly BarcodeReaderGeneric _reader = new()
     {
         AutoRotate = true,
         Options = new ZXing.Common.DecodingOptions
@@ -58,7 +61,7 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysi
 
     public Task<CameraPermissionStatus> RequestCameraPermissionAsync()
     {
-        var granted = ContextCompat.CheckSelfPermission(_activity, Android.Manifest.Permission.Camera)
+        var granted = ContextCompat.CheckSelfPermission(_activity, global::Android.Manifest.Permission.Camera)
             == Permission.Granted;
 
         if (granted)
@@ -68,7 +71,7 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysi
         }
 
         _permissionTcs = new TaskCompletionSource<CameraPermissionStatus>();
-        ActivityCompat.RequestPermissions(_activity, new[] { Android.Manifest.Permission.Camera }, CameraPermissionRequestCode);
+        ActivityCompat.RequestPermissions(_activity, new[] { global::Android.Manifest.Permission.Camera }, CameraPermissionRequestCode);
         return _permissionTcs.Task;
     }
 
@@ -101,13 +104,15 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysi
         _cameraProvider ??= await GetCameraProviderAsync();
         _analysisExecutor ??= Executors.NewSingleThreadExecutor();
 
-        var preview = new Preview.Builder().Build();
-        preview.SetSurfaceProvider(_previewControl.PreviewView.SurfaceProvider);
+        var preview = new CameraPreview.Builder().Build();
+        preview.SetSurfaceProvider(
+            ContextCompat.GetMainExecutor(_activity),
+            _previewControl.PreviewView.SurfaceProvider);
 
         var analysis = new ImageAnalysis.Builder()
             .SetBackpressureStrategy(ImageAnalysis.StrategyKeepOnlyLatest)
             .Build();
-        analysis.SetAnalyzer(_analysisExecutor, this);
+        analysis.SetAnalyzer(_analysisExecutor, new AnalyzerAdapter(AnalyzeFrame));
 
         _cameraProvider.UnbindAll();
         _cameraProvider.BindToLifecycle(
@@ -120,10 +125,11 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysi
         return Task.CompletedTask;
     }
 
-    // ImageAnalysis.IAnalyzer - runs on the background executor thread set
-    // up in StartAsync, one frame at a time (StrategyKeepOnlyLatest drops
-    // frames while we're still busy decoding the previous one).
-    public void Analyze(IImageProxy image)
+    // Runs on the background executor thread set up in StartAsync, one frame
+    // at a time (StrategyKeepOnlyLatest drops frames while we're still busy
+    // decoding the previous one). Plain private method, not an interface
+    // implementation - see AnalyzerAdapter below for why.
+    private void AnalyzeFrame(IImageProxy image)
     {
         try
         {
@@ -176,5 +182,23 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService, ImageAnalysi
             new JavaRunnable(() => tcs.TrySetResult((ProcessCameraProvider)future.Get()!)),
             ContextCompat.GetMainExecutor(_activity));
         return tcs.Task;
+    }
+
+    // ImageAnalysis.IAnalyzer is a Java-bound interface, which means anything
+    // implementing it needs the full Java-interop contract (Dispose included)
+    // that only a Java.Lang.Object subclass gets for free. Rather than make
+    // the whole service extend Java.Lang.Object just for this one interface,
+    // this tiny adapter carries the Java-interop baggage instead and forwards
+    // to a plain C# delegate - same idea as JavaRunnable.
+    private sealed class AnalyzerAdapter : Java.Lang.Object, ImageAnalysis.IAnalyzer
+    {
+        private readonly Action<IImageProxy> _analyze;
+
+        public AnalyzerAdapter(Action<IImageProxy> analyze)
+        {
+            _analyze = analyze;
+        }
+
+        public void Analyze(IImageProxy image) => _analyze(image);
     }
 }

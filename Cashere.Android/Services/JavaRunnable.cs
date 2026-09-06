@@ -10,7 +10,7 @@ namespace Cashere.Android.Services;
 // Small adapter so a C# Action can be passed anywhere a Java Runnable is
 // expected (e.g. ListenableFuture.AddListener) - standard idiom for .NET
 // for Android interop with Java async APIs.
-internal class JavaRunnable : Object, IRunnable
+internal class JavaRunnable : Java.Lang.Object, Java.Lang.IRunnable
 {
     private readonly Action _action;
 
