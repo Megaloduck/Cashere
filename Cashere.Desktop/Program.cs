@@ -12,9 +12,6 @@ sealed class Program
 {
     private static readonly CashereServerHost ServerHost = new();
 
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args)
     {
@@ -26,6 +23,9 @@ sealed class Program
         AppServices.ProductCatalog = new ProductCatalogService(dbContextFactory);
         AppServices.SaleService = new SaleService(dbContextFactory);
         AppServices.ShopContext = new ShopContextService(dbContextFactory);
+        AppServices.ProductAdmin = new ProductAdminService(dbContextFactory);
+        AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
+        AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
 
         ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
 
@@ -48,7 +48,6 @@ sealed class Program
         SeedData.EnsureSeedDataAsync(db).GetAwaiter().GetResult();
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()

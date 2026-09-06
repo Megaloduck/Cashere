@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:models="clr-namespace:Cashere.Models"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.ProductAdminView"
+             x:DataType="vm:ProductAdminViewModel">
+  <Grid RowDefinitions="Auto,Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, SKU OR BARCODE..." Text="{Binding SearchText}" Margin="0,0,10,0"/>
+      <Button Grid.Column="1" Content="+ NEW PRODUCT" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1*,1*,1*,170" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="SKU" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="PRICE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="STOCK" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="STATUS" Classes="eyebrow"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl ItemsSource="{Binding FilteredProducts}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Product">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="2*,1*,1*,1*,1*,170">
+                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock Grid.Column="1" Text="{Binding Sku}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                  <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+                  <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6">
+                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
+                  <Button Content="DEACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}"/>
+                  <Button Content="REACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+      <Border Classes="card" Width="460" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ScrollViewer MaxHeight="600">
+          <StackPanel Spacing="10">
+            <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
+            <Border Classes="rule-thick"/>
+
+            <TextBlock Text="SKU" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormSku}"/>
+
+            <TextBlock Text="BARCODE (OPTIONAL)" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormBarcode}"/>
+
+            <TextBlock Text="NAME" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormName}"/>
+
+            <TextBlock Text="CATEGORY" Classes="eyebrow"/>
+            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FormCategory}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="models:Category">
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBox Grid.Column="0" Text="{Binding NewCategoryName}" Watermark="New category name"/>
+              <Button Grid.Column="1" Content="ADD" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding AddCategoryCommand}"/>
+            </Grid>
+
+            <TextBlock Text="UNIT" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormUnit}"/>
+
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                <TextBlock Text="COST PRICE" Classes="eyebrow"/>
+                <TextBox Text="{Binding FormCostPrice}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                <TextBlock Text="SELLING PRICE" Classes="eyebrow"/>
+                <TextBox Text="{Binding FormSellingPrice}"/>
+              </StackPanel>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                <TextBlock Text="STOCK QTY" Classes="eyebrow"/>
+                <TextBox Text="{Binding FormStockQuantity}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+                <TextBlock Text="LOW STOCK ALERT" Classes="eyebrow"/>
+                <TextBox Text="{Binding FormLowStockThreshold}"/>
+              </StackPanel>
+            </Grid>
+
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+            <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+              <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+              <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

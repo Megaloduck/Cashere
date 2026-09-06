@@ -9,12 +9,11 @@
         Title="Cashere"
         WindowState="Maximized">
   <!--
-    Content is bound with an empty path so it's just whatever DataContext
-    App.axaml.cs assigns (PosViewModel normally, MainViewModel as a fallback).
-    The globally-registered ViewLocator (see App.axaml) then resolves the
-    matching View and sets it as that View's DataContext automatically -
-    this is what lets the same Window host different screens without
-    MainWindow needing to know about them.
+    Content is bound to CurrentView on ShellViewModel (previously bound to an
+    empty path, back when the window's own DataContext WAS the current
+    screen). The globally-registered ViewLocator (see App.axaml) resolves the
+    matching View and sets it as that View's DataContext automatically - this
+    is what lets the same Window swap between POS and Admin screens.
   -->
-  <ContentControl Content="{Binding}"/>
+  <ContentControl Content="{Binding CurrentView}"/>
 </Window>

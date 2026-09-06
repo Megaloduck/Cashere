@@ -16,5 +16,8 @@ namespace Cashere.Services
         public static IShopContextService? ShopContext { get; set; }
         public static IPosSyncClientService? SyncClient { get; set; }
         public static IBarcodeScannerService? BarcodeScanner { get; set; }
+        public static IProductAdminService? ProductAdmin { get; set; }
+        public static ICategoryAdminService? CategoryAdmin { get; set; }
+        public static ISupplierAdminService? SupplierAdmin { get; set; }
     }
 }

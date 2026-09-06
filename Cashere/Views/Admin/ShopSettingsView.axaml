@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.ShopSettingsView"
+             x:DataType="vm:ShopSettingsViewModel">
+  <Border Classes="card" Padding="24" MaxWidth="480" HorizontalAlignment="Left">
+    <StackPanel Spacing="10">
+      <TextBlock Text="SHOP SETTINGS" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <TextBlock Text="SHOP NAME" Classes="eyebrow"/>
+      <TextBox Text="{Binding ShopName}"/>
+
+      <TextBlock Text="ADDRESS" Classes="eyebrow"/>
+      <TextBox Text="{Binding Address}"/>
+
+      <TextBlock Text="PHONE" Classes="eyebrow"/>
+      <TextBox Text="{Binding Phone}"/>
+
+      <TextBlock Text="CURRENCY CODE" Classes="eyebrow"/>
+      <TextBox Text="{Binding Currency}"/>
+
+      <TextBlock Text="TAX RATE (%)" Classes="eyebrow"/>
+      <TextBox Text="{Binding TaxRatePercent}"/>
+
+      <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
+      <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
+
+      <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold"/>
+
+      <Button Content="SAVE SETTINGS" Classes="accent-blue" Command="{Binding SaveCommand}"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14" Margin="0,8,0,0"/>
+    </StackPanel>
+  </Border>
+</UserControl>

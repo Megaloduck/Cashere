@@ -4,6 +4,7 @@ using Cashere.Services;
 using Cashere.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 
 namespace Cashere.ViewModels.Pos;
 
@@ -17,6 +18,11 @@ public partial class PosViewModel : ViewModelBase
 
     public int CurrentCashierId { get; }
     public string CurrentCashierName { get; }
+
+    // Raised when the cashier taps ADMIN in the header - ShellViewModel
+    // subscribes to swap the current screen without PosViewModel needing to
+    // know anything about navigation itself.
+    public event Action? AdminRequested;
 
     [ObservableProperty]
     private CheckoutViewModel? _checkout;
@@ -65,6 +71,9 @@ public partial class PosViewModel : ViewModelBase
         Checkout.Cancelled += OnCheckoutCancelled;
         IsCheckoutOpen = true;
     }
+
+    [RelayCommand]
+    private void OpenAdmin() => AdminRequested?.Invoke();
 
     private async void OnSaleCompleted(CompletedSaleResult result)
     {

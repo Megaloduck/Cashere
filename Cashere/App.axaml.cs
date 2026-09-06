@@ -10,6 +10,7 @@ using Cashere.Services;
 using Cashere.ViewModels.Pos;
 using Cashere.ViewModels.Mobile;
 using Cashere.Views.Mobile;
+using Cashere.ViewModels.Admin;
 
 namespace Cashere;
 
@@ -28,7 +29,10 @@ public partial class App : Application
 
             if (AppServices.ProductCatalog is not null &&
                 AppServices.SaleService is not null &&
-                AppServices.ShopContext is not null)
+                AppServices.ShopContext is not null &&
+                AppServices.ProductAdmin is not null &&
+                AppServices.CategoryAdmin is not null &&
+                AppServices.SupplierAdmin is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
@@ -40,9 +44,17 @@ public partial class App : Application
                     cashier?.Id ?? 0,
                     cashier?.DisplayName ?? "Unknown");
 
+                var adminViewModel = new AdminViewModel(
+                    AppServices.ProductAdmin,
+                    AppServices.CategoryAdmin,
+                    AppServices.SupplierAdmin,
+                    AppServices.ShopContext);
+
+                var shell = new ShellViewModel(posViewModel, adminViewModel);
+
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = posViewModel
+                    DataContext = shell
                 };
 
                 _ = posViewModel.InitializeAsync();
@@ -59,7 +71,7 @@ public partial class App : Application
         {
             if (AppServices.SyncClient is not null)
             {
-                var pairingViewModel = new PairingViewModel(AppServices.SyncClient, AppServices.BarcodeScanner);               
+                var pairingViewModel = new PairingViewModel(AppServices.SyncClient, AppServices.BarcodeScanner);
 
                 singleViewPlatform.MainView = new PairingView
                 {
@@ -70,8 +82,6 @@ public partial class App : Application
             }
             else
             {
-                // Fallback for design-time / any path where AppServices wasn't
-                // wired up (e.g. running the single-view target directly).
                 singleViewPlatform.MainView = new MainView
                 {
                     DataContext = new MainViewModel()

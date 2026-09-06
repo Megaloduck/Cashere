@@ -38,4 +38,40 @@ public class ShopContextService : IShopContextService
         var settings = await db.ShopSettings.AsNoTracking().FirstOrDefaultAsync();
         return settings?.ShopName ?? "Cashere";
     }
+
+    public async Task<ShopSettings?> GetSettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        return await db.ShopSettings.AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task UpdateSettingsAsync(ShopSettings settings)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+
+        var existing = await db.ShopSettings.FirstOrDefaultAsync();
+        if (existing is null)
+        {
+            db.ShopSettings.Add(new ShopSettings
+            {
+                ShopName = settings.ShopName,
+                Address = settings.Address,
+                Phone = settings.Phone,
+                Currency = settings.Currency,
+                TaxRatePercent = settings.TaxRatePercent,
+                ReceiptFooterText = settings.ReceiptFooterText
+            });
+        }
+        else
+        {
+            existing.ShopName = settings.ShopName;
+            existing.Address = settings.Address;
+            existing.Phone = settings.Phone;
+            existing.Currency = settings.Currency;
+            existing.TaxRatePercent = settings.TaxRatePercent;
+            existing.ReceiptFooterText = settings.ReceiptFooterText;
+        }
+
+        await db.SaveChangesAsync();
+    }
 }
