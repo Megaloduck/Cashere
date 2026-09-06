@@ -50,12 +50,24 @@
                   Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}"/>
         </StackPanel>
 
-        <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
+               <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
           <Button Content="DISCONNECT" Classes="ghost" Command="{Binding DisconnectCommand}"/>
 
           <Border Classes="rule-thick"/>
 
-          <TextBlock Text="MANUAL BARCODE (TEMPORARY, UNTIL CAMERA SCANNING LANDS)" Classes="eyebrow" TextWrapping="Wrap"/>
+          <StackPanel Spacing="8" IsVisible="{Binding !ShowCameraPreview}">
+            <Button Content="ENABLE CAMERA SCANNING" Classes="accent-yellow" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Command="{Binding EnableCameraCommand}"/>
+            <TextBlock Text="Camera permission was denied - use manual entry below, or grant camera access in system settings and reconnect."
+                       IsVisible="{Binding CameraPermissionDenied}" Foreground="{StaticResource RedBrush}"
+                       TextWrapping="Wrap" FontWeight="Bold"/>
+          </StackPanel>
+
+          <Border Classes="card" IsVisible="{Binding ShowCameraPreview}" Height="240" Padding="0" ClipToBounds="True">
+            <ContentControl x:Name="CameraPreviewHost"/>
+          </Border>
+
+          <TextBlock Text="MANUAL BARCODE (ALWAYS AVAILABLE AS A FALLBACK)" Classes="eyebrow" TextWrapping="Wrap"/>
           <Grid ColumnDefinitions="*,Auto">
             <TextBox Grid.Column="0" Text="{Binding ManualBarcode}" Watermark="Scan or type a barcode"/>
             <Button Grid.Column="1" Content="ADD" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding SendManualScanCommand}"/>
@@ -65,6 +77,7 @@
           <Border Classes="rule-thick"/>
 
           <TextBlock Text="LIVE CART" Classes="eyebrow"/>
+          <!-- ...unchanged cart ItemsControl and subtotal block below... -->
           <ItemsControl ItemsSource="{Binding CartLines}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="services:SyncCartLine">

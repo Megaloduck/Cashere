@@ -1,5 +1,4 @@
 <Project>
-	<!-- https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management -->
 	<PropertyGroup>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
@@ -24,5 +23,14 @@
 		<!-- LAN sync (mobile <-> desktop). Server-side SignalR ships inside
              Microsoft.AspNetCore.App, so only the client package needs a version here -->
 		<PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
+
+		<!-- Barcode scanning (Android only). ZXing.Net is pure managed code -
+             CameraX supplies the frames, ZXing decodes them, no extra native
+             ML SDK required. -->
+		<PackageVersion Include="ZXing.Net" Version="0.16.9" />
+		<PackageVersion Include="Xamarin.AndroidX.Camera.Core" Version="1.4.2.3" />
+		<PackageVersion Include="Xamarin.AndroidX.Camera.Camera2" Version="1.4.2.3" />
+		<PackageVersion Include="Xamarin.AndroidX.Camera.Lifecycle" Version="1.4.2.3" />
+		<PackageVersion Include="Xamarin.AndroidX.Camera.View" Version="1.4.2.3" />
 	</ItemGroup>
 </Project>

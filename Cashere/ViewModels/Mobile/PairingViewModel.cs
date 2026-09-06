@@ -14,8 +14,18 @@ namespace Cashere.ViewModels.Mobile;
 public partial class PairingViewModel : ViewModelBase
 {
     private readonly IPosSyncClientService _syncClient;
+    private readonly IBarcodeScannerService? _scanner;
+
+    // Exposed so the View's code-behind can create/host the native preview
+    // control - Views are allowed to know about platform Controls, ViewModels
+    // aren't, so the control itself is never bound directly.
+    public IBarcodeScannerService? Scanner => _scanner;
 
     public ObservableCollection<SyncCartLine> CartLines { get; } = new();
+
+    // Raised whenever ShowCameraPreview flips, so the View knows to
+    // attach/detach the native preview control.
+    public event Action<bool>? CameraReadyChanged;
 
     [ObservableProperty]
     private string _hostInput = string.Empty;
@@ -44,18 +54,28 @@ public partial class PairingViewModel : ViewModelBase
     [ObservableProperty]
     private decimal _cartSubtotal;
 
+    [ObservableProperty]
+    private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
+
     public bool IsConnected => State == SyncConnectionState.Connected;
     public bool CanConnect => !IsBusy && State != SyncConnectionState.Connected && State != SyncConnectionState.Connecting;
+    public bool ShowCameraPreview => IsConnected && CameraPermission == CameraPermissionStatus.Granted;
+    public bool CameraPermissionDenied => CameraPermission == CameraPermissionStatus.Denied;
 
-    public PairingViewModel(IPosSyncClientService syncClient)
+    public PairingViewModel(IPosSyncClientService syncClient, IBarcodeScannerService? scanner = null)
     {
         _syncClient = syncClient;
+        _scanner = scanner;
         _syncClient.StateChanged += HandleSyncStateChanged;
         _syncClient.CartUpdated += HandleCartUpdated;
+
+        if (_scanner is not null)
+        {
+            _scanner.BarcodeScanned += HandleBarcodeScanned;
+            CameraPermission = _scanner.PermissionStatus;
+        }
     }
 
-    // Pre-fills the last shop this device paired with, so the cashier isn't
-    // retyping an IP address every shift.
     public async Task InitializeAsync()
     {
         var last = await _syncClient.LoadLastEndpointAsync();
@@ -78,13 +98,26 @@ public partial class PairingViewModel : ViewModelBase
         CartSubtotal = cart.Subtotal;
     }
 
+    // Camera path feeds into the exact same scan handling as manual entry -
+    // the till has no way to tell the two apart, by design.
+    private void HandleBarcodeScanned(string barcode) => _ = ProcessScanAsync(barcode);
+
     partial void OnStateChanged(SyncConnectionState value)
     {
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(CanConnect));
+        OnPropertyChanged(nameof(ShowCameraPreview));
+        CameraReadyChanged?.Invoke(ShowCameraPreview);
     }
 
     partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(CanConnect));
+
+    partial void OnCameraPermissionChanged(CameraPermissionStatus value)
+    {
+        OnPropertyChanged(nameof(ShowCameraPreview));
+        OnPropertyChanged(nameof(CameraPermissionDenied));
+        CameraReadyChanged?.Invoke(ShowCameraPreview);
+    }
 
     [RelayCommand]
     private async Task Connect()
@@ -131,6 +164,11 @@ public partial class PairingViewModel : ViewModelBase
     [RelayCommand]
     private async Task Disconnect()
     {
+        if (_scanner is not null)
+        {
+            await _scanner.StopAsync();
+        }
+
         await _syncClient.DisconnectAsync();
         ShopName = null;
         CartLines.Clear();
@@ -138,9 +176,14 @@ public partial class PairingViewModel : ViewModelBase
         LastScanMessage = string.Empty;
     }
 
-    // Manual entry stands in for the camera scanner until that phase lands -
-    // it exercises the exact same ScanBarcode round trip the camera will use,
-    // which is the whole point of doing the wiring before the camera work.
+    [RelayCommand]
+    private async Task EnableCamera()
+    {
+        if (_scanner is null) return;
+
+        CameraPermission = await _scanner.RequestCameraPermissionAsync();
+    }
+
     [RelayCommand]
     private async Task SendManualScan()
     {
@@ -148,7 +191,13 @@ public partial class PairingViewModel : ViewModelBase
 
         var barcode = ManualBarcode.Trim();
         ManualBarcode = string.Empty;
+        await ProcessScanAsync(barcode);
+    }
 
+    // Shared by both the manual TextBox path and the camera path above - the
+    // ScanBarcode round trip to the till is identical either way.
+    private async Task ProcessScanAsync(string barcode)
+    {
         try
         {
             var outcome = await _syncClient.ScanBarcodeAsync(barcode);

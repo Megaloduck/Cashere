@@ -21,6 +21,11 @@
 		<PackageReference Include="Avalonia.Android" />
 		<PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+		<PackageReference Include="ZXing.Net" />
+		<PackageReference Include="Xamarin.AndroidX.Camera.Core" />
+		<PackageReference Include="Xamarin.AndroidX.Camera.Camera2" />
+		<PackageReference Include="Xamarin.AndroidX.Camera.Lifecycle" />
+		<PackageReference Include="Xamarin.AndroidX.Camera.View" />
 	</ItemGroup>
 
 	<ItemGroup>

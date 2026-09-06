@@ -4,9 +4,7 @@ using Cashere.Data;
 using Cashere.Server;
 using Microsoft.EntityFrameworkCore;
 using Cashere.Data.Services;
-using Cashere.Server;
 using Cashere.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Cashere.Desktop;
 
