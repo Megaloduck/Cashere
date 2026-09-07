@@ -21,5 +21,7 @@ namespace Cashere.Services
         public static ISupplierAdminService? SupplierAdmin { get; set; }
         public static IPurchaseAdminService? PurchaseAdmin { get; set; }
         public static ICashierAdminService? CashierAdmin { get; set; }
+        public static ICustomerAdminService? CustomerAdmin { get; set; }
+        public static ISalesReportService? SalesReport { get; set; }
     }
 }

@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:services="clr-namespace:Cashere.Services"
+             mc:Ignorable="d" d:DesignWidth="1050" d:DesignHeight="640"
+             x:Class="Cashere.Views.Admin.SalesHistoryView"
+             x:DataType="vm:SalesHistoryViewModel">
+  <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <TextBlock Grid.Row="0" Text="SALES HISTORY" Classes="headline" FontSize="18" Margin="0,0,0,10"/>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" Margin="0,0,0,10">
+      <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,10,0">
+        <TextBlock Text="FROM" Classes="eyebrow"/>
+        <DatePicker SelectedDate="{Binding FromDate}"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,10,0">
+        <TextBlock Text="TO" Classes="eyebrow"/>
+        <DatePicker SelectedDate="{Binding ToDate}"/>
+      </StackPanel>
+      <Button Grid.Column="2" Content="TODAY" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetTodayCommand}"/>
+      <Button Grid.Column="3" Content="THIS WEEK" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetThisWeekCommand}"/>
+      <Button Grid.Column="4" Content="THIS MONTH" Classes="chip" VerticalAlignment="Bottom" Command="{Binding SetThisMonthCommand}"/>
+      <Button Grid.Column="5" Content="REFRESH" Classes="accent-blue" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding RefreshCommand}"/>
+    </Grid>
+
+    <Grid Grid.Row="2" ColumnDefinitions="150,1.3*,0.8*,0.8*,60,90,110,70" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="DATE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="SALE #" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="CASHIER" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="CUSTOMER" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="ITEMS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="5" Text="STATUS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="6" Text="TOTAL" Classes="eyebrow"/>
+    </Grid>
+    <Border Grid.Row="2" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <ScrollViewer Grid.Row="3">
+      <ItemsControl ItemsSource="{Binding Sales}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="services:SaleListItem">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="150,1.3*,0.8*,0.8*,60,90,110,70">
+                <TextBlock Grid.Column="0" Text="{Binding SaleDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding SaleNumber}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding CashierName}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{Binding CustomerName}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="{Binding ItemCount}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="{Binding Status}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="6" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Button Grid.Column="7" Content="VIEW" Classes="ghost" Click="OnViewClick"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="4" Background="#CC141414" IsVisible="{Binding IsDetailOpen}">
+      <Border Classes="card" Width="480" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+          <ScrollViewer MaxHeight="560">
+            <StackPanel Spacing="10" DataContext="{Binding SelectedSaleDetail}" x:DataType="services:SaleDetail">
+              <TextBlock Text="{Binding SaleNumber, StringFormat='SALE {0}'}" Classes="headline" FontSize="18"/>
+              <TextBlock Text="{Binding SaleDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Classes="eyebrow"/>
+              <Border Classes="rule-thick"/>
+
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="CASHIER"/>
+                <TextBlock Grid.Column="1" Text="{Binding CashierName}" FontWeight="Bold"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="CUSTOMER"/>
+                <TextBlock Grid.Column="1" Text="{Binding CustomerName}" FontWeight="Bold"/>
+              </Grid>
+
+              <Border Classes="rule-thick"/>
+              <TextBlock Text="ITEMS" Classes="eyebrow"/>
+              <ItemsControl ItemsSource="{Binding Lines}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="services:SaleLineDetail">
+                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4">
+                      <TextBlock Grid.Column="0" Text="{Binding ProductName}" TextWrapping="Wrap"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='x{0}'}" Margin="8,0"/>
+                      <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <Border Classes="rule-thick"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="SUBTOTAL"/>
+                <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="DISCOUNT"/>
+                <TextBlock Grid.Column="1" Text="{Binding DiscountAmount, StringFormat='Rp {0:N0}'}"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="TAX"/>
+                <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}"/>
+              </Grid>
+              <Border Background="{StaticResource YellowBrush}" Padding="10,8">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                  <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                </Grid>
+              </Border>
+
+              <Border Classes="rule-thick"/>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="GROSS PROFIT" FontWeight="Bold" Foreground="{StaticResource BlueBrush}"/>
+                <TextBlock Grid.Column="1" Text="{Binding GrossProfit, StringFormat='Rp {0:N0}'}" FontWeight="Bold" Foreground="{StaticResource BlueBrush}"/>
+              </Grid>
+
+              <Border Classes="rule-thick"/>
+              <TextBlock Text="PAYMENTS" Classes="eyebrow"/>
+              <ItemsControl ItemsSource="{Binding Payments}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="services:SalePaymentDetail">
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                      <TextBlock Grid.Column="0" Text="{Binding Method}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+
+          <Button Content="CLOSE" Classes="ghost" Command="{Binding CloseDetailCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

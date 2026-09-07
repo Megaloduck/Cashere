@@ -29,7 +29,7 @@
       <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
     </Grid>
 
-        <TabControl Grid.Row="2" Margin="16">
+    <TabControl Grid.Row="2" Margin="16">
       <TabItem Header="PRODUCTS">
         <views:ProductAdminView DataContext="{Binding Products}"/>
       </TabItem>
@@ -39,8 +39,17 @@
       <TabItem Header="SUPPLIERS">
         <views:SupplierAdminView DataContext="{Binding Suppliers}"/>
       </TabItem>
+      <TabItem Header="CUSTOMERS">
+        <views:CustomerAdminView DataContext="{Binding Customers}"/>
+      </TabItem>
       <TabItem Header="CASHIERS">
         <views:CashierAdminView DataContext="{Binding Cashiers}"/>
+      </TabItem>
+      <TabItem Header="SALES HISTORY">
+        <views:SalesHistoryView DataContext="{Binding SalesHistory}"/>
+      </TabItem>
+      <TabItem Header="REPORTS">
+        <views:SalesReportView DataContext="{Binding SalesReport}"/>
       </TabItem>
       <TabItem Header="SHOP SETTINGS">
         <views:ShopSettingsView DataContext="{Binding Settings}"/>

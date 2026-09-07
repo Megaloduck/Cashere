@@ -28,13 +28,15 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
 
             if (AppServices.ProductCatalog is not null &&
-                AppServices.SaleService is not null &&
-                AppServices.ShopContext is not null &&
-                AppServices.ProductAdmin is not null &&
-                AppServices.CategoryAdmin is not null &&
-                AppServices.SupplierAdmin is not null &&
-                AppServices.PurchaseAdmin is not null &&
-                AppServices.CashierAdmin is not null)
+     AppServices.SaleService is not null &&
+     AppServices.ShopContext is not null &&
+     AppServices.ProductAdmin is not null &&
+     AppServices.CategoryAdmin is not null &&
+     AppServices.SupplierAdmin is not null &&
+     AppServices.PurchaseAdmin is not null &&
+     AppServices.CashierAdmin is not null &&
+     AppServices.CustomerAdmin is not null &&
+     AppServices.SalesReport is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
@@ -52,6 +54,8 @@ public partial class App : Application
                     AppServices.SupplierAdmin,
                     AppServices.PurchaseAdmin,
                     AppServices.CashierAdmin,
+                    AppServices.CustomerAdmin,
+                    AppServices.SalesReport,
                     AppServices.ProductCatalog,
                     AppServices.ShopContext,
                     cashier?.Id ?? 0);

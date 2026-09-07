@@ -64,6 +64,15 @@
     <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
   </Style>
 
+
+      <!-- Date Picker -->
+  <Style Selector="DatePicker">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+  </Style>
+
   <!-- Buttons: flat, square, thick ink border, invert on hover -->
   <Style Selector="Button">
     <Setter Property="Background" Value="{StaticResource PaperBrush}"/>

@@ -28,6 +28,8 @@ sealed class Program
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
         AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory);
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
+        AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
+        AppServices.SalesReport = new SalesReportService(dbContextFactory);
 
         ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
 

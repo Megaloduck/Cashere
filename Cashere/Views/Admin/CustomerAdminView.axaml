@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:models="clr-namespace:Cashere.Models"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.CustomerAdminView"
+             x:DataType="vm:CustomerAdminViewModel">
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,10,0"/>
+      <Button Grid.Column="1" Content="+ NEW CUSTOMER" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1">
+      <ItemsControl ItemsSource="{Binding FilteredCustomers}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Customer">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="2*,1*,2*,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Email}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
+                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
+                  <Button Content="DELETE" Classes="ghost" Click="OnDeleteClick"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+      <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
+          <Border Classes="rule-thick"/>
+
+          <TextBlock Text="NAME" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormName}"/>
+
+          <TextBlock Text="PHONE" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormPhone}"/>
+
+          <TextBlock Text="EMAIL" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormEmail}"/>
+
+          <TextBlock Text="ADDRESS" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormAddress}"/>
+
+          <TextBlock Text="NOTES" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="60"/>
+
+          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+          <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+            <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>
