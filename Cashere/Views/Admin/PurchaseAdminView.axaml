@@ -4,13 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.PurchaseAdminView"
              x:DataType="vm:PurchaseAdminViewModel">
   <Grid RowDefinitions="Auto,Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="PURCHASES" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
-      <Button Grid.Column="1" Content="+ RECORD PURCHASE" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          <TextBlock Text="RECORD PURCHASE"/>
+        </StackPanel>
+      </Button>
     </Grid>
 
     <Grid Grid.Row="1" ColumnDefinitions="Auto,2*,1*,Auto,Auto" Margin="0,0,0,4">
@@ -43,7 +49,7 @@
     <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="520" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
         <ScrollViewer MaxHeight="640">
-          <StackPanel Spacing="10">
+          <StackPanel Spacing="12">
             <TextBlock Text="RECORD PURCHASE" Classes="headline" FontSize="18"/>
             <Border Classes="rule-thick"/>
 
@@ -82,7 +88,12 @@
                 <TextBlock Text="UNIT COST" Classes="eyebrow"/>
                 <TextBox Text="{Binding LineUnitCost}"/>
               </StackPanel>
-              <Button Grid.Column="2" Content="ADD" Classes="accent-yellow" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}"/>
+              <Button Grid.Column="2" Classes="accent-yellow" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+                  <TextBlock Text="ADD"/>
+                </StackPanel>
+              </Button>
             </Grid>
 
             <ItemsControl ItemsSource="{Binding FormLines}">
@@ -93,14 +104,16 @@
                       <TextBlock Grid.Column="0" Text="{Binding ProductName}" FontWeight="Bold" VerticalAlignment="Center"/>
                       <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='x{0}'}" Margin="8,0" VerticalAlignment="Center"/>
                       <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold" VerticalAlignment="Center"/>
-                      <Button Grid.Column="3" Content="X" Classes="ghost" Margin="10,0,0,0" Click="OnRemoveFormLineClick"/>
+                      <Button Grid.Column="3" Classes="ghost" Margin="8,0,0,0" Click="OnRemoveFormLineClick" ToolTip.Tip="Remove">
+                        <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                      </Button>
                     </Grid>
                   </Border>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <Border Background="{StaticResource YellowBrush}" Padding="10,8">
+            <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="10,8">
               <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding FormTotal, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>

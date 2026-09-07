@@ -4,13 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.CustomerAdminView"
              x:DataType="vm:CustomerAdminViewModel">
   <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
-      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,10,0"/>
-      <Button Grid.Column="1" Content="+ NEW CUSTOMER" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,12,0">
+        <TextBox.InnerLeftContent>
+          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+        </TextBox.InnerLeftContent>
+      </TextBox>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          <TextBlock Text="NEW CUSTOMER"/>
+        </StackPanel>
+      </Button>
     </Grid>
 
     <ScrollViewer Grid.Row="1">
@@ -22,9 +32,13 @@
                 <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="{Binding Email}" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
-                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
-                  <Button Content="DELETE" Classes="ghost" Click="OnDeleteClick"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnDeleteClick" ToolTip.Tip="Delete">
+                    <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                  </Button>
                 </StackPanel>
               </Grid>
             </Border>
@@ -35,7 +49,7 @@
 
     <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Spacing="10">
+        <StackPanel Spacing="12">
           <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
           <Border Classes="rule-thick"/>
 

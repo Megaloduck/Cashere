@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="680"
              x:Class="Cashere.Views.Admin.SalesReportView"
              x:DataType="vm:SalesReportViewModel">
@@ -12,56 +13,94 @@
       <TextBlock Text="REPORTS" Classes="headline" FontSize="18"/>
 
       <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*">
-        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,10,0">
+        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,12,0">
           <TextBlock Text="FROM" Classes="eyebrow"/>
           <DatePicker SelectedDate="{Binding FromDate}"/>
         </StackPanel>
-        <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,10,0">
+        <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,12,0">
           <TextBlock Text="TO" Classes="eyebrow"/>
           <DatePicker SelectedDate="{Binding ToDate}"/>
         </StackPanel>
-        <Button Grid.Column="2" Content="TODAY" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetTodayCommand}"/>
-        <Button Grid.Column="3" Content="THIS WEEK" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetThisWeekCommand}"/>
-        <Button Grid.Column="4" Content="THIS MONTH" Classes="chip" VerticalAlignment="Bottom" Command="{Binding SetThisMonthCommand}"/>
-        <Button Grid.Column="5" Content="REFRESH" Classes="accent-blue" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding RefreshCommand}"/>
+        <Button Grid.Column="2" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetTodayCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="CalendarToday" Width="14" Height="14"/>
+            <TextBlock Text="TODAY"/>
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="3" Classes="chip" VerticalAlignment="Bottom" Margin="0,0,8,0" Command="{Binding SetThisWeekCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="CalendarRange" Width="14" Height="14"/>
+            <TextBlock Text="THIS WEEK"/>
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="4" Classes="chip" VerticalAlignment="Bottom" Command="{Binding SetThisMonthCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="CalendarMonth" Width="14" Height="14"/>
+            <TextBlock Text="THIS MONTH"/>
+          </StackPanel>
+        </Button>
+        <Button Grid.Column="5" Classes="accent-blue" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding RefreshCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
+            <TextBlock Text="REFRESH"/>
+          </StackPanel>
+        </Button>
       </Grid>
 
       <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
 
       <UniformGrid Columns="3" Rows="2">
-        <Border Classes="card" Padding="14" Margin="0,0,10,10">
+        <Border Classes="card" Padding="14" Margin="0,0,12,12">
           <StackPanel Spacing="4">
-            <TextBlock Text="TRANSACTIONS" Classes="eyebrow"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="Receipt" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
+              <TextBlock Text="TRANSACTIONS" Classes="eyebrow"/>
+            </StackPanel>
             <TextBlock Text="{Binding TransactionCount}" FontWeight="Black" FontSize="22"/>
           </StackPanel>
         </Border>
-        <Border Classes="card" Padding="14" Margin="0,0,10,10">
+        <Border Classes="card" Padding="14" Margin="0,0,12,12">
           <StackPanel Spacing="4">
-            <TextBlock Text="GROSS REVENUE" Classes="eyebrow"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="CashMultiple" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
+              <TextBlock Text="GROSS REVENUE" Classes="eyebrow"/>
+            </StackPanel>
             <TextBlock Text="{Binding GrossRevenue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="22"/>
           </StackPanel>
         </Border>
-        <Border Background="{StaticResource YellowBrush}" Padding="14" Margin="0,0,0,10">
+        <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="14" Margin="0,0,0,12">
           <StackPanel Spacing="4">
-            <TextBlock Text="GROSS PROFIT" Classes="eyebrow" Foreground="{StaticResource InkBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="TrendingUp" Width="14" Height="14" Foreground="{StaticResource InkBrush}"/>
+              <TextBlock Text="GROSS PROFIT" Classes="eyebrow" Foreground="{StaticResource InkBrush}"/>
+            </StackPanel>
             <TextBlock Text="{Binding GrossProfit, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="22" Foreground="{StaticResource InkBrush}"/>
           </StackPanel>
         </Border>
-        <Border Classes="card" Padding="14" Margin="0,0,10,0">
+        <Border Classes="card" Padding="14" Margin="0,0,12,0">
           <StackPanel Spacing="4">
-            <TextBlock Text="COST OF GOODS SOLD" Classes="eyebrow"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="PackageVariantClosed" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
+              <TextBlock Text="COST OF GOODS SOLD" Classes="eyebrow"/>
+            </StackPanel>
             <TextBlock Text="{Binding TotalCost, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="22"/>
           </StackPanel>
         </Border>
-        <Border Classes="card" Padding="14" Margin="0,0,10,0">
+        <Border Classes="card" Padding="14" Margin="0,0,12,0">
           <StackPanel Spacing="4">
-            <TextBlock Text="TOTAL DISCOUNT" Classes="eyebrow"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="TagOutline" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
+              <TextBlock Text="TOTAL DISCOUNT" Classes="eyebrow"/>
+            </StackPanel>
             <TextBlock Text="{Binding TotalDiscount, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="22"/>
           </StackPanel>
         </Border>
         <Border Classes="card" Padding="14">
           <StackPanel Spacing="4">
-            <TextBlock Text="TOTAL TAX" Classes="eyebrow"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="Percent" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
+              <TextBlock Text="TOTAL TAX" Classes="eyebrow"/>
+            </StackPanel>
             <TextBlock Text="{Binding TotalTax, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="22"/>
           </StackPanel>
         </Border>

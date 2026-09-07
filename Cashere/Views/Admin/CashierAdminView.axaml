@@ -4,13 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.CashierAdminView"
              x:DataType="vm:CashierAdminViewModel">
   <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="CASHIERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
-      <Button Grid.Column="1" Content="+ NEW CASHIER" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          <TextBlock Text="NEW CASHIER"/>
+        </StackPanel>
+      </Button>
     </Grid>
 
     <ScrollViewer Grid.Row="1">
@@ -26,10 +32,16 @@
                   <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
                   <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
-                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
-                  <Button Content="DEACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}"/>
-                  <Button Content="REACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}"/>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4">
+                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
+                    <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
+                    <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+                  </Button>
                 </StackPanel>
               </Grid>
             </Border>
@@ -40,7 +52,7 @@
 
     <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Spacing="10">
+        <StackPanel Spacing="12">
           <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
           <Border Classes="rule-thick"/>
 
@@ -54,7 +66,11 @@
           <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding FormRole}" HorizontalAlignment="Stretch"/>
 
           <TextBlock Text="{Binding PasswordFieldLabel}" Classes="eyebrow" TextWrapping="Wrap"/>
-          <TextBox Text="{Binding FormPassword}" PasswordChar="•"/>
+          <TextBox Text="{Binding FormPassword}" PasswordChar="•">
+            <TextBox.InnerLeftContent>
+              <mi:MaterialIcon Kind="LockOutline" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+            </TextBox.InnerLeftContent>
+          </TextBox>
 
           <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
 
@@ -66,4 +82,4 @@
       </Border>
     </Border>
   </Grid>
-</UserControl>
+</UserControl>  
