@@ -3,14 +3,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="460"
              x:Class="Cashere.Views.Pos.CheckoutView"
              x:DataType="vm:CheckoutViewModel">
-  <StackPanel Spacing="14">
-    <TextBlock Text="CHECKOUT" Classes="headline" FontSize="20"/>
+  <StackPanel Spacing="12">
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <mi:MaterialIcon Kind="CartOutline" Width="20" Height="20"/>
+      <TextBlock Text="CHECKOUT" Classes="headline" FontSize="20"/>
+    </StackPanel>
     <Border Classes="rule-thick"/>
 
-    <Border Background="{StaticResource BlueBrush}" Padding="12,10">
+    <Border Background="{StaticResource BlueBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0" Text="TOTAL DUE" FontWeight="Bold" Foreground="White"/>
         <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="White"/>
@@ -36,13 +40,26 @@
       <TextBox Text="{Binding ReferenceNumber}"/>
     </StackPanel>
 
-    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <mi:MaterialIcon Kind="AlertCircleOutline" Width="16" Height="16" Foreground="{StaticResource RedBrush}"/>
+      <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+    </StackPanel>
 
     <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
-      <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelCommand}"
-              Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
-      <Button Grid.Column="1" Content="COMPLETE SALE" Classes="accent-blue" Command="{Binding CompleteCommand}" IsEnabled="{Binding CanComplete}"
-              Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+      <Button Grid.Column="0" Classes="ghost" Command="{Binding CancelCommand}"
+              Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="ArrowLeft" Width="16" Height="16"/>
+          <TextBlock Text="CANCEL"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding CompleteCommand}" IsEnabled="{Binding CanComplete}"
+              Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="CheckCircleOutline" Width="18" Height="18"/>
+          <TextBlock Text="COMPLETE SALE"/>
+        </StackPanel>
+      </Button>
     </Grid>
   </StackPanel>
 </UserControl>

@@ -4,13 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.ProductAdminView"
              x:DataType="vm:ProductAdminViewModel">
   <Grid RowDefinitions="Auto,Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
-      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, SKU OR BARCODE..." Text="{Binding SearchText}" Margin="0,0,10,0"/>
-      <Button Grid.Column="1" Content="+ NEW PRODUCT" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, SKU OR BARCODE..." Text="{Binding SearchText}" Margin="0,0,12,0">
+        <TextBox.InnerLeftContent>
+          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+        </TextBox.InnerLeftContent>
+      </TextBox>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          <TextBlock Text="NEW PRODUCT"/>
+        </StackPanel>
+      </Button>
     </Grid>
 
     <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1*,1*,1*,170" Margin="0,0,0,4">
@@ -36,10 +46,16 @@
                   <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
                   <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6">
-                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
-                  <Button Content="DEACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}"/>
-                  <Button Content="REACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}"/>
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4">
+                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
+                    <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
+                    <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+                  </Button>
                 </StackPanel>
               </Grid>
             </Border>
@@ -74,7 +90,9 @@
             </ComboBox>
             <Grid ColumnDefinitions="*,Auto">
               <TextBox Grid.Column="0" Text="{Binding NewCategoryName}" Watermark="New category name"/>
-              <Button Grid.Column="1" Content="ADD" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding AddCategoryCommand}"/>
+              <Button Grid.Column="1" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding AddCategoryCommand}">
+                <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+              </Button>
             </Grid>
 
             <TextBlock Text="UNIT" Classes="eyebrow"/>

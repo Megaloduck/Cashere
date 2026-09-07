@@ -3,14 +3,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
              x:Class="Cashere.Views.Pos.CartView"
              x:DataType="vm:CartViewModel">
   <Border Classes="card" Padding="16">
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
         <TextBlock Grid.Column="0" Text="CURRENT ORDER" Classes="headline" FontSize="16"/>
-        <Button Grid.Column="1" Content="CLEAR" Classes="ghost" Command="{Binding ClearCartCommand}" IsEnabled="{Binding HasItems}"/>
+        <Button Grid.Column="1" Classes="ghost" Command="{Binding ClearCartCommand}" IsEnabled="{Binding HasItems}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="DeleteSweepOutline" Width="16" Height="16"/>
+            <TextBlock Text="CLEAR"/>
+          </StackPanel>
+        </Button>
       </Grid>
 
       <Border Grid.Row="1" Classes="rule-thick" Margin="0,0,0,8"/>
@@ -22,10 +28,16 @@
               <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
                   <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold"/>
-                  <Button Grid.Column="1" Content="-" Width="30" Classes="accent-red" Padding="0" Command="{Binding DecrementCommand}"/>
+                  <Button Grid.Column="1" Width="34" Classes="accent-red" Padding="0" Command="{Binding DecrementCommand}">
+                    <mi:MaterialIcon Kind="Minus" Width="14" Height="14"/>
+                  </Button>
                   <TextBlock Grid.Column="2" Text="{Binding Quantity}" Width="32" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
-                  <Button Grid.Column="3" Content="+" Width="30" Classes="accent-yellow" Padding="0" Command="{Binding IncrementCommand}"/>
-                  <Button Grid.Column="4" Content="X" Width="30" Classes="ghost" Margin="10,0,0,0" Click="OnRemoveLineClick"/>
+                  <Button Grid.Column="3" Width="34" Classes="accent-yellow" Padding="0" Command="{Binding IncrementCommand}">
+                    <mi:MaterialIcon Kind="Plus" Width="14" Height="14"/>
+                  </Button>
+                  <Button Grid.Column="4" Width="34" Classes="ghost" Margin="8,0,0,0" Click="OnRemoveLineClick">
+                    <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                  </Button>
                 </Grid>
               </Border>
             </DataTemplate>
@@ -33,9 +45,9 @@
         </ItemsControl>
       </ScrollViewer>
 
-      <Border Grid.Row="3" Classes="rule-thick" Margin="0,8,0,10"/>
+      <Border Grid.Row="3" Classes="rule-thick" Margin="0,8,0,12"/>
 
-      <StackPanel Grid.Row="4" Spacing="6">
+      <StackPanel Grid.Row="4" Spacing="8">
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Grid.Column="0" Text="SUBTOTAL" Classes="eyebrow"/>
           <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
@@ -44,7 +56,7 @@
           <TextBlock Grid.Column="0" Text="TAX" Classes="eyebrow"/>
           <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
         </Grid>
-        <Border Background="{StaticResource YellowBrush}" Padding="10,8" Margin="0,4,0,0">
+        <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,8" Margin="0,4,0,0">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" FontSize="16" Foreground="{StaticResource InkBrush}"/>
             <TextBlock Grid.Column="1" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="{StaticResource InkBrush}"/>
@@ -53,4 +65,4 @@
       </StackPanel>
     </Grid>
   </Border>
-</UserControl>
+</UserControl>  

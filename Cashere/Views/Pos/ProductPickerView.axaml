@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
              xmlns:models="clr-namespace:Cashere.Models"
              xmlns:converters="clr-namespace:Cashere.Converters"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="600"
              x:Class="Cashere.Views.Pos.ProductPickerView"
              x:DataType="vm:ProductPickerViewModel">
@@ -16,10 +17,19 @@
     <TextBox Grid.Row="0"
              Watermark="SEARCH BY NAME, SKU OR BARCODE..."
              Text="{Binding SearchText}"
-             Margin="0,0,0,10"/>
+             Margin="0,0,0,12">
+      <TextBox.InnerLeftContent>
+        <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+      </TextBox.InnerLeftContent>
+    </TextBox>
 
-    <WrapPanel Grid.Row="1" Margin="0,0,0,10">
-      <Button Content="ALL" Classes="chip" Margin="0,0,8,8" Click="OnAllCategoriesClick"/>
+    <WrapPanel Grid.Row="1" Margin="0,0,0,12">
+      <Button Classes="chip" Margin="0,0,8,8" Click="OnAllCategoriesClick">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Apps" Width="14" Height="14"/>
+          <TextBlock Text="ALL"/>
+        </StackPanel>
+      </Button>
       <ItemsControl ItemsSource="{Binding Categories}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>

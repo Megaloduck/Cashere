@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Mobile"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="720"
              x:Class="Cashere.Views.Mobile.PairingView"
              x:DataType="vm:PairingViewModel">
@@ -27,9 +28,9 @@
     </Grid>
 
     <ScrollViewer Grid.Row="2">
-      <StackPanel Margin="18" Spacing="16">
+      <StackPanel Margin="16" Spacing="16">
 
-        <Border Classes="card" Padding="14">
+        <Border Classes="card" Padding="16">
           <StackPanel Spacing="6">
             <TextBlock Text="CONNECTION" Classes="eyebrow"/>
             <TextBlock Text="{Binding State}" FontWeight="Black" FontSize="18"/>
@@ -46,18 +47,33 @@
 
           <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
 
-          <Button Content="CONNECT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                  Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}"/>
+          <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                  Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <mi:MaterialIcon Kind="LanConnect" Width="18" Height="18"/>
+              <TextBlock Text="CONNECT"/>
+            </StackPanel>
+          </Button>
         </StackPanel>
 
-               <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
-          <Button Content="DISCONNECT" Classes="ghost" Command="{Binding DisconnectCommand}"/>
+        <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
+          <Button Classes="ghost" Command="{Binding DisconnectCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <mi:MaterialIcon Kind="LanDisconnect" Width="16" Height="16"/>
+              <TextBlock Text="DISCONNECT"/>
+            </StackPanel>
+          </Button>
 
           <Border Classes="rule-thick"/>
 
           <StackPanel Spacing="8" IsVisible="{Binding !ShowCameraPreview}">
-            <Button Content="ENABLE CAMERA SCANNING" Classes="accent-yellow" HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center" Command="{Binding EnableCameraCommand}"/>
+            <Button Classes="accent-yellow" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Command="{Binding EnableCameraCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <mi:MaterialIcon Kind="CameraOutline" Width="18" Height="18"/>
+                <TextBlock Text="ENABLE CAMERA SCANNING"/>
+              </StackPanel>
+            </Button>
             <TextBlock Text="Camera permission was denied - use manual entry below, or grant camera access in system settings and reconnect."
                        IsVisible="{Binding CameraPermissionDenied}" Foreground="{StaticResource RedBrush}"
                        TextWrapping="Wrap" FontWeight="Bold"/>
@@ -69,15 +85,20 @@
 
           <TextBlock Text="MANUAL BARCODE (ALWAYS AVAILABLE AS A FALLBACK)" Classes="eyebrow" TextWrapping="Wrap"/>
           <Grid ColumnDefinitions="*,Auto">
-            <TextBox Grid.Column="0" Text="{Binding ManualBarcode}" Watermark="Scan or type a barcode"/>
-            <Button Grid.Column="1" Content="ADD" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding SendManualScanCommand}"/>
+            <TextBox Grid.Column="0" Text="{Binding ManualBarcode}" Watermark="Scan or type a barcode">
+              <TextBox.InnerLeftContent>
+                <mi:MaterialIcon Kind="BarcodeScan" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+              </TextBox.InnerLeftContent>
+            </TextBox>
+            <Button Grid.Column="1" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding SendManualScanCommand}">
+              <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+            </Button>
           </Grid>
           <TextBlock Text="{Binding LastScanMessage}" FontWeight="Bold" TextWrapping="Wrap"/>
 
           <Border Classes="rule-thick"/>
 
           <TextBlock Text="LIVE CART" Classes="eyebrow"/>
-          <!-- ...unchanged cart ItemsControl and subtotal block below... -->
           <ItemsControl ItemsSource="{Binding CartLines}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="services:SyncCartLine">
@@ -92,7 +113,7 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <Border Background="{StaticResource YellowBrush}" Padding="10,8">
+          <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="10,8">
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Grid.Column="0" Text="SUBTOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
               <TextBlock Grid.Column="1" Text="{Binding CartSubtotal, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
@@ -103,4 +124,4 @@
       </StackPanel>
     </ScrollViewer>
   </Grid>
-</UserControl>
+</UserControl>  
