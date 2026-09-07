@@ -87,6 +87,8 @@
        default light-gray hover. This is the "white on hover" you saw. -->
   <Style Selector="TextBox:pointerover">
     <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
+
     <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
   </Style>
 
@@ -94,6 +96,7 @@
     <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
     <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
   </Style>
 
   <Style Selector="TextBox:disabled">
@@ -109,7 +112,7 @@
   <!-- Icons dropped into TextBox.InnerLeftContent (Avalonia 11) - used by
        the search boxes below, gives the icon a bit of breathing room. -->
   <Style Selector="TextBox /template/ ContentPresenter#PART_InnerLeftContentPresenter">
-    <Setter Property="Margin" Value="8,0,0,0"/>
+    <Setter Property="Margin" Value="10,0,0,0"/>
   </Style>
 
   <Style Selector="TextBox.accent-red">
@@ -283,6 +286,8 @@
   </Style>
   <Style Selector="TabItem:pointerover">
     <Setter Property="Background" Value="{StaticResource GrayLightBrush}"/>
+        
+      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
   </Style>
   <Style Selector="TabItem:selected">
     <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
@@ -316,7 +321,9 @@
     <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-blue:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+<Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
   </Style>
 
   <Style Selector="Button.accent-red">
@@ -325,7 +332,9 @@
     <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-red:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+      <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
   </Style>
 
   <Style Selector="Button.accent-yellow">
@@ -336,6 +345,7 @@
   <Style Selector="Button.accent-yellow:pointerover">
     <Setter Property="Background" Value="{StaticResource InkBrush}"/>
     <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
   </Style>
 
   <Style Selector="Button.ghost">
