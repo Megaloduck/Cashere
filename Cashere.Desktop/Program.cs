@@ -26,6 +26,8 @@ sealed class Program
         AppServices.ProductAdmin = new ProductAdminService(dbContextFactory);
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
+        AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory);
+        AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
 
         ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
 

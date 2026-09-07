@@ -32,7 +32,9 @@ public partial class App : Application
                 AppServices.ShopContext is not null &&
                 AppServices.ProductAdmin is not null &&
                 AppServices.CategoryAdmin is not null &&
-                AppServices.SupplierAdmin is not null)
+                AppServices.SupplierAdmin is not null &&
+                AppServices.PurchaseAdmin is not null &&
+                AppServices.CashierAdmin is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
@@ -48,7 +50,11 @@ public partial class App : Application
                     AppServices.ProductAdmin,
                     AppServices.CategoryAdmin,
                     AppServices.SupplierAdmin,
-                    AppServices.ShopContext);
+                    AppServices.PurchaseAdmin,
+                    AppServices.CashierAdmin,
+                    AppServices.ProductCatalog,
+                    AppServices.ShopContext,
+                    cashier?.Id ?? 0);
 
                 var shell = new ShellViewModel(posViewModel, adminViewModel);
 

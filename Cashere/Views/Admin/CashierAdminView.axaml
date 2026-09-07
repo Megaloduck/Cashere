@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:models="clr-namespace:Cashere.Models"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.CashierAdminView"
+             x:DataType="vm:CashierAdminViewModel">
+  <Grid RowDefinitions="Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+      <TextBlock Grid.Column="0" Text="CASHIERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+      <Button Grid.Column="1" Content="+ NEW CASHIER" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1">
+      <ItemsControl ItemsSource="{Binding Cashiers}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Cashier">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="2*,1*,1*,1*,170">
+                <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Username}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Role}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                  <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+                  <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
+                  <Button Content="EDIT" Classes="ghost" Click="OnEditClick"/>
+                  <Button Content="DEACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}"/>
+                  <Button Content="REACTIVATE" Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+      <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
+          <Border Classes="rule-thick"/>
+
+          <TextBlock Text="USERNAME" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormUsername}"/>
+
+          <TextBlock Text="DISPLAY NAME" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormDisplayName}"/>
+
+          <TextBlock Text="ROLE" Classes="eyebrow"/>
+          <ComboBox ItemsSource="{Binding Roles}" SelectedItem="{Binding FormRole}" HorizontalAlignment="Stretch"/>
+
+          <TextBlock Text="{Binding PasswordFieldLabel}" Classes="eyebrow" TextWrapping="Wrap"/>
+          <TextBox Text="{Binding FormPassword}" PasswordChar="•"/>
+
+          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+          <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+            <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>

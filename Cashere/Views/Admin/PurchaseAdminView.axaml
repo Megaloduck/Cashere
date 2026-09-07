@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:models="clr-namespace:Cashere.Models"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.PurchaseAdminView"
+             x:DataType="vm:PurchaseAdminViewModel">
+  <Grid RowDefinitions="Auto,Auto,*">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+      <TextBlock Grid.Column="0" Text="PURCHASES" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+      <Button Grid.Column="1" Content="+ RECORD PURCHASE" Classes="accent-blue" Command="{Binding AddNewCommand}"/>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,2*,1*,Auto,Auto" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="DATE" Classes="eyebrow" Width="110"/>
+      <TextBlock Grid.Column="1" Text="SUPPLIER" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="REFERENCE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="ITEMS" Classes="eyebrow" Width="60"/>
+      <TextBlock Grid.Column="4" Text="TOTAL" Classes="eyebrow" Width="120"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl ItemsSource="{Binding Purchases}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Purchase">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="Auto,2*,1*,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding PurchaseDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="110" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Supplier.Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding ReferenceNumber}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{Binding Items.Count}" Width="60" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" Width="120" FontWeight="Bold" VerticalAlignment="Center"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+      <Border Classes="card" Width="520" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ScrollViewer MaxHeight="640">
+          <StackPanel Spacing="10">
+            <TextBlock Text="RECORD PURCHASE" Classes="headline" FontSize="18"/>
+            <Border Classes="rule-thick"/>
+
+            <TextBlock Text="SUPPLIER" Classes="eyebrow"/>
+            <ComboBox ItemsSource="{Binding Suppliers}" SelectedItem="{Binding FormSupplier}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="models:Supplier">
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Text="REFERENCE NUMBER (OPTIONAL)" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormReferenceNumber}"/>
+
+            <TextBlock Text="NOTES (OPTIONAL)" Classes="eyebrow"/>
+            <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="50"/>
+
+            <Border Classes="rule-thick" Margin="0,4"/>
+            <TextBlock Text="ADD LINE ITEM" Classes="eyebrow"/>
+
+            <ComboBox ItemsSource="{Binding Products}" SelectedItem="{Binding LineProduct}" HorizontalAlignment="Stretch">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="models:Product">
+                  <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <Grid ColumnDefinitions="*,*,Auto">
+              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+                <TextBlock Text="QUANTITY" Classes="eyebrow"/>
+                <TextBox Text="{Binding LineQuantity}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,6,0">
+                <TextBlock Text="UNIT COST" Classes="eyebrow"/>
+                <TextBox Text="{Binding LineUnitCost}"/>
+              </StackPanel>
+              <Button Grid.Column="2" Content="ADD" Classes="accent-yellow" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}"/>
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding FormLines}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PurchaseLineViewModel">
+                  <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                      <TextBlock Grid.Column="0" Text="{Binding ProductName}" FontWeight="Bold" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='x{0}'}" Margin="8,0" VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold" VerticalAlignment="Center"/>
+                      <Button Grid.Column="3" Content="X" Classes="ghost" Margin="10,0,0,0" Click="OnRemoveFormLineClick"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border Background="{StaticResource YellowBrush}" Padding="10,8">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                <TextBlock Grid.Column="1" Text="{Binding FormTotal, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+              </Grid>
+            </Border>
+
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+            <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+              <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+              <Button Grid.Column="1" Content="SAVE PURCHASE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>
