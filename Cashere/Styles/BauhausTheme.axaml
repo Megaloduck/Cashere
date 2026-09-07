@@ -49,6 +49,107 @@
     <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
   </Style>
 
+        <!-- Text Box -->
+<Style Selector="TextBox">
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="FontWeight" Value="Medium"/>
+</Style>
+
+<!-- Focus state - yellow accent -->
+<Style Selector="TextBox:focus">
+    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+</Style>
+
+<!-- Disabled state -->
+<Style Selector="TextBox:disabled">
+    <Setter Property="Opacity" Value="0.5"/>
+    <Setter Property="Background" Value="{StaticResource GrayLightBrush}"/>
+</Style>
+
+<!-- Selection color -->
+<Style Selector="TextBox">
+    <Setter Property="SelectionBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="SelectionForegroundBrush" Value="{StaticResource InkBrush}"/>
+</Style>
+
+<!-- Placeholder text -->
+<Style Selector="TextBox /template/ TextBlock#Watermark">
+    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
+    <Setter Property="FontStyle" Value="Italic"/>
+</Style>
+
+<!-- Bauhaus Red accent TextBox -->
+<Style Selector="TextBox.accent-red">
+    <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+</Style>
+<Style Selector="TextBox.accent-red:focus">
+    <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
+</Style>
+
+<!-- Bauhaus Blue accent TextBox -->
+<Style Selector="TextBox.accent-blue">
+    <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+</Style>
+<Style Selector="TextBox.accent-blue:focus">
+    <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
+</Style>
+
+<!-- Bauhaus Yellow accent TextBox -->
+<Style Selector="TextBox.accent-yellow">
+    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+</Style>
+<Style Selector="TextBox.accent-yellow:focus">
+    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
+</Style>
+
+<!-- Ghost/flat TextBox (borderless) -->
+<Style Selector="TextBox.ghost">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="4,4"/>
+</Style>
+<Style Selector="TextBox.ghost:focus">
+    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderThickness" Value="0,0,0,3"/>
+    <Setter Property="Background" Value="Transparent"/>
+</Style>
+
+<!-- Large TextBox for multi-line content -->
+<Style Selector="TextBox.large">
+    <Setter Property="FontSize" Value="16"/>
+    <Setter Property="Padding" Value="14,12"/>
+    <Setter Property="MinHeight" Value="80"/>
+</Style>
+
+<!-- Compact TextBox for dense layouts -->
+<Style Selector="TextBox.compact">
+    <Setter Property="Padding" Value="6,4"/>
+    <Setter Property="FontSize" Value="11"/>
+    <Setter Property="BorderThickness" Value="1.5"/>
+</Style>
+
+<!-- Search/filter TextBox style -->
+<Style Selector="TextBox.search">
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="Padding" Value="10,8,36,8"/>
+    <!-- Note: You'd need to add a search icon overlay separately in the  view -->
+</Style>
+
 
       <!-- Tabs -->
   <Style Selector="TabItem">
@@ -142,14 +243,7 @@
   </Style>
 
   <!-- Inputs -->
-  <Style Selector="TextBox">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
-    <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="0"/>
-    <Setter Property="Padding" Value="10,8"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
-  </Style>
+ 
 
   <Style Selector="ComboBox">
     <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
