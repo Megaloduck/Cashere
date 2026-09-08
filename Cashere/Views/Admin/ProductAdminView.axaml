@@ -30,6 +30,7 @@
       <TextBlock Grid.Column="2" Text="PRICE" Classes="eyebrow"/>
       <TextBlock Grid.Column="3" Text="STOCK" Classes="eyebrow"/>
       <TextBlock Grid.Column="4" Text="STATUS" Classes="eyebrow"/>
+        <TextBlock Grid.Column="5" Text="ACTIONS" Classes="eyebrow"/>
     </Grid>
     <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
 

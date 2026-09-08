@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.SupplierAdminView"
              x:DataType="vm:SupplierAdminViewModel">
-  <Grid RowDefinitions="Auto,*">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="SUPPLIERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
       <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
@@ -19,16 +19,27 @@
       </Button>
     </Grid>
 
-    <ScrollViewer Grid.Row="1">
+    <!-- Header with consistent column definitions -->
+    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,2*,Auto" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="PHONE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="CONTACT PERSON" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="ACTIONS" Classes="eyebrow" HorizontalAlignment="Center"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <!-- Use ItemsRepeater or ensure each row uses the same grid -->
+    <ScrollViewer Grid.Row="2">
       <ItemsControl ItemsSource="{Binding Suppliers}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Supplier">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <!-- Same column definitions as header for perfect alignment -->
               <Grid ColumnDefinitions="2*,1*,2*,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding ContactPerson}" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="2" Text="{Binding ContactPerson}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
                   <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
                     <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
                   </Button>

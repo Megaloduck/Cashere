@@ -8,12 +8,13 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.CustomerAdminView"
              x:DataType="vm:CustomerAdminViewModel">
-  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
-    <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto"  Margin="0,0,0,12">
-        <TextBlock Grid.Column="0" Text="CUSTOMERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="12">
+    <!-- Header with Search and Add New button -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto" Margin="0,0,0,12">
+      <TextBlock Grid.Column="0" Text="CUSTOMERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
       <TextBox Grid.Column="1" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,12,0">
         <TextBox.InnerLeftContent>
-          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16"  Margin="12,0,0,0" Foreground="{StaticResource GrayBrush}"/>
+          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Margin="12,0,0,0" Foreground="{StaticResource GrayBrush}"/>
         </TextBox.InnerLeftContent>
       </TextBox>
       <Button Grid.Column="2" Classes="accent-blue" Command="{Binding AddNewCommand}">
@@ -24,16 +25,27 @@
       </Button>
     </Grid>
 
-    <ScrollViewer Grid.Row="1">
+    <!-- Table Header -->
+    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,2*,Auto" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="PHONE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="EMAIL" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="ACTIONS" Classes="eyebrow" HorizontalAlignment="Center"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <!-- Data Rows -->
+    <ScrollViewer Grid.Row="2">
       <ItemsControl ItemsSource="{Binding FilteredCustomers}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Customer">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <!-- Same column definitions as header -->
               <Grid ColumnDefinitions="2*,1*,2*,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding Email}" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding Phone}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="2" Text="{Binding Email}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
                   <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
                     <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
                   </Button>
@@ -48,7 +60,8 @@
       </ItemsControl>
     </ScrollViewer>
 
-    <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+    <!-- Editor Overlay -->
+    <Border Grid.RowSpan="4" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
         <StackPanel Spacing="12">
           <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>

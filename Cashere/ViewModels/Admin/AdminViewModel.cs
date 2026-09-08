@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cashere.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels.Admin;
@@ -20,6 +21,38 @@ public partial class AdminViewModel : ViewModelBase
     public ShopSettingsViewModel Settings { get; }
 
     public event Action? BackRequested;
+
+    [ObservableProperty]
+    private AdminSection _selectedSection = AdminSection.Products;
+
+    // Resolved via the global ViewLocator exactly like ShellViewModel.CurrentView -
+    // the sidebar just swaps which child ViewModel this points at instead of a
+    // TabControl swapping which TabItem is visible.
+    public ViewModelBase CurrentSectionViewModel => SelectedSection switch
+    {
+        AdminSection.Products => Products,
+        AdminSection.Purchases => Purchases,
+        AdminSection.Suppliers => Suppliers,
+        AdminSection.Customers => Customers,
+        AdminSection.Cashiers => Cashiers,
+        AdminSection.SalesHistory => SalesHistory,
+        AdminSection.SalesReport => SalesReport,
+        AdminSection.Settings => Settings,
+        _ => Products
+    };
+
+    public string CurrentSectionTitle => SelectedSection switch
+    {
+        AdminSection.Products => "PRODUCTS",
+        AdminSection.Purchases => "PURCHASES",
+        AdminSection.Suppliers => "SUPPLIERS",
+        AdminSection.Customers => "CUSTOMERS",
+        AdminSection.Cashiers => "CASHIERS",
+        AdminSection.SalesHistory => "SALES HISTORY",
+        AdminSection.SalesReport => "REPORTS",
+        AdminSection.Settings => "SHOP SETTINGS",
+        _ => "ADMIN"
+    };
 
     public AdminViewModel(
         IProductAdminService productAdmin,
@@ -54,6 +87,15 @@ public partial class AdminViewModel : ViewModelBase
         await SalesReport.LoadAsync();
         await Settings.LoadAsync();
     }
+
+    partial void OnSelectedSectionChanged(AdminSection value)
+    {
+        OnPropertyChanged(nameof(CurrentSectionViewModel));
+        OnPropertyChanged(nameof(CurrentSectionTitle));
+    }
+
+    [RelayCommand]
+    private void SelectSection(AdminSection section) => SelectedSection = section;
 
     [RelayCommand]
     private void Back() => BackRequested?.Invoke();

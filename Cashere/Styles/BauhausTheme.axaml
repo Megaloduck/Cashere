@@ -1,7 +1,6 @@
-<!-- Cashere/Styles/BauhausTheme.axaml -->
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
   <!--
     Bauhaus theme: primary triad (red/yellow/blue) + ink/paper neutrals,
     flat color blocking, thick ink borders instead of shadows. Corners are
@@ -64,6 +63,7 @@
   <Style Selector="TextBlock.headline">
     <Setter Property="FontWeight" Value="Black"/>
     <Setter Property="FontSize" Value="20"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>    
     <Setter Property="LetterSpacing" Value="1"/>
   </Style>
   <Style Selector="TextBlock.eyebrow">
@@ -303,6 +303,42 @@
   <Style Selector="TabItem:selected">
     <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
+
+   <!-- Admin sidebar navigation -->
+<Style Selector="TextBlock.nav-group-label">
+  <Setter Property="FontWeight" Value="Bold"/>
+  <Setter Property="FontSize" Value="10"/>
+  <Setter Property="LetterSpacing" Value="2"/>
+  <Setter Property="Foreground" Value="White"/>
+  <Setter Property="Margin" Value="16,18,16,6"/>
+</Style>
+
+<Style Selector="Button.nav-item">
+  <Setter Property="Background" Value="Transparent"/>
+  <Setter Property="BorderThickness" Value="0"/>
+  <Setter Property="CornerRadius" Value="0"/>
+  <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  <Setter Property="HorizontalContentAlignment" Value="Left"/>
+  <Setter Property="Padding" Value="16,12"/>
+  <Setter Property="FontWeight" Value="Bold"/>
+  <Setter Property="FontSize" Value="12"/>
+</Style>
+
+<!-- The global "TextBlock" style further up this file hardcodes
+     Foreground to InkBrush, which wins over the Button's own Foreground
+     since it's a direct setter on the TextBlock itself, not an inherited
+     value. These descendant selectors override it back per nav state. -->
+
+
+<Style Selector="Button.nav-item:pointerover">
+  <Setter Property="Background" Value="#242424"/>
+</Style>
+<Style Selector="Button.nav-item.selected">
+  <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+</Style>
+<Style Selector="Button.nav-item.selected:pointerover">
+  <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+</Style>
 
   <!-- Buttons: flat, thick ink border, invert on hover -->
   <Style Selector="Button">

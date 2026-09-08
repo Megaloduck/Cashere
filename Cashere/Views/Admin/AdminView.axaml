@@ -3,10 +3,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
-             xmlns:views="clr-namespace:Cashere.Views.Admin"
+             xmlns:converters="clr-namespace:Cashere.Converters"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
              x:Class="Cashere.Views.Admin.AdminView"
              x:DataType="vm:AdminViewModel">
+
+  <UserControl.Resources>
+    <converters:EnumMatchConverter x:Key="EnumMatch"/>
+  </UserControl.Resources>
+
   <Grid RowDefinitions="Auto,Auto,*">
     <Border Grid.Row="0" Background="{StaticResource InkBrush}" Padding="20,14">
       <Grid ColumnDefinitions="*,Auto">
@@ -16,7 +22,7 @@
           <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
           <StackPanel Margin="10,0,0,0">
             <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
-            <TextBlock Text="ADMIN" Classes="eyebrow" Foreground="#B8B8B8"/>
+            <TextBlock Text="{Binding CurrentSectionTitle}" Classes="eyebrow" Foreground="#B8B8B8"/>
           </StackPanel>
         </StackPanel>
         <Button Grid.Column="1" Content="BACK TO POS" Classes="accent-yellow" Command="{Binding BackCommand}" VerticalAlignment="Center"/>
@@ -29,31 +35,84 @@
       <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
     </Grid>
 
-    <TabControl Grid.Row="2" Margin="16">
-      <TabItem Header="PRODUCTS">
-        <views:ProductAdminView DataContext="{Binding Products}"/>
-      </TabItem>
-      <TabItem Header="PURCHASES">
-        <views:PurchaseAdminView DataContext="{Binding Purchases}"/>
-      </TabItem>
-      <TabItem Header="SUPPLIERS">
-        <views:SupplierAdminView DataContext="{Binding Suppliers}"/>
-      </TabItem>
-      <TabItem Header="CUSTOMERS">
-        <views:CustomerAdminView DataContext="{Binding Customers}"/>
-      </TabItem>
-      <TabItem Header="CASHIERS">
-        <views:CashierAdminView DataContext="{Binding Cashiers}"/>
-      </TabItem>
-      <TabItem Header="SALES HISTORY">
-        <views:SalesHistoryView DataContext="{Binding SalesHistory}"/>
-      </TabItem>
-      <TabItem Header="REPORTS">
-        <views:SalesReportView DataContext="{Binding SalesReport}"/>
-      </TabItem>
-      <TabItem Header="SHOP SETTINGS">
-        <views:ShopSettingsView DataContext="{Binding Settings}"/>
-      </TabItem>
-    </TabControl>
+    <Grid Grid.Row="2" ColumnDefinitions="220,*">
+
+      <Border Grid.Column="0" Background="{StaticResource GrayBrush}">
+        <ScrollViewer>
+          <StackPanel Margin="0,16">
+
+            <TextBlock Text="CATALOG" Classes="nav-group-label"/>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Products}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Products}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18"/>
+                <TextBlock Text="PRODUCTS"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Purchases}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Purchases}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="TruckDeliveryOutline" Width="18" Height="18"/>
+                <TextBlock Text="PURCHASES"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Suppliers}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Suppliers}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="OfficeBuildingOutline" Width="18" Height="18"/>
+                <TextBlock Text="SUPPLIERS"/>
+              </StackPanel>
+            </Button>
+
+            <TextBlock Text="PEOPLE" Classes="nav-group-label"/>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Customers}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="AccountGroupOutline" Width="18" Height="18"/>
+                <TextBlock Text="CUSTOMERS"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Cashiers}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Cashiers}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
+                <TextBlock Text="CASHIERS"/>
+              </StackPanel>
+            </Button>
+
+            <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="History" Width="18" Height="18"/>
+                <TextBlock Text="SALES HISTORY"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesReport}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="ChartBar" Width="18" Height="18"/>
+                <TextBlock Text="REPORTS"/>
+              </StackPanel>
+            </Button>
+
+            <TextBlock Text="CONFIGURATION" Classes="nav-group-label"/>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
+                <TextBlock Text="SHOP SETTINGS"/>
+              </StackPanel>
+            </Button>
+
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+
+      <Border Grid.Column="1" Padding="16">
+        <ContentControl Content="{Binding CurrentSectionViewModel}"/>
+      </Border>
+
+    </Grid>
   </Grid>
 </UserControl>

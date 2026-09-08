@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="1050" d:DesignHeight="640"
              x:Class="Cashere.Views.Admin.SalesHistoryView"
              x:DataType="vm:SalesHistoryViewModel">
-  <Grid RowDefinitions="Auto,Auto,Auto,*">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="12">
     <TextBlock Grid.Row="0" Text="SALES HISTORY" Classes="headline" FontSize="18" Margin="0,0,0,12"/>
 
     <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" Margin="0,0,0,12">

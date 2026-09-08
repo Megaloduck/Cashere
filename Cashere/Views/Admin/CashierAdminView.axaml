@@ -8,7 +8,8 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.CashierAdminView"
              x:DataType="vm:CashierAdminViewModel">
-  <Grid RowDefinitions="Auto,*" Margin="12">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+    <!-- Header with Add New button -->
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="CASHIERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
       <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
@@ -19,20 +20,32 @@
       </Button>
     </Grid>
 
-    <ScrollViewer Grid.Row="1">
+    <!-- Table Header -->
+    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1*,1*,170" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="DISPLAY NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="USERNAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="ROLE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="STATUS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="ACTIONS" Classes="eyebrow" HorizontalAlignment="Center"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <!-- Data Rows -->
+    <ScrollViewer Grid.Row="2">
       <ItemsControl ItemsSource="{Binding Cashiers}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Cashier">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <!-- Same column definitions as header -->
               <Grid ColumnDefinitions="2*,1*,1*,1*,170">
-                <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="Bold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Username}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding Role}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding Username}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="2" Text="{Binding Role}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 <StackPanel Grid.Column="3" VerticalAlignment="Center">
                   <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
                   <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4">
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
                   <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
                     <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
                   </Button>
@@ -50,7 +63,8 @@
       </ItemsControl>
     </ScrollViewer>
 
-    <Border Grid.RowSpan="2" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+    <!-- Editor Overlay -->
+    <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
         <StackPanel Spacing="12">
           <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
@@ -82,4 +96,4 @@
       </Border>
     </Border>
   </Grid>
-</UserControl>  
+</UserControl>
