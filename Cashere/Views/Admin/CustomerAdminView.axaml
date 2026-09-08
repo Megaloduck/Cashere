@@ -8,14 +8,15 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.CustomerAdminView"
              x:DataType="vm:CustomerAdminViewModel">
-  <Grid RowDefinitions="Auto,*">
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-      <TextBox Grid.Column="0" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,12,0">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+    <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto"  Margin="0,0,0,12">
+        <TextBlock Grid.Column="0" Text="CUSTOMERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+      <TextBox Grid.Column="1" Watermark="SEARCH BY NAME, PHONE OR EMAIL..." Text="{Binding SearchText}" Margin="0,0,12,0">
         <TextBox.InnerLeftContent>
-          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+          <mi:MaterialIcon Kind="Magnify" Width="16" Height="16"  Margin="12,0,0,0" Foreground="{StaticResource GrayBrush}"/>
         </TextBox.InnerLeftContent>
       </TextBox>
-      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}">
+      <Button Grid.Column="2" Classes="accent-blue" Command="{Binding AddNewCommand}">
         <StackPanel Orientation="Horizontal" Spacing="6">
           <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
           <TextBlock Text="NEW CUSTOMER"/>

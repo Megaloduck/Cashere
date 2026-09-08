@@ -19,13 +19,13 @@
     <Color x:Key="BauhausGray">#8A8A8A</Color>
     <Color x:Key="BauhausGrayLight">#E2DED2</Color>
 
-    <SolidColorBrush x:Key="InkBrush" Color="{StaticResource BauhausInk}"/>
-    <SolidColorBrush x:Key="PaperBrush" Color="{StaticResource BauhausPaper}"/>
-    <SolidColorBrush x:Key="RedBrush" Color="{StaticResource BauhausRed}"/>
-    <SolidColorBrush x:Key="BlueBrush" Color="{StaticResource BauhausBlue}"/>
-    <SolidColorBrush x:Key="YellowBrush" Color="{StaticResource BauhausYellow}"/>
-    <SolidColorBrush x:Key="GrayBrush" Color="{StaticResource BauhausGray}"/>
-    <SolidColorBrush x:Key="GrayLightBrush" Color="{StaticResource BauhausGrayLight}"/>
+    <SolidColorBrush x:Key="InkBrush" Color="{DynamicResource BauhausInk}"/>
+    <SolidColorBrush x:Key="PaperBrush" Color="{DynamicResource BauhausPaper}"/>
+    <SolidColorBrush x:Key="RedBrush" Color="{DynamicResource BauhausRed}"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="{DynamicResource BauhausBlue}"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="{DynamicResource BauhausYellow}"/>
+    <SolidColorBrush x:Key="GrayBrush" Color="{DynamicResource BauhausGray}"/>
+    <SolidColorBrush x:Key="GrayLightBrush" Color="{DynamicResource BauhausGrayLight}"/>
 
     <!-- Corner radius scale - reference these instead of hardcoding
          numbers, so the whole app can be re-tuned from one place. -->
@@ -46,7 +46,7 @@
 
   <!-- Surfaces -->
   <Style Selector="Window">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
     <Setter Property="FontFamily" Value="Inter"/>
   </Style>
   <Style Selector="UserControl">
@@ -55,7 +55,7 @@
 
   <!-- Typography -->
   <Style Selector="TextBlock">
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="TextBlock.headline">
     <Setter Property="FontWeight" Value="Black"/>
@@ -66,46 +66,46 @@
     <Setter Property="FontWeight" Value="Bold"/>
     <Setter Property="FontSize" Value="11"/>
     <Setter Property="LetterSpacing" Value="2"/>
-    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource GrayBrush}"/>
   </Style>
 
   <!-- Text Box -->
   <Style Selector="TextBox">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
     <Setter Property="Padding" Value="10,8"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontSize" Value="13"/>
     <Setter Property="FontWeight" Value="Medium"/>
-    <Setter Property="SelectionBrush" Value="{StaticResource YellowBrush}"/>
-    <Setter Property="SelectionForegroundBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="SelectionBrush" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
 
   <!-- Hover - previously undefined, so it fell through to Fluent's
        default light-gray hover. This is the "white on hover" you saw. -->
   <Style Selector="TextBox:pointerover">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
 
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
   <Style Selector="TextBox:focus">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
   <Style Selector="TextBox:disabled">
     <Setter Property="Opacity" Value="0.5"/>
-    <Setter Property="Background" Value="{StaticResource GrayLightBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource GrayLightBrush}"/>
   </Style>
 
   <Style Selector="TextBox /template/ TextBlock#Watermark">
-    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource GrayBrush}"/>
     <Setter Property="FontStyle" Value="Italic"/>
   </Style>
 
@@ -116,29 +116,29 @@
   </Style>
 
   <Style Selector="TextBox.accent-red">
-    <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
   </Style>
   <Style Selector="TextBox.accent-red:focus">
-    <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
 
   <Style Selector="TextBox.accent-blue">
-    <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
   </Style>
   <Style Selector="TextBox.accent-blue:focus">
-    <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
 
   <Style Selector="TextBox.accent-yellow">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
   </Style>
   <Style Selector="TextBox.accent-yellow:focus">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
 
@@ -153,7 +153,7 @@
     <Setter Property="BorderBrush" Value="Transparent"/>
   </Style>
   <Style Selector="TextBox.ghost:focus">
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="0,0,0,3"/>
     <Setter Property="Background" Value="Transparent"/>
   </Style>
@@ -172,87 +172,87 @@
 
   <!-- ComboBox -->
   <Style Selector="ComboBox">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
     <Setter Property="Padding" Value="10,8"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
   <Style Selector="ComboBox:pointerover">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="ComboBox:focus-within">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
 
   <Style Selector="ComboBoxItem">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="Padding" Value="10,8"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusSmall}"/>
   </Style>
   <Style Selector="ComboBoxItem:pointerover">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="ComboBoxItem:selected">
-    <Setter Property="Background" Value="{StaticResource BlueBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
   </Style>
 
   <!-- DatePicker - previously had zero styling at all, hence full white. -->
   <Style Selector="DatePicker">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
   <Style Selector="DatePicker:pointerover">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="DatePicker:focus-within">
-    <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
   <!-- The small calendar-icon button inside the DatePicker shell. -->
   <Style Selector="DatePicker /template/ Button">
     <Setter Property="Background" Value="Transparent"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="DatePicker /template/ Button:pointerover">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
   <!-- The calendar popup the DatePicker opens -->
   <Style Selector="Calendar">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
   </Style>
   <Style Selector="CalendarButton">
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
   <Style Selector="CalendarButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="CalendarDayButton">
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusSmall}"/>
   </Style>
   <Style Selector="CalendarDayButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="CalendarDayButton:selected">
-    <Setter Property="Background" Value="{StaticResource BlueBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
   </Style>
 
   <!-- ToggleButton - covers the dropdown arrow inside ComboBox and the
@@ -260,24 +260,24 @@
        default whitish hover before this. -->
   <Style Selector="ToggleButton">
     <Setter Property="Background" Value="Transparent"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="0"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusSmall}"/>
   </Style>
   <Style Selector="ToggleButton:pointerover">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="ToggleButton:checked">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
   </Style>
 
   <!-- Tabs -->
   <Style Selector="TabItem">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2,2,2,0"/>
     <Setter Property="CornerRadius" Value="8,8,0,0"/>
     <Setter Property="Padding" Value="16,10"/>
@@ -285,93 +285,98 @@
     <Setter Property="FontSize" Value="12"/>
   </Style>
   <Style Selector="TabItem:pointerover">
-    <Setter Property="Background" Value="{StaticResource GrayLightBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource GrayLightBrush}"/>
         
-      <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="TabItem:selected">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
   <!-- Buttons: flat, thick ink border, invert on hover -->
   <Style Selector="Button">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
     <Setter Property="Padding" Value="16,10"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
   <Style Selector="Button:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
   </Style>
   <Style Selector="Button:pressed">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="Button:disabled">
     <Setter Property="Opacity" Value="0.4"/>
   </Style>
 
   <Style Selector="Button.accent-blue">
-    <Setter Property="Background" Value="{StaticResource BlueBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-blue:pointerover">
-<Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource BlueBrush}"/>
+<Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
   </Style>
 
   <Style Selector="Button.accent-red">
-    <Setter Property="Background" Value="{StaticResource RedBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource RedBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-red:pointerover">
-      <Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource RedBrush}"/>
+      <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}"/>
   </Style>
 
   <Style Selector="Button.accent-yellow">
-    <Setter Property="Background" Value="{StaticResource YellowBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-yellow:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
-    <Setter Property="Foreground" Value="{StaticResource PaperBrush}"/>
-      <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
   <Style Selector="Button.ghost">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>
-    <Setter Property="Foreground" Value="{StaticResource GrayBrush}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}"/>
+    <Setter Property="Foreground" Value="{DynamicResource GrayBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusSmall}"/>
   </Style>
   <Style Selector="Button.ghost:pointerover">
     <Setter Property="Background" Value="Transparent"/>
-    <Setter Property="Foreground" Value="{StaticResource RedBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource RedBrush}"/>
   </Style>
 
   <Style Selector="Button.chip">
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusPill}"/>
     <Setter Property="Padding" Value="14,6"/>
     <Setter Property="BorderThickness" Value="2"/>
   </Style>
+      <Style Selector="Button.chip:pointerover">
+    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
+  </Style>
 
   <Style Selector="Button.product-tile">
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusMedium}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
     <Setter Property="BorderThickness" Value="2"/>
     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
   </Style>
   <Style Selector="Button.product-tile:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
   </Style>
 
   <!-- ScrollBar - Fluent's default thumb hover is a translucent white
@@ -381,26 +386,26 @@
     <Setter Property="Background" Value="Transparent"/>
   </Style>
   <Style Selector="ScrollBar /template/ Thumb">
-    <Setter Property="Background" Value="{StaticResource GrayBrush}"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}"/>
+    <Setter Property="Background" Value="{DynamicResource GrayBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusPill}"/>
   </Style>
   <Style Selector="ScrollBar /template/ Thumb:pointerover">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
   </Style>
 
   <!-- Cards & rules -->
   <Style Selector="Border.card">
-    <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusLarge}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusLarge}"/>
   </Style>
 
   <!-- Left as a true square rule on purpose - it's a structural divider,
        not a container, so it stays flat even though everything else now
        has soft corners. -->
   <Style Selector="Border.rule-thick">
-    <Setter Property="Background" Value="{StaticResource InkBrush}"/>
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
     <Setter Property="Height" Value="3"/>
   </Style>
 
