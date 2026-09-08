@@ -7,11 +7,13 @@
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="680"
              x:Class="Cashere.Views.Admin.SalesReportView"
-             x:DataType="vm:SalesReportViewModel">
-  <ScrollViewer>
-    <StackPanel Spacing="16">
-      <TextBlock Text="REPORTS" Classes="headline" FontSize="18"/>
+             x:DataType="vm:SalesReportViewModel">    
 
+  <Grid RowDefinitions="Auto,*" Margin="12"> 
+      <TextBlock Text="REPORTS" Classes="headline" FontSize="18" Margin="0,0,0,12"/>
+  <ScrollViewer Grid.Row="1">
+    <StackPanel Spacing="16">
+      
       <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*">
         <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,12,0">
           <TextBlock Text="FROM" Classes="eyebrow"/>
@@ -135,4 +137,5 @@
       </ItemsControl>
     </StackPanel>
   </ScrollViewer>
+      </Grid>
 </UserControl>  

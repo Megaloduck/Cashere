@@ -239,14 +239,6 @@
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
 
-  <!-- The small calendar-icon button inside the DatePicker shell. -->
-  <Style Selector="DatePicker /template/ Button">
-    <Setter Property="Background" Value="Transparent"/>
-    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
-  </Style>
-  <Style Selector="DatePicker /template/ Button:pointerover">
-    <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
-  </Style>
 
   <!-- The calendar popup the DatePicker opens -->
   <Style Selector="Calendar">
@@ -388,6 +380,18 @@
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
+    <!-- DatePicker's entire clickable surface is one internal Button
+     (PART_FlyoutButton). Must come after the generic Button:pointerover
+     invert rule above, or that rule paints it ink-black on hover. -->
+<Style Selector="DatePicker /template/ Button#PART_FlyoutButton">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+</Style>
+<Style Selector="DatePicker /template/ Button#PART_FlyoutButton:pointerover">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
+</Style>
 
   <Style Selector="Button.product-tile">
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
