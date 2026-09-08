@@ -27,6 +27,10 @@
     <SolidColorBrush x:Key="GrayBrush" Color="{DynamicResource BauhausGray}"/>
     <SolidColorBrush x:Key="GrayLightBrush" Color="{DynamicResource BauhausGrayLight}"/>
 
+      <!-- Hides Fluent's default selected-tab underline/pipe, which our
+     TabItem:selected yellow background already communicates on its own. -->
+<SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill">Transparent</SolidColorBrush>
+
     <!-- Corner radius scale - reference these instead of hardcoding
          numbers, so the whole app can be re-tuned from one place. -->
     <CornerRadius x:Key="RadiusSmall">4</CornerRadius>
@@ -86,18 +90,21 @@
   <!-- Hover - previously undefined, so it fell through to Fluent's
        default light-gray hover. This is the "white on hover" you saw. -->
   <Style Selector="TextBox:pointerover">
-    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
+  <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+</Style>
+<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+</Style>
 
-    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
-  </Style>
-
-  <Style Selector="TextBox:focus">
-    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
-    <Setter Property="BorderThickness" Value="3"/>
-    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
-      <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
-  </Style>
+<Style Selector="TextBox:focus">
+  <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+</Style>
+<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+  <Setter Property="BorderThickness" Value="3"/>
+</Style>
 
   <Style Selector="TextBox:disabled">
     <Setter Property="Opacity" Value="0.5"/>
@@ -180,14 +187,19 @@
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
-  <Style Selector="ComboBox:pointerover">
-    <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
-    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
-  </Style>
-  <Style Selector="ComboBox:focus-within">
-    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
-    <Setter Property="BorderThickness" Value="3"/>
-  </Style>
+  <Style Selector="ComboBox:pointerover /template/ Border#Background">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+</Style>
+<Style Selector="ComboBox:pressed /template/ Border#Background">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+</Style>
+<Style Selector="ComboBox:focus-within /template/ Border#Background">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+  <Setter Property="BorderThickness" Value="3"/>
+</Style>
 
   <Style Selector="ComboBoxItem">
     <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
@@ -210,16 +222,23 @@
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
-    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>      
+    <Setter Property="Height" Value="35"/>      
+    <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
-  <Style Selector="DatePicker:pointerover">
-    <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
-  </Style>
+    <Style Selector="DatePicker:pointerover">
+  <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+</Style>
+<Style Selector="DatePicker:pointerover /template/ Border#PART_BorderElement">
+  <Setter Property="Background" Value="{StaticResource PaperBrush}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource YellowBrush}"/>
+</Style>
   <Style Selector="DatePicker:focus-within">
     <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="BorderThickness" Value="3"/>
   </Style>
+
   <!-- The small calendar-icon button inside the DatePicker shell. -->
   <Style Selector="DatePicker /template/ Button">
     <Setter Property="Background" Value="Transparent"/>
@@ -286,7 +305,7 @@
   </Style>
   <Style Selector="TabItem:pointerover">
     <Setter Property="Background" Value="{DynamicResource GrayLightBrush}"/>
-        
+        <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
       <Setter Property="Foreground" Value="{DynamicResource YellowBrush}"/>
   </Style>
   <Style Selector="TabItem:selected">

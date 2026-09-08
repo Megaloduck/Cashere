@@ -3,7 +3,7 @@
              xmlns:local="using:Cashere"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="Cashere.App"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Light">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
