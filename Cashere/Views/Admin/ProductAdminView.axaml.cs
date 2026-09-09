@@ -29,4 +29,12 @@ public partial class ProductAdminView : UserControl
             vm.ToggleActiveCommand.Execute(product);
         }
     }
+
+    private void OnRemovePhotoClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: Product product } && DataContext is ProductAdminViewModel vm)
+        {
+            vm.RemovePhotoCommand.Execute(product);
+        }
+    }
 }

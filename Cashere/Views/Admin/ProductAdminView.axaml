@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.ProductAdminView"
              x:DataType="vm:ProductAdminViewModel">
+  <UserControl.Resources>
+    <converters:PhotoPathToImageConverter x:Key="PhotoPathToImage"/>
+  </UserControl.Resources>
+
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto"  Margin="0,0,0,12">
         <TextBlock Grid.Column="0" Text="PRODUCTS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
@@ -24,13 +29,13 @@
       </Button>
     </Grid>
 
-    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1*,1*,1*,170" Margin="0,0,0,4">
-      <TextBlock Grid.Column="0" Text="NAME" Classes="eyebrow"/>
-      <TextBlock Grid.Column="1" Text="SKU" Classes="eyebrow"/>
-      <TextBlock Grid.Column="2" Text="PRICE" Classes="eyebrow"/>
-      <TextBlock Grid.Column="3" Text="STOCK" Classes="eyebrow"/>
-      <TextBlock Grid.Column="4" Text="STATUS" Classes="eyebrow"/>
-        <TextBlock Grid.Column="5" Text="ACTIONS" Classes="eyebrow"/>
+    <Grid Grid.Row="1" ColumnDefinitions="48,2*,1*,1*,1*,1*,190" Margin="0,0,0,4">
+      <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="PRICE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="STOCK" Classes="eyebrow"/>
+      <TextBlock Grid.Column="5" Text="STATUS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="6" Text="ACTIONS" Classes="eyebrow"/>
     </Grid>
     <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
 
@@ -39,16 +44,27 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Product">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
-              <Grid ColumnDefinitions="2*,1*,1*,1*,1*,170">
-                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                <TextBlock Grid.Column="1" Text="{Binding Sku}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="3" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+              <Grid ColumnDefinitions="48,2*,1*,1*,1*,1*,190">
+                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="{StaticResource RadiusSmall}"
+                        Background="{StaticResource GrayLightBrush}" ClipToBounds="True" VerticalAlignment="Center">
+                  <Grid>
+                    <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
+                           IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           Stretch="UniformToFill"/>
+                    <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18" Foreground="{StaticResource GrayBrush}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}"/>
+                  </Grid>
+                </Border>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="10,0,0,0"/>
+                <TextBlock Grid.Column="2" Text="{Binding Sku}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="5" VerticalAlignment="Center">
                   <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
                   <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
                 </StackPanel>
-                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4">
+                <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="4">
                   <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
                     <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
                   </Button>
@@ -57,6 +73,11 @@
                   </Button>
                   <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
                     <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnRemovePhotoClick"
+                          IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                          ToolTip.Tip="Remove photo">
+                    <mi:MaterialIcon Kind="ImageRemoveOutline" Width="16" Height="16"/>
                   </Button>
                 </StackPanel>
               </Grid>

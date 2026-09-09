@@ -127,6 +127,19 @@ public partial class ProductAdminViewModel : ViewModelBase
         await LoadAsync();
     }
 
+    // Manual escape hatch for a bad/wrong photo captured from the mobile
+    // labeling flow - clears Product.PhotoPath so the tile/row falls back to
+    // the category-colored placeholder. Doesn't touch the file on disk
+    // (CashereServerHost's upload endpoint overwrites it on next upload
+    // regardless), just the DB reference.
+    [RelayCommand]
+    private async Task RemovePhoto(Product? product)
+    {
+        if (product is null) return;
+        await _productAdmin.SetPhotoPathAsync(product.Id, null);
+        await LoadAsync();
+    }
+
     [RelayCommand]
     private async Task AddCategory()
     {

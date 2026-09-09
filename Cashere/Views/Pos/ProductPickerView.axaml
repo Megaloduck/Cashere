@@ -11,6 +11,7 @@
              x:DataType="vm:ProductPickerViewModel">
   <UserControl.Resources>
     <converters:BauhausAccentConverter x:Key="BauhausAccent"/>
+    <converters:PhotoPathToImageConverter x:Key="PhotoPathToImage"/>
   </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,Auto,*">
@@ -55,9 +56,18 @@
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Product">
-            <Button Width="160" Height="130" Margin="0,0,12,12" Padding="0" Classes="product-tile" Click="OnProductClick">
-              <Grid RowDefinitions="6,*">
-                <Border Grid.Row="0" Background="{Binding CategoryId, Converter={StaticResource BauhausAccent}}"/>
+            <Button Width="160" Height="158" Margin="0,0,12,12" Padding="0" Classes="product-tile" Click="OnProductClick">
+              <Grid RowDefinitions="64,*">
+                <Grid Grid.Row="0" ClipToBounds="True">
+                  <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
+                         IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                         Stretch="UniformToFill"/>
+                  <Border Background="{Binding CategoryId, Converter={StaticResource BauhausAccent}}"
+                          IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}" CornerRadius="5,5,0,0">
+                    <mi:MaterialIcon Kind="PackageVariantClosed" Width="24" Height="24" Foreground="White"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.85"/>
+                  </Border>
+                </Grid>
                 <StackPanel Grid.Row="1" Margin="12,10" Spacing="4">
                   <TextBlock Text="{Binding Name}" FontWeight="Bold" TextWrapping="Wrap"/>
                   <TextBlock Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" FontWeight="Black"/>
