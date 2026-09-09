@@ -8,34 +8,18 @@
              mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="720"
              x:Class="Cashere.Views.Mobile.ScanningView"
              x:DataType="vm:ScanningViewModel">
-  <Grid RowDefinitions="Auto,Auto,*">
-    <Border Grid.Row="0" Background="{StaticResource InkBrush}" Padding="18,20">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
-        <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
-        <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
-        <StackPanel Margin="10,0,0,0">
-          <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
-          <TextBlock Text="SCANNER" Classes="eyebrow" Foreground="#B8B8B8"/>
-        </StackPanel>
-      </StackPanel>
-    </Border>
+  
+  <Grid>
+    <!-- Not connected -->
+    <StackPanel Margin="24" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center"
+                IsVisible="{Binding !IsConnected}">
+      <mi:MaterialIcon Kind="LanDisconnect" Width="32" Height="32" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center"/>
+      <TextBlock Text="NOT CONNECTED" Classes="eyebrow" HorizontalAlignment="Center"/>
+      <TextBlock Text="Go to the PAIR tab and connect to a till first." TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource GrayBrush}"/>
+    </StackPanel>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Height="6">
-      <Border Grid.Column="0" Background="{StaticResource RedBrush}"/>
-      <Border Grid.Column="1" Background="{StaticResource YellowBrush}"/>
-      <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
-    </Grid>
-
-    <Grid Grid.Row="2" IsVisible="{Binding !IsConnected}">
-      <StackPanel Margin="24" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <mi:MaterialIcon Kind="LanDisconnect" Width="32" Height="32" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center"/>
-        <TextBlock Text="NOT CONNECTED" Classes="eyebrow" HorizontalAlignment="Center"/>
-        <TextBlock Text="Go to the PAIR tab and connect to a till first." TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource GrayBrush}"/>
-      </StackPanel>
-    </Grid>
-
-    <ScrollViewer Grid.Row="2" IsVisible="{Binding IsConnected}">
+    <!-- Scanning content -->
+    <ScrollViewer IsVisible="{Binding IsConnected}">
       <StackPanel Margin="16" Spacing="16">
 
         <StackPanel Spacing="8" IsVisible="{Binding !ShowCameraPreview}">

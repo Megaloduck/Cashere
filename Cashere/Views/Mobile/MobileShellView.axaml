@@ -11,44 +11,83 @@
 
   <UserControl.Resources>
     <converters:EnumMatchConverter x:Key="EnumMatch"/>
+    <converters:EnumToTitleConverter x:Key="EnumToTitle"/>
   </UserControl.Resources>
 
-  <Grid ColumnDefinitions="*,Auto">
-    <!-- Content - now in Column 0 (left side) -->
-    <Grid Grid.Column="0">
-      <ContentControl Content="{Binding CurrentView}"/>
+  <Grid RowDefinitions="Auto,Auto,*,Auto" ColumnDefinitions="*,Auto">
+    
+    <!-- SHELL HEADER - Row 0 -->
+    <Border Grid.Row="0" Grid.ColumnSpan="2" 
+            Background="{StaticResource InkBrush}" 
+            Padding="18,12">
+      <Grid>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
+          <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
+          <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
+          <StackPanel Margin="10,0,0,0">
+            <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
+            <TextBlock Text="{Binding SelectedSection, Converter={StaticResource EnumToTitle}}" 
+                       Classes="eyebrow" Foreground="#B8B8B8"/>
+          </StackPanel>
+        </StackPanel>
+        
+        <!-- Menu button locked in header -->
+        <Button Classes="ghost" 
+                Command="{Binding ToggleSidebarCommand}"
+                IsVisible="{Binding !IsSidebarVisible}"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center"
+                Margin="0,0,4,0" 
+                Padding="8"
+                Background="Transparent"
+                CornerRadius="{StaticResource RadiusMedium}">
+          <mi:MaterialIcon Kind="Menu" Width="22" Height="22" Foreground="White"/>
+        </Button>
+      </Grid>
+    </Border>
 
-      <!-- Floating reveal button - moved to right side, offset adjusted -->
-      <Button Classes="ghost" Command="{Binding ToggleSidebarCommand}"
-              IsVisible="{Binding !IsSidebarVisible}"
-              HorizontalAlignment="Right" VerticalAlignment="Top"
-              Margin="0,90,10,0" Padding="8" CornerRadius="{StaticResource RadiusMedium}"
-              Background="{StaticResource InkBrush}">
-        <mi:MaterialIcon Kind="Menu" Width="20" Height="20" Foreground="White"/>
-      </Button>
+    <!-- TRI-COLOR STRIP - Row 1 -->
+    <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,*,*" Height="4">
+      <Border Grid.Column="0" Background="{StaticResource RedBrush}"/>
+      <Border Grid.Column="1" Background="{StaticResource YellowBrush}"/>
+      <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
     </Grid>
 
-    <!-- Sidebar - now in Column 1 (right side) -->
-    <Border Grid.Column="1" Background="{StaticResource InkBrush}" Width="72" IsVisible="{Binding IsSidebarVisible}">
-      <StackPanel Margin="0,24,0,0" Spacing="4">
-        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Pairing}"
-                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Pairing}">
+    <!-- CONTENT - Row 2 -->
+    <ContentControl Grid.Row="2" Grid.Column="0" 
+                    Content="{Binding CurrentView}"/>
+
+    <!-- SIDEBAR - Row 2, Column 1 -->
+    <Border Grid.Row="2" Grid.Column="1" 
+            Background="{StaticResource InkBrush}" 
+            Width="72" 
+            IsVisible="{Binding IsSidebarVisible}">
+      <StackPanel Margin="0,16,0,0" Spacing="4">
+        <Button Classes="rail-item" 
+                Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Pairing}"
+                Command="{Binding SelectSectionCommand}" 
+                CommandParameter="{x:Static vm:MobileSection.Pairing}">
           <StackPanel Spacing="4" HorizontalAlignment="Center">
             <mi:MaterialIcon Kind="LanConnect" Width="22" Height="22" HorizontalAlignment="Center"/>
             <TextBlock Text="PAIR" Classes="rail-label" HorizontalAlignment="Center"/>
           </StackPanel>
         </Button>
 
-        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Scanning}"
-                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Scanning}">
+        <Button Classes="rail-item" 
+                Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Scanning}"
+                Command="{Binding SelectSectionCommand}" 
+                CommandParameter="{x:Static vm:MobileSection.Scanning}">
           <StackPanel Spacing="4" HorizontalAlignment="Center">
             <mi:MaterialIcon Kind="BarcodeScan" Width="22" Height="22" HorizontalAlignment="Center"/>
             <TextBlock Text="SCAN" Classes="rail-label" HorizontalAlignment="Center"/>
           </StackPanel>
         </Button>
 
-        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Labeling}"
-                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Labeling}">
+        <Button Classes="rail-item" 
+                Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Labeling}"
+                Command="{Binding SelectSectionCommand}" 
+                CommandParameter="{x:Static vm:MobileSection.Labeling}">
           <StackPanel Spacing="4" HorizontalAlignment="Center">
             <mi:MaterialIcon Kind="CameraPlusOutline" Width="22" Height="22" HorizontalAlignment="Center"/>
             <TextBlock Text="LABEL" Classes="rail-label" HorizontalAlignment="Center"/>
@@ -57,11 +96,8 @@
 
         <Border Height="2" Background="#2A2A2A" Margin="16,10"/>
 
-        <!-- Collapses the rail - useful on smaller phones or to free up
-             width for the camera preview on Scan/Label. -->
         <Button Classes="rail-item" Command="{Binding ToggleSidebarCommand}">
           <StackPanel Spacing="4" HorizontalAlignment="Center">
-            <!-- Changed from ArrowLeft to ArrowRight -->
             <mi:MaterialIcon Kind="ArrowRight" Width="22" Height="22" HorizontalAlignment="Center"/>
             <TextBlock Text="HIDE" Classes="rail-label" HorizontalAlignment="Center"/>
           </StackPanel>
@@ -69,4 +105,4 @@
       </StackPanel>
     </Border>
   </Grid>
-</UserControl>
+</UserControl>  

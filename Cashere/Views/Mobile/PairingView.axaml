@@ -7,67 +7,48 @@
              mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="720"
              x:Class="Cashere.Views.Mobile.PairingView"
              x:DataType="vm:PairingViewModel">
-  <Grid RowDefinitions="Auto,Auto,*">
-    <Border Grid.Row="0" Background="{StaticResource InkBrush}" Padding="18,20">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
-        <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
-        <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
-        <StackPanel Margin="10,0,0,0">
-          <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
-          <TextBlock Text="PAIRING" Classes="eyebrow" Foreground="#B8B8B8"/>
+  
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="16">
+
+      <Border Classes="card" Padding="16">
+        <StackPanel Spacing="6">
+          <TextBlock Text="CONNECTION" Classes="eyebrow"/>
+          <TextBlock Text="{Binding State}" FontWeight="Black" FontSize="18"/>
+          <TextBlock Text="{Binding ShopName, StringFormat='Shop: {0}'}" IsVisible="{Binding IsConnected}" FontWeight="Bold"/>
         </StackPanel>
-      </StackPanel>
-    </Border>
+      </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Height="6">
-      <Border Grid.Column="0" Background="{StaticResource RedBrush}"/>
-      <Border Grid.Column="1" Background="{StaticResource YellowBrush}"/>
-      <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
-    </Grid>
+      <StackPanel Spacing="8" IsVisible="{Binding !IsConnected}">
+        <TextBlock Text="TILL IP ADDRESS" Classes="eyebrow"/>
+        <TextBox Text="{Binding HostInput}" Watermark="192.168.1.42"/>
 
-    <ScrollViewer Grid.Row="2">
-      <StackPanel Margin="16" Spacing="16">
+        <TextBlock Text="PORT" Classes="eyebrow"/>
+        <TextBox Text="{Binding PortInput}" Watermark="5177"/>
 
-        <Border Classes="card" Padding="16">
-          <StackPanel Spacing="6">
-            <TextBlock Text="CONNECTION" Classes="eyebrow"/>
-            <TextBlock Text="{Binding State}" FontWeight="Black" FontSize="18"/>
-            <TextBlock Text="{Binding ShopName, StringFormat='Shop: {0}'}" IsVisible="{Binding IsConnected}" FontWeight="Bold"/>
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+        <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <mi:MaterialIcon Kind="LanConnect" Width="18" Height="18"/>
+            <TextBlock Text="CONNECT"/>
           </StackPanel>
-        </Border>
-
-        <StackPanel Spacing="8" IsVisible="{Binding !IsConnected}">
-          <TextBlock Text="TILL IP ADDRESS" Classes="eyebrow"/>
-          <TextBox Text="{Binding HostInput}" Watermark="192.168.1.42"/>
-
-          <TextBlock Text="PORT" Classes="eyebrow"/>
-          <TextBox Text="{Binding PortInput}" Watermark="5177"/>
-
-          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
-
-          <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                  Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <mi:MaterialIcon Kind="LanConnect" Width="18" Height="18"/>
-              <TextBlock Text="CONNECT"/>
-            </StackPanel>
-          </Button>
-        </StackPanel>
-
-        <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
-          <TextBlock Text="You're connected. Switch to SCAN to start ringing up items, or LABEL to photograph a product."
-                     TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"/>
-
-          <Button Classes="ghost" Command="{Binding DisconnectCommand}">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <mi:MaterialIcon Kind="LanDisconnect" Width="16" Height="16"/>
-              <TextBlock Text="DISCONNECT"/>
-            </StackPanel>
-          </Button>
-        </StackPanel>
-
+        </Button>
       </StackPanel>
-    </ScrollViewer>
-  </Grid>
+
+      <StackPanel Spacing="10" IsVisible="{Binding IsConnected}">
+        <TextBlock Text="You're connected. Switch to SCAN to start ringing up items, or LABEL to photograph a product."
+                   TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"/>
+
+        <Button Classes="ghost" Command="{Binding DisconnectCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="LanDisconnect" Width="16" Height="16"/>
+            <TextBlock Text="DISCONNECT"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>
