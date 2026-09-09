@@ -13,8 +13,23 @@
     <converters:EnumMatchConverter x:Key="EnumMatch"/>
   </UserControl.Resources>
 
-  <Grid ColumnDefinitions="Auto,*">
-    <Border Grid.Column="0" Background="{StaticResource InkBrush}" Width="72" IsVisible="{Binding IsSidebarVisible}">
+  <Grid ColumnDefinitions="*,Auto">
+    <!-- Content - now in Column 0 (left side) -->
+    <Grid Grid.Column="0">
+      <ContentControl Content="{Binding CurrentView}"/>
+
+      <!-- Floating reveal button - moved to right side, offset adjusted -->
+      <Button Classes="ghost" Command="{Binding ToggleSidebarCommand}"
+              IsVisible="{Binding !IsSidebarVisible}"
+              HorizontalAlignment="Right" VerticalAlignment="Top"
+              Margin="0,90,10,0" Padding="8" CornerRadius="{StaticResource RadiusMedium}"
+              Background="{StaticResource InkBrush}">
+        <mi:MaterialIcon Kind="Menu" Width="20" Height="20" Foreground="White"/>
+      </Button>
+    </Grid>
+
+    <!-- Sidebar - now in Column 1 (right side) -->
+    <Border Grid.Column="1" Background="{StaticResource InkBrush}" Width="72" IsVisible="{Binding IsSidebarVisible}">
       <StackPanel Margin="0,24,0,0" Spacing="4">
         <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Pairing}"
                 Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Pairing}">
@@ -46,27 +61,12 @@
              width for the camera preview on Scan/Label. -->
         <Button Classes="rail-item" Command="{Binding ToggleSidebarCommand}">
           <StackPanel Spacing="4" HorizontalAlignment="Center">
-            <mi:MaterialIcon Kind="ArrowLeft" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <!-- Changed from ArrowLeft to ArrowRight -->
+            <mi:MaterialIcon Kind="ArrowRight" Width="22" Height="22" HorizontalAlignment="Center"/>
             <TextBlock Text="HIDE" Classes="rail-label" HorizontalAlignment="Center"/>
           </StackPanel>
         </Button>
       </StackPanel>
     </Border>
-
-    <Grid Grid.Column="1">
-      <ContentControl Content="{Binding CurrentView}"/>
-
-      <!-- Floating reveal button - only shown while the rail is hidden, so
-           there's always a way back regardless of which section is active.
-           Offset below each child view's own dark header (padding 18,20 +
-           the 6px tri-color strip) so it never overlaps that content. -->
-      <Button Classes="ghost" Command="{Binding ToggleSidebarCommand}"
-              IsVisible="{Binding !IsSidebarVisible}"
-              HorizontalAlignment="Left" VerticalAlignment="Top"
-              Margin="10,90,0,0" Padding="8" CornerRadius="{StaticResource RadiusMedium}"
-              Background="{StaticResource InkBrush}">
-        <mi:MaterialIcon Kind="Menu" Width="20" Height="20" Foreground="White"/>
-      </Button>
-    </Grid>
   </Grid>
 </UserControl>
