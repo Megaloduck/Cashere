@@ -309,10 +309,10 @@
   <Setter Property="FontWeight" Value="Bold"/>
   <Setter Property="FontSize" Value="10"/>
   <Setter Property="LetterSpacing" Value="2"/>
-  <Setter Property="Foreground" Value="White"/>
+  <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
   <Setter Property="Margin" Value="16,18,16,6"/>
 </Style>
-
+        <!-- Desktop nav item (icon + label, for a desktop sidebar) -->
 <Style Selector="Button.nav-item">
   <Setter Property="Background" Value="Transparent"/>
   <Setter Property="BorderThickness" Value="0"/>
@@ -320,24 +320,37 @@
   <Setter Property="HorizontalAlignment" Value="Stretch"/>
   <Setter Property="HorizontalContentAlignment" Value="Left"/>
   <Setter Property="Padding" Value="16,12"/>
-  <Setter Property="FontWeight" Value="Bold"/>
-  <Setter Property="FontSize" Value="12"/>
 </Style>
 
-<!-- The global "TextBlock" style further up this file hardcodes
-     Foreground to InkBrush, which wins over the Button's own Foreground
-     since it's a direct setter on the TextBlock itself, not an inherited
-     value. These descendant selectors override it back per nav state. -->
+<Style Selector="Button.nav-item mi|MaterialIcon">
+  <Setter Property="Foreground" Value="White"/>
+  <Setter Property="Margin" Value="0,0,12,0"/>
+</Style>
 
+<Style Selector="Button.nav-item TextBlock.nav-label">
+  <Setter Property="FontWeight" Value="Bold"/>
+  <Setter Property="FontSize" Value="12"/>
+  <Setter Property="Foreground" Value="White"/>
+</Style>
 
 <Style Selector="Button.nav-item:pointerover">
   <Setter Property="Background" Value="#242424"/>
 </Style>
+
 <Style Selector="Button.nav-item.selected">
   <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
 </Style>
+
 <Style Selector="Button.nav-item.selected:pointerover">
   <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+</Style>
+
+<Style Selector="Button.nav-item.selected mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.nav-item.selected TextBlock.nav-label">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
 </Style>
 
     <!-- Mobile nav rail (icon + tiny label, narrow enough for a phone) -->
