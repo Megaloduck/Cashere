@@ -5,6 +5,13 @@ using Avalonia.Android;
 using Cashere.Android.Services;
 using Cashere.Services;
 
+using Android.App;
+using Android.Content.PM;
+using Avalonia;
+using Avalonia.Android;
+using Cashere.Android.Services;
+using Cashere.Services;
+
 namespace Cashere.Android;
 
 [Activity(
@@ -16,16 +23,22 @@ namespace Cashere.Android;
 public class MainActivity : AvaloniaMainActivity<App>
 {
     private CameraXBarcodeScannerService? _scannerService;
+    private CameraXPhotoCaptureService? _photoCaptureService;
 
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
-        // Wired here (mirrors Cashere.Desktop/Program.cs) so both services
+        // Wired here (mirrors Cashere.Desktop/Program.cs) so all services
         // are set before App.OnFrameworkInitializationCompleted builds the
-        // pairing screen.
-        AppServices.SyncClient = new SignalRPosSyncClientService();
+        // mobile shell.
+        var syncClient = new SignalRPosSyncClientService();
+        AppServices.SyncClient = syncClient;
+        AppServices.ProductPhoto = new HttpProductPhotoService(syncClient);
 
         _scannerService = new CameraXBarcodeScannerService(this);
         AppServices.BarcodeScanner = _scannerService;
+
+        _photoCaptureService = new CameraXPhotoCaptureService(this);
+        AppServices.PhotoCapture = _photoCaptureService;
 
         return base.CustomizeAppBuilder(builder)
             .WithInterFont();
@@ -35,5 +48,6 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         _scannerService?.CompletePermissionRequest(requestCode, grantResults);
+        _photoCaptureService?.CompletePermissionRequest(requestCode, grantResults);
     }
 }

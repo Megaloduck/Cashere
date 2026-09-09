@@ -13,8 +13,8 @@
     <converters:EnumMatchConverter x:Key="EnumMatch"/>
   </UserControl.Resources>
 
-  <Grid ColumnDefinitions="72,*">
-    <Border Grid.Column="0" Background="{StaticResource InkBrush}">
+  <Grid ColumnDefinitions="Auto,*">
+    <Border Grid.Column="0" Background="{StaticResource InkBrush}" Width="72" IsVisible="{Binding IsSidebarVisible}">
       <StackPanel Margin="0,24,0,0" Spacing="4">
         <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Pairing}"
                 Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Pairing}">
@@ -39,9 +39,34 @@
             <TextBlock Text="LABEL" Classes="rail-label" HorizontalAlignment="Center"/>
           </StackPanel>
         </Button>
+
+        <Border Height="2" Background="#2A2A2A" Margin="16,10"/>
+
+        <!-- Collapses the rail - useful on smaller phones or to free up
+             width for the camera preview on Scan/Label. -->
+        <Button Classes="rail-item" Command="{Binding ToggleSidebarCommand}">
+          <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <mi:MaterialIcon Kind="ArrowLeft" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <TextBlock Text="HIDE" Classes="rail-label" HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Border>
 
-    <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
+    <Grid Grid.Column="1">
+      <ContentControl Content="{Binding CurrentView}"/>
+
+      <!-- Floating reveal button - only shown while the rail is hidden, so
+           there's always a way back regardless of which section is active.
+           Offset below each child view's own dark header (padding 18,20 +
+           the 6px tri-color strip) so it never overlaps that content. -->
+      <Button Classes="ghost" Command="{Binding ToggleSidebarCommand}"
+              IsVisible="{Binding !IsSidebarVisible}"
+              HorizontalAlignment="Left" VerticalAlignment="Top"
+              Margin="10,90,0,0" Padding="8" CornerRadius="{StaticResource RadiusMedium}"
+              Background="{StaticResource InkBrush}">
+        <mi:MaterialIcon Kind="Menu" Width="20" Height="20" Foreground="White"/>
+      </Button>
+    </Grid>
   </Grid>
 </UserControl>

@@ -39,6 +39,12 @@ public interface IPosSyncClientService
     event Action<SyncConnectionState>? StateChanged;
     event Action<SyncCartSnapshot>? CartUpdated;
 
+    // Pushed by the till whenever an admin-driven change (product create/edit,
+    // activate/deactivate, photo upload/removal, purchase stock update) makes
+    // the mobile catalog projection stale. LabelingViewModel subscribes to
+    // this to auto-refresh its product list.
+    event Action? ProductCatalogChanged;
+
     Task<PairingResult> ConnectAsync(ShopEndpoint endpoint, CancellationToken cancellationToken = default);
     Task DisconnectAsync();
     Task<BarcodeScanOutcome> ScanBarcodeAsync(string barcode, int quantity = 1);

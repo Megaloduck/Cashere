@@ -10,6 +10,7 @@ using System.Threading;
 using Cashere.Services;
 using Cashere.Sync.Dtos;
 using Microsoft.AspNetCore.SignalR.Client;
+using Avalonia.Threading;
 
 namespace Cashere.Android.Services;
 
@@ -30,6 +31,7 @@ public class SignalRPosSyncClientService : IPosSyncClientService
 
     public event Action<SyncConnectionState>? StateChanged;
     public event Action<SyncCartSnapshot>? CartUpdated;
+    public event Action? ProductCatalogChanged;
 
     public async Task<PairingResult> ConnectAsync(ShopEndpoint endpoint, CancellationToken cancellationToken = default)
     {
@@ -59,7 +61,12 @@ public class SignalRPosSyncClientService : IPosSyncClientService
                 .Build();
 
             _connection.On<CartDto>("CartUpdated", dto => CartUpdated?.Invoke(MapCart(dto)));
-            _connection.On("ProductCatalogChanged", () => { /* handled in the barcode-scanning phase */ });
+
+            // Dispatched onto the UI thread since subscribers (e.g.
+            // LabelingViewModel) mutate ObservableCollections in response,
+            // and this callback otherwise runs on a SignalR threadpool thread.
+            _connection.On("ProductCatalogChanged", () =>
+                Dispatcher.UIThread.Post(() => ProductCatalogChanged?.Invoke()));
 
             _connection.Reconnecting += _ => { SetState(SyncConnectionState.Reconnecting); return Task.CompletedTask; };
             _connection.Reconnected += _ => { SetState(SyncConnectionState.Connected); return Task.CompletedTask; };

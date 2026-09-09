@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using Cashere.Services;
 
 namespace Cashere.Server.Endpoints;
 
@@ -25,7 +26,8 @@ public static class ProductPhotoEndpoints
         // Called by the mobile labeling flow after a still capture. Expects
         // multipart/form-data with a single file field named "photo".
         app.MapPost("/api/products/{id:int}/photo", async (
-            int id, HttpRequest request, CashereDbContext db, ProductPhotoStorage storage) =>
+            int id, HttpRequest request, CashereDbContext db, ProductPhotoStorage storage,
+            IProductCatalogChangeNotifier notifier) =>
         {
             if (!request.HasFormContentType)
             {
@@ -78,6 +80,17 @@ public static class ProductPhotoEndpoints
             product.PhotoPath = relativePath;
             product.UpdatedAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
+
+            try
+            {
+                // Best-effort - the uploading device already has the fresh
+                // state locally regardless of whether other connected
+                // devices receive the push.
+                await notifier.NotifyChangedAsync();
+            }
+            catch
+            {
+            }
 
             return Results.Ok(new ProductPhotoUploadResult(relativePath, $"/media/{relativePath}"));
         });

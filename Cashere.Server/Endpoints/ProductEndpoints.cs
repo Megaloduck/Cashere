@@ -18,6 +18,8 @@ public static class ProductEndpoints
     {
         // Full catalog pull - mobile calls this once on pairing, then relies
         // on ProductCatalogChanged pushes (future work) to know when to refetch.
+        // Also used by the mobile Labeling tab to pick which product to
+        // photograph - HasPhoto lets that screen flag products still missing one.
         app.MapGet("/api/products", async (CashereDbContext db) =>
         {
             var products = await db.Products
@@ -27,7 +29,8 @@ public static class ProductEndpoints
                     p.Id, p.Sku, p.Barcode, p.Name, p.Unit,
                     p.SellingPrice, p.StockQuantity,
                     p.Category != null ? p.Category.Name : null,
-                    p.IsActive))
+                    p.IsActive,
+                    p.PhotoPath != null))
                 .ToListAsync();
 
             return Results.Ok(products);

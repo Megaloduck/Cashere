@@ -22,6 +22,11 @@ public partial class MobileShellViewModel : ViewModelBase
     [ObservableProperty]
     private MobileSection _selectedSection = MobileSection.Pairing;
 
+    // Lets the narrow nav rail be tucked away - useful on smaller phones, or
+    // to free up width for the camera preview on Scan/Label.
+    [ObservableProperty]
+    private bool _isSidebarVisible = true;
+
     public ViewModelBase CurrentView => SelectedSection switch
     {
         MobileSection.Pairing => Pairing,
@@ -30,11 +35,15 @@ public partial class MobileShellViewModel : ViewModelBase
         _ => Pairing
     };
 
-    public MobileShellViewModel(IPosSyncClientService syncClient, IBarcodeScannerService? scanner)
+    public MobileShellViewModel(
+        IPosSyncClientService syncClient,
+        IBarcodeScannerService? scanner,
+        IPhotoCaptureService? photoCapture,
+        IProductPhotoService? productPhoto)
     {
         Pairing = new PairingViewModel(syncClient);
         Scanning = new ScanningViewModel(syncClient, scanner);
-        Labeling = new LabelingViewModel();
+        Labeling = new LabelingViewModel(syncClient, photoCapture, productPhoto);
     }
 
     public async Task InitializeAsync()
@@ -46,14 +55,21 @@ public partial class MobileShellViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(CurrentView));
 
-        // Picks up the current cart in case a connection happened on the
-        // Pairing tab while Scanning wasn't visible.
+        // Picks up latest state in case a connection or catalog change
+        // happened on another tab while this one wasn't visible.
         if (value == MobileSection.Scanning)
         {
             _ = Scanning.RefreshAsync();
+        }
+        else if (value == MobileSection.Labeling)
+        {
+            _ = Labeling.RefreshAsync();
         }
     }
 
     [RelayCommand]
     private void SelectSection(MobileSection section) => SelectedSection = section;
+
+    [RelayCommand]
+    private void ToggleSidebar() => IsSidebarVisible = !IsSidebarVisible;
 }

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
+using Cashere.Services;
 
 namespace Cashere.Server;
 
@@ -25,6 +26,12 @@ public class CashereServerHost
     private WebApplication? _app;
 
     public int Port { get; }
+
+    // Exposed so Cashere.Desktop's admin services - built separately in
+    // Program.cs, outside this WebApplication's own DI container - can push
+    // ProductCatalogChanged notifications through the same SignalR hub
+    // connected mobile clients are listening on.
+    public IProductCatalogChangeNotifier? CatalogChangeNotifier { get; private set; }
 
     public CashereServerHost(int port = 5177)
     {
@@ -42,6 +49,7 @@ public class CashereServerHost
 
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<ActiveCartService>();
+        builder.Services.AddSingleton<IProductCatalogChangeNotifier, SignalRProductCatalogChangeNotifier>();
         builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
             p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
@@ -55,6 +63,10 @@ public class CashereServerHost
         builder.Services.AddSingleton(photoStorage);
 
         _app = builder.Build();
+
+        // Grabbed once here, right after the container is built, so
+        // Program.cs can hand it to ProductAdminService/PurchaseAdminService.
+        CatalogChangeNotifier = _app.Services.GetRequiredService<IProductCatalogChangeNotifier>();
 
         _app.UseCors();
 

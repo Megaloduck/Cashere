@@ -12,10 +12,14 @@ namespace Cashere.Data.Services;
 public class ProductAdminService : IProductAdminService
 {
     private readonly IDbContextFactory<CashereDbContext> _dbContextFactory;
+    private readonly IProductCatalogChangeNotifier? _catalogChangeNotifier;
 
-    public ProductAdminService(IDbContextFactory<CashereDbContext> dbContextFactory)
+    public ProductAdminService(
+        IDbContextFactory<CashereDbContext> dbContextFactory,
+        IProductCatalogChangeNotifier? catalogChangeNotifier = null)
     {
         _dbContextFactory = dbContextFactory;
+        _catalogChangeNotifier = catalogChangeNotifier;
     }
 
     public async Task<List<Product>> GetAllProductsAsync()
@@ -52,6 +56,7 @@ public class ProductAdminService : IProductAdminService
 
         db.Products.Add(product);
         await db.SaveChangesAsync();
+        await NotifyCatalogChangedAsync();
         return product;
     }
 
@@ -76,6 +81,7 @@ public class ProductAdminService : IProductAdminService
         product.UpdatedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync();
+        await NotifyCatalogChangedAsync();
     }
 
     public async Task SetActiveAsync(int productId, bool isActive)
@@ -87,6 +93,7 @@ public class ProductAdminService : IProductAdminService
         product.IsActive = isActive;
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
+        await NotifyCatalogChangedAsync();
     }
 
     public async Task SetPhotoPathAsync(int productId, string? photoPath)
@@ -98,6 +105,7 @@ public class ProductAdminService : IProductAdminService
         product.PhotoPath = string.IsNullOrWhiteSpace(photoPath) ? null : photoPath.Trim();
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
+        await NotifyCatalogChangedAsync();
     }
 
     // Checked up front rather than relying on catching the unique-index
@@ -125,4 +133,22 @@ public class ProductAdminService : IProductAdminService
 
     private static string? NormalizeBarcode(string? barcode) =>
         string.IsNullOrWhiteSpace(barcode) ? null : barcode.Trim();
+
+    // Best-effort push to any connected mobile clients so their Labeling
+    // product list picks up the change without needing a manual refresh or
+    // reconnect. A failure here never fails the admin operation itself - a
+    // phone that misses the push will still catch up on its own manual
+    // refresh or next reconnect.
+    private async Task NotifyCatalogChangedAsync()
+    {
+        if (_catalogChangeNotifier is null) return;
+
+        try
+        {
+            await _catalogChangeNotifier.NotifyChangedAsync();
+        }
+        catch
+        {
+        }
+    }
 }

@@ -11,4 +11,5 @@ public record ProductDto(
     decimal SellingPrice,
     int StockQuantity,
     string? CategoryName,
-    bool IsActive);
+    bool IsActive,
+    bool HasPhoto);

@@ -19,19 +19,24 @@ sealed class Program
 
         ApplyMigrationsAndSeed(dbPath);
 
+        // Started before AppServices are wired up below so ProductAdmin and
+        // PurchaseAdmin can be constructed with ServerHost.CatalogChangeNotifier -
+        // the bridge that lets admin-panel writes (built here, outside the
+        // server's own DI container) push ProductCatalogChanged to connected
+        // mobile clients through the same SignalR hub.
+        ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
+
         var dbContextFactory = new SqliteDbContextFactory(dbPath);
         AppServices.ProductCatalog = new ProductCatalogService(dbContextFactory);
         AppServices.SaleService = new SaleService(dbContextFactory);
         AppServices.ShopContext = new ShopContextService(dbContextFactory);
-        AppServices.ProductAdmin = new ProductAdminService(dbContextFactory);
+        AppServices.ProductAdmin = new ProductAdminService(dbContextFactory, ServerHost.CatalogChangeNotifier);
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
-        AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory);
+        AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, ServerHost.CatalogChangeNotifier);
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
-
-        ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
 
         try
         {

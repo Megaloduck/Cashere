@@ -81,7 +81,11 @@ public partial class App : Application
         {
             if (AppServices.SyncClient is not null)
             {
-                var shell = new MobileShellViewModel(AppServices.SyncClient, AppServices.BarcodeScanner);
+                var shell = new MobileShellViewModel(
+    AppServices.SyncClient,
+    AppServices.BarcodeScanner,
+    AppServices.PhotoCapture,
+    AppServices.ProductPhoto);
 
                 singleViewPlatform.MainView = new MobileShellView
                 {

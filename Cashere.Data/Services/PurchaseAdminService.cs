@@ -12,10 +12,14 @@ namespace Cashere.Data.Services;
 public class PurchaseAdminService : IPurchaseAdminService
 {
     private readonly IDbContextFactory<CashereDbContext> _dbContextFactory;
+    private readonly IProductCatalogChangeNotifier? _catalogChangeNotifier;
 
-    public PurchaseAdminService(IDbContextFactory<CashereDbContext> dbContextFactory)
+    public PurchaseAdminService(
+        IDbContextFactory<CashereDbContext> dbContextFactory,
+        IProductCatalogChangeNotifier? catalogChangeNotifier = null)
     {
         _dbContextFactory = dbContextFactory;
+        _catalogChangeNotifier = catalogChangeNotifier;
     }
 
     public async Task<List<Purchase>> GetAllPurchasesAsync()
@@ -104,6 +108,20 @@ public class PurchaseAdminService : IPurchaseAdminService
 
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
+
+        // Purchases change Product.StockQuantity, which is part of the
+        // mobile-facing ProductDto projection - push the same catalog-changed
+        // signal ProductAdminService uses, best-effort.
+        if (_catalogChangeNotifier is not null)
+        {
+            try
+            {
+                await _catalogChangeNotifier.NotifyChangedAsync();
+            }
+            catch
+            {
+            }
+        }
 
         return purchase;
     }
