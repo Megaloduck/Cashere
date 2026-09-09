@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace Cashere.Server;
 
@@ -43,10 +45,27 @@ public class CashereServerHost
         builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
             p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
+        // Product photos live alongside the SQLite db, under a sibling
+        // "media" folder - e.g. %LocalAppData%\Cashere\media\products\17.jpg,
+        // served back out at /media/products/17.jpg. Constructing the
+        // singleton here (not just registering the type) ensures the folder
+        // exists before UseStaticFiles below tries to serve from it.
+        var mediaRoot = Path.Combine(Path.GetDirectoryName(sqliteDbPath)!, "media");
+        var photoStorage = new ProductPhotoStorage(mediaRoot);
+        builder.Services.AddSingleton(photoStorage);
+
         _app = builder.Build();
 
         _app.UseCors();
+
+        _app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(mediaRoot),
+            RequestPath = "/media"
+        });
+
         _app.MapProductEndpoints();
+        _app.MapProductPhotoEndpoints();
         _app.MapHub<PosSyncHub>("/hubs/pos-sync");
 
         await _app.StartAsync();

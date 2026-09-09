@@ -1,14 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using System;
-using Cashere.ViewModels.Mobile;    
 
 namespace Cashere.Views.Mobile;
 
-public partial class PairingView : UserControl
+public partial class LabelingView : UserControl
 {
-    public PairingView()
+    public LabelingView()
     {
         InitializeComponent();
     }

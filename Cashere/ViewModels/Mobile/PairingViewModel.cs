@@ -11,21 +11,14 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels.Mobile;
 
+// Connection-only screen now - scanning (camera + manual entry + live cart)
+// moved to ScanningViewModel/ScanningView once the mobile UI grew a sidebar
+// with dedicated Pairing/Scanning/Labeling sections. Shares the same
+// IPosSyncClientService instance as ScanningViewModel, so connecting here is
+// immediately reflected there.
 public partial class PairingViewModel : ViewModelBase
 {
     private readonly IPosSyncClientService _syncClient;
-    private readonly IBarcodeScannerService? _scanner;
-
-    // Exposed so the View's code-behind can create/host the native preview
-    // control - Views are allowed to know about platform Controls, ViewModels
-    // aren't, so the control itself is never bound directly.
-    public IBarcodeScannerService? Scanner => _scanner;
-
-    public ObservableCollection<SyncCartLine> CartLines { get; } = new();
-
-    // Raised whenever ShowCameraPreview flips, so the View knows to
-    // attach/detach the native preview control.
-    public event Action<bool>? CameraReadyChanged;
 
     [ObservableProperty]
     private string _hostInput = string.Empty;
@@ -45,35 +38,13 @@ public partial class PairingViewModel : ViewModelBase
     [ObservableProperty]
     private string? _shopName;
 
-    [ObservableProperty]
-    private string _manualBarcode = string.Empty;
-
-    [ObservableProperty]
-    private string _lastScanMessage = string.Empty;
-
-    [ObservableProperty]
-    private decimal _cartSubtotal;
-
-    [ObservableProperty]
-    private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
-
     public bool IsConnected => State == SyncConnectionState.Connected;
     public bool CanConnect => !IsBusy && State != SyncConnectionState.Connected && State != SyncConnectionState.Connecting;
-    public bool ShowCameraPreview => IsConnected && CameraPermission == CameraPermissionStatus.Granted;
-    public bool CameraPermissionDenied => CameraPermission == CameraPermissionStatus.Denied;
 
-    public PairingViewModel(IPosSyncClientService syncClient, IBarcodeScannerService? scanner = null)
+    public PairingViewModel(IPosSyncClientService syncClient)
     {
         _syncClient = syncClient;
-        _scanner = scanner;
         _syncClient.StateChanged += HandleSyncStateChanged;
-        _syncClient.CartUpdated += HandleCartUpdated;
-
-        if (_scanner is not null)
-        {
-            _scanner.BarcodeScanned += HandleBarcodeScanned;
-            CameraPermission = _scanner.PermissionStatus;
-        }
     }
 
     public async Task InitializeAsync()
@@ -84,40 +55,21 @@ public partial class PairingViewModel : ViewModelBase
             HostInput = last.Host;
             PortInput = last.Port.ToString();
         }
+
+        // Reflect current state in case the client is already connected.
+        State = _syncClient.State;
+        ShopName = _syncClient.ShopName;
     }
 
     private void HandleSyncStateChanged(SyncConnectionState state) => State = state;
-
-    private void HandleCartUpdated(SyncCartSnapshot cart)
-    {
-        CartLines.Clear();
-        foreach (var line in cart.Items)
-        {
-            CartLines.Add(line);
-        }
-        CartSubtotal = cart.Subtotal;
-    }
-
-    // Camera path feeds into the exact same scan handling as manual entry -
-    // the till has no way to tell the two apart, by design.
-    private void HandleBarcodeScanned(string barcode) => _ = ProcessScanAsync(barcode);
 
     partial void OnStateChanged(SyncConnectionState value)
     {
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(CanConnect));
-        OnPropertyChanged(nameof(ShowCameraPreview));
-        CameraReadyChanged?.Invoke(ShowCameraPreview);
     }
 
     partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(CanConnect));
-
-    partial void OnCameraPermissionChanged(CameraPermissionStatus value)
-    {
-        OnPropertyChanged(nameof(ShowCameraPreview));
-        OnPropertyChanged(nameof(CameraPermissionDenied));
-        CameraReadyChanged?.Invoke(ShowCameraPreview);
-    }
 
     [RelayCommand]
     private async Task Connect()
@@ -143,8 +95,6 @@ public partial class PairingViewModel : ViewModelBase
             if (result.Success)
             {
                 ShopName = result.ShopName;
-                var cart = await _syncClient.GetCurrentCartAsync();
-                HandleCartUpdated(cart);
             }
             else
             {
@@ -164,55 +114,7 @@ public partial class PairingViewModel : ViewModelBase
     [RelayCommand]
     private async Task Disconnect()
     {
-        if (_scanner is not null)
-        {
-            await _scanner.StopAsync();
-        }
-
         await _syncClient.DisconnectAsync();
         ShopName = null;
-        CartLines.Clear();
-        CartSubtotal = 0;
-        LastScanMessage = string.Empty;
-    }
-
-    [RelayCommand]
-    private async Task EnableCamera()
-    {
-        if (_scanner is null) return;
-
-        CameraPermission = await _scanner.RequestCameraPermissionAsync();
-    }
-
-    [RelayCommand]
-    private async Task SendManualScan()
-    {
-        if (string.IsNullOrWhiteSpace(ManualBarcode)) return;
-
-        var barcode = ManualBarcode.Trim();
-        ManualBarcode = string.Empty;
-        await ProcessScanAsync(barcode);
-    }
-
-    // Shared by both the manual TextBox path and the camera path above - the
-    // ScanBarcode round trip to the till is identical either way.
-    private async Task ProcessScanAsync(string barcode)
-    {
-        try
-        {
-            var outcome = await _syncClient.ScanBarcodeAsync(barcode);
-            LastScanMessage = outcome.Found
-                ? $"Added: {outcome.ProductName}"
-                : outcome.Message ?? "No product matches that barcode.";
-
-            if (outcome.Cart is not null)
-            {
-                HandleCartUpdated(outcome.Cart);
-            }
-        }
-        catch (Exception ex)
-        {
-            LastScanMessage = $"Scan failed: {ex.Message}";
-        }
     }
 }

@@ -81,14 +81,14 @@ public partial class App : Application
         {
             if (AppServices.SyncClient is not null)
             {
-                var pairingViewModel = new PairingViewModel(AppServices.SyncClient, AppServices.BarcodeScanner);
+                var shell = new MobileShellViewModel(AppServices.SyncClient, AppServices.BarcodeScanner);
 
-                singleViewPlatform.MainView = new PairingView
+                singleViewPlatform.MainView = new MobileShellView
                 {
-                    DataContext = pairingViewModel
+                    DataContext = shell
                 };
 
-                _ = pairingViewModel.InitializeAsync();
+                _ = shell.InitializeAsync();
             }
             else
             {

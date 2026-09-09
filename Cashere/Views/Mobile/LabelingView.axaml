@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Mobile"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="720"
+             x:Class="Cashere.Views.Mobile.LabelingView"
+             x:DataType="vm:LabelingViewModel">
+  <Grid RowDefinitions="Auto,Auto,*">
+    <Border Grid.Row="0" Background="{StaticResource InkBrush}" Padding="18,20">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
+        <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
+        <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
+        <StackPanel Margin="10,0,0,0">
+          <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
+          <TextBlock Text="LABELING" Classes="eyebrow" Foreground="#B8B8B8"/>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Height="6">
+      <Border Grid.Column="0" Background="{StaticResource RedBrush}"/>
+      <Border Grid.Column="1" Background="{StaticResource YellowBrush}"/>
+      <Border Grid.Column="2" Background="{StaticResource BlueBrush}"/>
+    </Grid>
+
+    <StackPanel Grid.Row="2" Margin="24" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center">
+      <mi:MaterialIcon Kind="CameraPlusOutline" Width="32" Height="32" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center"/>
+      <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource GrayBrush}"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

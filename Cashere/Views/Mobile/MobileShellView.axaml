@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Mobile"
+             xmlns:converters="clr-namespace:Cashere.Converters"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="720"
+             x:Class="Cashere.Views.Mobile.MobileShellView"
+             x:DataType="vm:MobileShellViewModel">
+
+  <UserControl.Resources>
+    <converters:EnumMatchConverter x:Key="EnumMatch"/>
+  </UserControl.Resources>
+
+  <Grid ColumnDefinitions="72,*">
+    <Border Grid.Column="0" Background="{StaticResource InkBrush}">
+      <StackPanel Margin="0,24,0,0" Spacing="4">
+        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Pairing}"
+                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Pairing}">
+          <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <mi:MaterialIcon Kind="LanConnect" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <TextBlock Text="PAIR" Classes="rail-label" HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
+        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Scanning}"
+                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Scanning}">
+          <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <mi:MaterialIcon Kind="BarcodeScan" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <TextBlock Text="SCAN" Classes="rail-label" HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
+        <Button Classes="rail-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Labeling}"
+                Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:MobileSection.Labeling}">
+          <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <mi:MaterialIcon Kind="CameraPlusOutline" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <TextBlock Text="LABEL" Classes="rail-label" HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Border>
+
+    <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
+  </Grid>
+</UserControl>
