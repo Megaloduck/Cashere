@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cashere.Data.Migrations
 {
     [DbContext(typeof(CashereDbContext))]
-    [Migration("20260908171950_AddProductPhotoPath")]
+    [Migration("20260909060155_AddProductPhotoPath")]
     partial class AddProductPhotoPath
     {
         /// <inheritdoc />
@@ -207,6 +207,10 @@ namespace Cashere.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhotoPath")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("SellingPrice")
