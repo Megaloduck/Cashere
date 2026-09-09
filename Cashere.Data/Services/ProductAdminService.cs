@@ -89,6 +89,17 @@ public class ProductAdminService : IProductAdminService
         await db.SaveChangesAsync();
     }
 
+    public async Task SetPhotoPathAsync(int productId, string? photoPath)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId)
+            ?? throw new AdminValidationException($"Product {productId} was not found.");
+
+        product.PhotoPath = string.IsNullOrWhiteSpace(photoPath) ? null : photoPath.Trim();
+        product.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+    }
+
     // Checked up front rather than relying on catching the unique-index
     // violation, so the cashier gets a clear message instead of a raw
     // SQLite constraint error.

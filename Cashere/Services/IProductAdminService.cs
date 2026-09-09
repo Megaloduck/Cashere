@@ -18,14 +18,17 @@ public record ProductInput(
     int StockQuantity,
     int LowStockThreshold);
 
-// Admin-side CRUD for the product catalog - deliberately separate from
-// IProductCatalogService, which is the POS-facing, active-only, read-only
-// view of the same table. Implemented in Cashere.Data with EF Core, same
-// split as every other service pair in this project.
 public interface IProductAdminService
 {
     Task<List<Product>> GetAllProductsAsync();
     Task<Product> CreateProductAsync(ProductInput input);
     Task UpdateProductAsync(int productId, ProductInput input);
     Task SetActiveAsync(int productId, bool isActive);
+
+    // Set by the server's photo-upload endpoint once a mobile-captured photo
+    // has been saved to disk, or by desktop admin to manually clear a bad
+    // photo. Deliberately separate from ProductInput/UpdateProductAsync -
+    // the photo lifecycle (capture -> upload -> store) is independent of the
+    // rest of the product form.
+    Task SetPhotoPathAsync(int productId, string? photoPath);
 }

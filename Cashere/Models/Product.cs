@@ -17,6 +17,9 @@ public class Product
     public int StockQuantity { get; set; }
     public int LowStockThreshold { get; set; } = 5;
     public bool IsActive { get; set; } = true;
+    // Relative path under the desktop's local media folder, e.g. "products/17.jpg".
+    // Null until a photo has been uploaded from the mobile labeling flow (or set manually).
+    public string? PhotoPath { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

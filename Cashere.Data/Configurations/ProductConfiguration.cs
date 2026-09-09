@@ -13,6 +13,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Unit).IsRequired().HasMaxLength(20);
         builder.Property(p => p.CostPrice).HasPrecision(18, 2);
         builder.Property(p => p.SellingPrice).HasPrecision(18, 2);
+        builder.Property(p => p.PhotoPath).HasMaxLength(500);
 
         builder.HasIndex(p => p.Sku).IsUnique();
         builder.HasIndex(p => p.Barcode).IsUnique().HasFilter("Barcode IS NOT NULL");
