@@ -37,6 +37,7 @@ sealed class Program
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
+        AppServices.ConnectedDevices = ServerHost.ConnectedDevices;
 
         try
         {

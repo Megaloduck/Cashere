@@ -7,6 +7,15 @@ using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Cashere.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 namespace Cashere.ViewModels.Admin;
 
 public partial class AdminViewModel : ViewModelBase
@@ -19,6 +28,7 @@ public partial class AdminViewModel : ViewModelBase
     public SalesHistoryViewModel SalesHistory { get; }
     public SalesReportViewModel SalesReport { get; }
     public ShopSettingsViewModel Settings { get; }
+    public DevicesAdminViewModel Devices { get; }
 
     public event Action? BackRequested;
 
@@ -38,6 +48,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.SalesHistory => SalesHistory,
         AdminSection.SalesReport => SalesReport,
         AdminSection.Settings => Settings,
+        AdminSection.Devices => Devices,
         _ => Products
     };
 
@@ -51,6 +62,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.SalesHistory => "SALES HISTORY",
         AdminSection.SalesReport => "REPORTS",
         AdminSection.Settings => "SHOP SETTINGS",
+        AdminSection.Devices => "CONNECTED DEVICES",
         _ => "ADMIN"
     };
 
@@ -64,7 +76,8 @@ public partial class AdminViewModel : ViewModelBase
         ISalesReportService salesReport,
         IProductCatalogService productCatalog,
         IShopContextService shopContext,
-        int currentCashierId)
+        int currentCashierId,
+        IConnectedDeviceService? connectedDeviceService = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
@@ -74,6 +87,7 @@ public partial class AdminViewModel : ViewModelBase
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
         Settings = new ShopSettingsViewModel(shopContext);
+        Devices = new DevicesAdminViewModel(connectedDeviceService);
     }
 
     public async Task InitializeAsync()
@@ -86,12 +100,21 @@ public partial class AdminViewModel : ViewModelBase
         await SalesHistory.LoadAsync();
         await SalesReport.LoadAsync();
         await Settings.LoadAsync();
+        await Devices.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(AdminSection value)
     {
         OnPropertyChanged(nameof(CurrentSectionViewModel));
         OnPropertyChanged(nameof(CurrentSectionTitle));
+
+        // Devices is live connection state - refresh whenever the cashier
+        // navigates to it, same reasoning as MobileShellViewModel refreshing
+        // Scanning/Labeling on tab switch.
+        if (value == AdminSection.Devices)
+        {
+            Devices.RefreshCommand.Execute(null);
+        }
     }
 
     [RelayCommand]

@@ -25,5 +25,6 @@ namespace Cashere.Services
         public static ICashierAdminService? CashierAdmin { get; set; }
         public static ICustomerAdminService? CustomerAdmin { get; set; }
         public static ISalesReportService? SalesReport { get; set; }
+        public static IConnectedDeviceService? ConnectedDevices { get; set; }
     }
 }

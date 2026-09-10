@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
-using Cashere.Services;
+using Cashere.Services; 
 
 namespace Cashere.Server;
 
@@ -33,6 +33,12 @@ public class CashereServerHost
     // connected mobile clients are listening on.
     public IProductCatalogChangeNotifier? CatalogChangeNotifier { get; private set; }
 
+    // Same idea, but for reading rather than pushing: lets Cashere.Desktop's
+    // AdminViewModel list whichever mobile clients PosSyncHub currently has
+    // connected, without needing a network round trip - both live in this
+    // same process.
+    public IConnectedDeviceService? ConnectedDevices { get; private set; }
+
     public CashereServerHost(int port = 5177)
     {
         Port = port;
@@ -50,6 +56,14 @@ public class CashereServerHost
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<ActiveCartService>();
         builder.Services.AddSingleton<IProductCatalogChangeNotifier, SignalRProductCatalogChangeNotifier>();
+
+        // Registered as both the concrete type (so PosSyncHub can call the
+        // Register*/mutator methods) and the interface (so anything outside
+        // Cashere.Server - i.e. the desktop admin UI - only ever sees the
+        // read-only GetConnectedDevices()/DevicesChanged surface).
+        builder.Services.AddSingleton<ConnectedDeviceService>();
+        builder.Services.AddSingleton<IConnectedDeviceService>(sp => sp.GetRequiredService<ConnectedDeviceService>());
+
         builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
             p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
@@ -65,8 +79,9 @@ public class CashereServerHost
         _app = builder.Build();
 
         // Grabbed once here, right after the container is built, so
-        // Program.cs can hand it to ProductAdminService/PurchaseAdminService.
+        // Program.cs can hand these to the admin services / AdminViewModel.
         CatalogChangeNotifier = _app.Services.GetRequiredService<IProductCatalogChangeNotifier>();
+        ConnectedDevices = _app.Services.GetRequiredService<IConnectedDeviceService>();
 
         _app.UseCors();
 

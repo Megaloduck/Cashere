@@ -49,16 +49,17 @@ public partial class App : Application
                     cashier?.DisplayName ?? "Unknown");
 
                 var adminViewModel = new AdminViewModel(
-                    AppServices.ProductAdmin,
-                    AppServices.CategoryAdmin,
-                    AppServices.SupplierAdmin,
-                    AppServices.PurchaseAdmin,
-                    AppServices.CashierAdmin,
-                    AppServices.CustomerAdmin,
-                    AppServices.SalesReport,
-                    AppServices.ProductCatalog,
-                    AppServices.ShopContext,
-                    cashier?.Id ?? 0);
+     AppServices.ProductAdmin,
+     AppServices.CategoryAdmin,
+     AppServices.SupplierAdmin,
+     AppServices.PurchaseAdmin,
+     AppServices.CashierAdmin,
+     AppServices.CustomerAdmin,
+     AppServices.SalesReport,
+     AppServices.ProductCatalog,
+     AppServices.ShopContext,
+     cashier?.Id ?? 0,
+     AppServices.ConnectedDevices);
 
                 var shell = new ShellViewModel(posViewModel, adminViewModel);
 

@@ -80,6 +80,14 @@
               </StackPanel>
             </Button>
 
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Devices}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Devices}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="Devices" Width="18" Height="18"/>
+                <TextBlock Text="DEVICES"/>
+              </StackPanel>
+            </Button>
+
             <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">

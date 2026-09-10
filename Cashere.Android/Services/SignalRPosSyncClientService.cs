@@ -14,10 +14,6 @@ using Avalonia.Threading;
 
 namespace Cashere.Android.Services;
 
-// SignalR-backed implementation of IPosSyncClientService. Lives in
-// Cashere.Android (not the shared, EF-free Cashere project) so it's the only
-// place carrying the SignalR client + networking dependencies - same
-// separation as EF-backed services living in Cashere.Data instead of Cashere.
 public class SignalRPosSyncClientService : IPosSyncClientService
 {
     private const string LastEndpointFileName = "last-shop-endpoint.txt";
@@ -43,9 +39,6 @@ public class SignalRPosSyncClientService : IPosSyncClientService
 
         try
         {
-            // Confirm this is actually a Cashere till before opening a hub
-            // connection - turns a typo'd IP into a clear message instead of
-            // a raw SignalR negotiation failure.
             var health = await _httpClient.GetFromJsonAsync<HealthResponse>(
                 $"{baseAddress}/api/health", cancellationToken);
 
@@ -55,8 +48,13 @@ public class SignalRPosSyncClientService : IPosSyncClientService
                 return new PairingResult(false, null, "The till didn't respond as expected.");
             }
 
+            // Picked up server-side by PosSyncHub.OnConnectedAsync and surfaced
+            // on the desktop admin's Devices screen - purely informational,
+            // the hub never trusts it for anything else.
+            var deviceName = Uri.EscapeDataString(GetDeviceName());
+
             _connection = new HubConnectionBuilder()
-                .WithUrl($"{baseAddress}/hubs/pos-sync")
+                .WithUrl($"{baseAddress}/hubs/pos-sync?deviceName={deviceName}")
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -165,6 +163,31 @@ public class SignalRPosSyncClientService : IPosSyncClientService
     {
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         return Path.Combine(folder, LastEndpointFileName);
+    }
+
+    // Best-effort friendly label for the desktop admin's Devices screen -
+    // e.g. "Google Pixel 7". Falls back gracefully if info is missing;
+    // never throws (a device-name failure shouldn't break pairing).
+    private static string GetDeviceName()
+    {
+        try
+        {
+            var manufacturer = global::Android.OS.Build.Manufacturer ?? string.Empty;
+            var model = global::Android.OS.Build.Model ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(model))
+            {
+                return "Android Device";
+            }
+
+            return string.IsNullOrWhiteSpace(manufacturer) || model.StartsWith(manufacturer, StringComparison.OrdinalIgnoreCase)
+                ? model
+                : $"{manufacturer} {model}";
+        }
+        catch
+        {
+            return "Android Device";
+        }
     }
 
     private void SetState(SyncConnectionState state)
