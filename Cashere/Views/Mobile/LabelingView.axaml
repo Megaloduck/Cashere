@@ -84,8 +84,9 @@
         <ContentControl x:Name="CameraPreviewHost"/>
       </Border>
 
-      <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-              Padding="0,16" FontSize="16" IsVisible="{Binding ShowCameraPreview}" Command="{Binding CaptureCommand}">
+            <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              Padding="0,16" FontSize="16" IsVisible="{Binding ShowCameraPreview}"
+              IsEnabled="{Binding IsCameraStarted}" Command="{Binding CaptureCommand}">
         <StackPanel Orientation="Horizontal" Spacing="8">
           <mi:MaterialIcon Kind="Camera" Width="20" Height="20"/>
           <TextBlock Text="TAKE PHOTO"/>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content.PM;
@@ -25,6 +26,12 @@ public class CameraXPhotoCaptureService : IPhotoCaptureService
     private const int CameraPermissionRequestCode = 4243;
 
     private readonly Activity _activity;
+
+    // Serializes StartAsync() calls - LabelingView can raise CameraReadyChanged
+    // in quick succession (permission granted, product picked, etc.), and
+    // without this a second call could UnbindAll()/BindToLifecycle() while
+    // the first is still mid-poll below.
+    private readonly SemaphoreSlim _startLock = new(1, 1);
 
     private CameraPreviewControl? _previewControl;
     private IExecutorService? _captureExecutor;
@@ -75,27 +82,59 @@ public class CameraXPhotoCaptureService : IPhotoCaptureService
 
     public async Task StartAsync()
     {
-        if (_previewControl?.PreviewView is null)
+        if (_previewControl is null)
         {
             throw new InvalidOperationException(
                 "CreatePreviewControl() must be attached to the visual tree before StartAsync().");
         }
 
-        _cameraProvider ??= await GetCameraProviderAsync();
-        _captureExecutor ??= Executors.NewSingleThreadExecutor();
+        await _startLock.WaitAsync();
+        try
+        {
+            // Avalonia's NativeControlHost (CameraPreviewControl) creates the
+            // native Android PreviewView asynchronously, once the control
+            // returned by CreatePreviewControl() is actually attached to the
+            // visual tree (e.g. assigned to a ContentControl.Content) and a
+            // layout pass runs. That can still be pending on the very first
+            // frame after assigning Content - previously this made StartAsync
+            // throw immediately, and since callers didn't await it, it failed
+            // silently, leaving _imageCapture null and the camera never bound.
+            // Poll briefly instead of failing on the first check.
+            var waited = TimeSpan.Zero;
+            var pollInterval = TimeSpan.FromMilliseconds(25);
+            var timeout = TimeSpan.FromSeconds(3);
+            while (_previewControl.PreviewView is null && waited < timeout)
+            {
+                await Task.Delay(pollInterval);
+                waited += pollInterval;
+            }
 
-        var preview = new CameraPreview.Builder().Build();
-        preview.SetSurfaceProvider(
-            ContextCompat.GetMainExecutor(_activity),
-            _previewControl.PreviewView.SurfaceProvider);
+            if (_previewControl.PreviewView is null)
+            {
+                throw new InvalidOperationException(
+                    "Camera preview surface never became ready - try again.");
+            }
 
-        _imageCapture = new ImageCapture.Builder()
-            .SetCaptureMode(ImageCapture.CaptureModeMinimizeLatency)
-            .Build();
+            _cameraProvider ??= await GetCameraProviderAsync();
+            _captureExecutor ??= Executors.NewSingleThreadExecutor();
 
-        _cameraProvider.UnbindAll();
-        _cameraProvider.BindToLifecycle(
-            (ILifecycleOwner)_activity, CameraSelector.DefaultBackCamera, preview, _imageCapture);
+            var preview = new CameraPreview.Builder().Build();
+            preview.SetSurfaceProvider(
+                ContextCompat.GetMainExecutor(_activity),
+                _previewControl.PreviewView.SurfaceProvider);
+
+            _imageCapture = new ImageCapture.Builder()
+                .SetCaptureMode(ImageCapture.CaptureModeMinimizeLatency)
+                .Build();
+
+            _cameraProvider.UnbindAll();
+            _cameraProvider.BindToLifecycle(
+                (ILifecycleOwner)_activity, CameraSelector.DefaultBackCamera, preview, _imageCapture);
+        }
+        finally
+        {
+            _startLock.Release();
+        }
     }
 
     public Task StopAsync()
@@ -127,12 +166,6 @@ public class CameraXPhotoCaptureService : IPhotoCaptureService
         return tcs.Task;
     }
 
-    // ImageCapture.OnImageCapturedCallback is a Java-bound abstract class, so
-    // this adapter carries the Java-interop baggage instead of the whole
-    // service extending Java.Lang.Object - same idea as AnalyzerAdapter in
-    // CameraXBarcodeScannerService and JavaRunnable elsewhere in this folder.
-    // In-memory JPEG capture returns the full compressed image as a single
-    // plane, unlike the raw YUV planes AnalyzeFrame reads for barcode decoding.
     private sealed class CaptureCallback : ImageCapture.OnImageCapturedCallback
     {
         private readonly TaskCompletionSource<byte[]> _tcs;

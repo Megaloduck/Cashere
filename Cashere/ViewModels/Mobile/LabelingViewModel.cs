@@ -48,6 +48,9 @@ public partial class LabelingViewModel : ViewModelBase
     private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
 
     [ObservableProperty]
+    private bool _isCameraStarted;
+
+    [ObservableProperty]
     private byte[]? _capturedPhoto;
 
     [ObservableProperty]
@@ -63,6 +66,14 @@ public partial class LabelingViewModel : ViewModelBase
 
     public bool IsConnected => State == SyncConnectionState.Connected;
     public bool ShowProductList => IsConnected && SelectedProduct is null;
+
+    // Called by the View once PhotoCapture.StartAsync() actually completes -
+    // ShowCameraPreview turning true only means permission is granted and the
+    // capture panel is showing, not that the native camera session is bound
+    // yet, so TAKE PHOTO stays disabled until this confirms it.
+    public void SetCameraStarted(bool started) => IsCameraStarted = started;
+
+    public void ReportCameraError(string message) => StatusMessage = message;
     public bool ShowCapturePanel => IsConnected && SelectedProduct is not null && CapturedPhoto is null;
     public bool ShowReviewPanel => IsConnected && SelectedProduct is not null && CapturedPhoto is not null;
     public bool ShowCameraPreview => ShowCapturePanel && CameraPermission == CameraPermissionStatus.Granted;
@@ -212,16 +223,9 @@ public partial class LabelingViewModel : ViewModelBase
     private async Task Refresh() => await RefreshAsync();
 
     [RelayCommand]
-    private async Task EnableCamera()
-    {
-        if (_photoCapture is null) return;
-        CameraPermission = await _photoCapture.RequestCameraPermissionAsync();
-    }
-
-    [RelayCommand]
     private async Task Capture()
     {
-        if (_photoCapture is null) return;
+        if (_photoCapture is null || !IsCameraStarted) return;
 
         try
         {
@@ -232,6 +236,13 @@ public partial class LabelingViewModel : ViewModelBase
         {
             StatusMessage = $"Capture failed: {ex.Message}";
         }
+    }
+
+    [RelayCommand]
+    private async Task EnableCamera()
+    {
+        if (_photoCapture is null) return;
+        CameraPermission = await _photoCapture.RequestCameraPermissionAsync();
     }
 
     // Clearing CapturedPhoto flips ShowCameraPreview back to true (permission

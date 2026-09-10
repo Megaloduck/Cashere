@@ -40,19 +40,35 @@ public partial class LabelingView : UserControl
         }
     }
 
-    private void OnCameraReadyChanged(bool ready)
+    private async void OnCameraReadyChanged(bool ready)
     {
         if (DataContext is not LabelingViewModel vm || vm.PhotoCapture is null) return;
 
         if (ready)
         {
+            // Not actually ready to take a photo until StartAsync below
+            // confirms the camera is bound - keeps TAKE PHOTO disabled for
+            // the brief window while the native preview surface attaches.
+            vm.SetCameraStarted(false);
+
             _cameraPreviewControl ??= vm.PhotoCapture.CreatePreviewControl();
             CameraPreviewHost.Content = _cameraPreviewControl;
-            _ = vm.PhotoCapture.StartAsync();
+
+            try
+            {
+                await vm.PhotoCapture.StartAsync();
+                vm.SetCameraStarted(true);
+            }
+            catch (Exception ex)
+            {
+                vm.SetCameraStarted(false);
+                vm.ReportCameraError($"Could not start camera: {ex.Message}");
+            }
         }
         else
         {
             CameraPreviewHost.Content = null;
+            vm.SetCameraStarted(false);
         }
     }
 
