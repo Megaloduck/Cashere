@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:Class="Cashere.SyncronizationAdminView"
+             x:DataType="vm:SyncronizationAdminViewModel">
+
+    <Grid RowDefinitions="Auto,*" Margin="12"> 
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <StackPanel Grid.Column="0" Spacing="10">
+                <TextBlock  Text="SYNCHRONIZATION" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+                <Border Classes="rule-thick"/>
+            </StackPanel>            
+        </Grid>
+        <!-- Content -->
+
+    <ScrollViewer>
+        <StackPanel>
+                    <Border Classes="rule-thick" Margin="0,8"/>
+                    <TextBlock Text="NETWORK (LOCAL SYNC SERVER)" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="BIND ADDRESS" Classes="eyebrow"/>
+                    <ComboBox ItemsSource="{Binding AvailableBindAddresses}"
+                              SelectedItem="{Binding ServerBindAddress}"
+                              HorizontalAlignment="Stretch"/>
+                    <TextBlock Text="0.0.0.0 binds every network adapter on this PC - the safe default. Pick a specific address only to restrict which network the till is reachable on."
+                               Foreground="{StaticResource GrayBrush}"
+                               TextWrapping="Wrap"
+                               FontSize="11"/>
+
+                    <TextBlock Text="PORT" Classes="eyebrow"/>
+                    <TextBox Text="{Binding ServerPort}" Watermark="5177"/>
+
+                    <TextBlock Text="Changes take effect the next time Cashere is started."
+                               Foreground="{StaticResource GrayBrush}"
+                               TextWrapping="Wrap"
+                               FontSize="11"/>
+
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="{StaticResource BlueBrush}"
+                               FontWeight="Bold"
+                               TextWrapping="Wrap"/>
+
+                    <Button Content="SAVE SETTINGS"
+                            Classes="accent-blue"
+                            Command="{Binding SaveCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Padding="0,14"
+                            Margin="0,8,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+</UserControl>

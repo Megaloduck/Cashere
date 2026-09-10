@@ -16,5 +16,6 @@ public enum AdminSection
     SalesHistory,
     SalesReport,
     Settings,
-    Devices
+    Devices,
+    Syncronization
 }
