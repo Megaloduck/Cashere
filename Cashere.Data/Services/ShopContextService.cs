@@ -59,7 +59,9 @@ public class ShopContextService : IShopContextService
                 Phone = settings.Phone,
                 Currency = settings.Currency,
                 TaxRatePercent = settings.TaxRatePercent,
-                ReceiptFooterText = settings.ReceiptFooterText
+                ReceiptFooterText = settings.ReceiptFooterText,
+                ServerBindAddress = settings.ServerBindAddress,
+                ServerPort = settings.ServerPort
             });
         }
         else
@@ -70,6 +72,8 @@ public class ShopContextService : IShopContextService
             existing.Currency = settings.Currency;
             existing.TaxRatePercent = settings.TaxRatePercent;
             existing.ReceiptFooterText = settings.ReceiptFooterText;
+            existing.ServerBindAddress = settings.ServerBindAddress;
+            existing.ServerPort = settings.ServerPort;
         }
 
         await db.SaveChangesAsync();

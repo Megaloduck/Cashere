@@ -45,6 +45,12 @@ public interface IPosSyncClientService
     // this to auto-refresh its product list.
     event Action? ProductCatalogChanged;
 
+    // Raised after this device has been kicked from the till's Devices
+    // screen and has already disconnected itself. Carries the reason text
+    // the till sent, purely for display - subscribers don't need to tear
+    // anything down themselves, that already happened.
+    event Action<string>? Kicked;
+
     Task<PairingResult> ConnectAsync(ShopEndpoint endpoint, CancellationToken cancellationToken = default);
     Task DisconnectAsync();
     Task<BarcodeScanOutcome> ScanBarcodeAsync(string barcode, int quantity = 1);

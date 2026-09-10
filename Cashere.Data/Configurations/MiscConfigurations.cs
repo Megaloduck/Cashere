@@ -1,6 +1,6 @@
 using Cashere.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;  
 
 namespace Cashere.Data.Configurations;
 
@@ -48,5 +48,6 @@ public class ShopSettingsConfiguration : IEntityTypeConfiguration<ShopSettings>
         builder.Property(s => s.ShopName).IsRequired().HasMaxLength(200);
         builder.Property(s => s.Currency).IsRequired().HasMaxLength(10);
         builder.Property(s => s.TaxRatePercent).HasPrecision(5, 2);
+        builder.Property(s => s.ServerBindAddress).IsRequired().HasMaxLength(64);
     }
 }

@@ -19,10 +19,11 @@
       </Button>
     </Grid>
 
-    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1.3*" Margin="0,0,0,4" IsVisible="{Binding IsServiceAvailable}">
+    <Grid Grid.Row="1" ColumnDefinitions="2*,1*,1.3*,90" Margin="0,0,0,4" IsVisible="{Binding IsServiceAvailable}">
       <TextBlock Grid.Column="0" Text="DEVICE" Classes="eyebrow"/>
       <TextBlock Grid.Column="1" Text="IP ADDRESS" Classes="eyebrow"/>
       <TextBlock Grid.Column="2" Text="CONNECTED SINCE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="ACTIONS" Classes="eyebrow" HorizontalAlignment="Center"/>
     </Grid>
     <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom" IsVisible="{Binding IsServiceAvailable}"/>
 
@@ -31,13 +32,18 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="services:ConnectedDeviceInfo">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
-              <Grid ColumnDefinitions="2*,1*,1.3*">
+              <Grid ColumnDefinitions="2*,1*,1.3*,90">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                   <mi:MaterialIcon Kind="CellphoneLink" Width="18" Height="18" Foreground="{StaticResource BlueBrush}"/>
                   <TextBlock Text="{Binding DeviceName}" FontWeight="Bold" TextWrapping="Wrap"/>
                 </StackPanel>
                 <TextBlock Grid.Column="1" Text="{Binding IpAddress}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="{Binding ConnectedAt, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                  <Button Classes="ghost" Click="OnKickClick" ToolTip.Tip="Disconnect this device">
+                    <mi:MaterialIcon Kind="CellphoneRemove" Width="18" Height="18"/>
+                  </Button>
+                </StackPanel>
               </Grid>
             </Border>
           </DataTemplate>

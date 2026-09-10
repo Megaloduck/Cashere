@@ -9,48 +9,88 @@
     <Grid RowDefinitions="Auto,*" Margin="12">
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-            <TextBlock Grid.Column="0" Text="SHOP SETTINGS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="0" Spacing="10">
+                <TextBlock  Text="SHOP SETTINGS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+                <Border Classes="rule-thick"/>
+            </StackPanel>            
         </Grid>
 
         <!-- Content -->
-        <Grid Grid.Row="1" ColumnDefinitions="2*,1*" >
-            <!-- Receipt Configuration -->
-            <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,12,0">
-                <Border Classes="rule-thick"/>
+        <Grid Grid.Row="1" ColumnDefinitions="2*,1*">
+            <!-- Receipt Configuration (scrollable) -->
+            <ScrollViewer Grid.Column="0"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Margin="0,0,12,0">
+                <StackPanel Spacing="10">
+                    
+                    <TextBlock Text="SHOP NAME" Classes="eyebrow"/>
+                    <TextBox Text="{Binding ShopName}"/>
 
-                <TextBlock Text="SHOP NAME" Classes="eyebrow"/>
-                <TextBox Text="{Binding ShopName}"/>
+                    <TextBlock Text="ADDRESS" Classes="eyebrow"/>
+                    <TextBox Text="{Binding Address}"/>
 
-                <TextBlock Text="ADDRESS" Classes="eyebrow"/>
-                <TextBox Text="{Binding Address}"/>
+                    <TextBlock Text="PHONE" Classes="eyebrow"/>
+                    <TextBox Text="{Binding Phone}"/>
 
-                <TextBlock Text="PHONE" Classes="eyebrow"/>
-                <TextBox Text="{Binding Phone}"/>
+                    <TextBlock Text="CURRENCY CODE" Classes="eyebrow"/>
+                    <TextBox Text="{Binding Currency}"/>
 
-                <TextBlock Text="CURRENCY CODE" Classes="eyebrow"/>
-                <TextBox Text="{Binding Currency}"/>
+                    <TextBlock Text="TAX RATE (%)" Classes="eyebrow"/>
+                    <TextBox Text="{Binding TaxRatePercent}"/>
 
-                <TextBlock Text="TAX RATE (%)" Classes="eyebrow"/>
-                <TextBox Text="{Binding TaxRatePercent}"/>
+                    <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
+                    <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
 
-                <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
-                <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
+                    <Border Classes="rule-thick" Margin="0,8"/>
+                    <TextBlock Text="NETWORK (LOCAL SYNC SERVER)" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
 
-                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+                    <TextBlock Text="BIND ADDRESS" Classes="eyebrow"/>
+                    <ComboBox ItemsSource="{Binding AvailableBindAddresses}"
+                              SelectedItem="{Binding ServerBindAddress}"
+                              HorizontalAlignment="Stretch"/>
+                    <TextBlock Text="0.0.0.0 binds every network adapter on this PC - the safe default. Pick a specific address only to restrict which network the till is reachable on."
+                               Foreground="{StaticResource GrayBrush}"
+                               TextWrapping="Wrap"
+                               FontSize="11"/>
 
-                <Button Content="SAVE SETTINGS" Classes="accent-blue" Command="{Binding SaveCommand}"
-                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14" Margin="0,8,0,0"/>
-            </StackPanel>
+                    <TextBlock Text="PORT" Classes="eyebrow"/>
+                    <TextBox Text="{Binding ServerPort}" Watermark="5177"/>
+
+                    <TextBlock Text="Changes take effect the next time Cashere is started."
+                               Foreground="{StaticResource GrayBrush}"
+                               TextWrapping="Wrap"
+                               FontSize="11"/>
+
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="{StaticResource BlueBrush}"
+                               FontWeight="Bold"
+                               TextWrapping="Wrap"/>
+
+                    <Button Content="SAVE SETTINGS"
+                            Classes="accent-blue"
+                            Command="{Binding SaveCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Padding="0,14"
+                            Margin="0,8,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
 
             <!-- Receipt Preview -->
             <StackPanel Grid.Column="1" Spacing="10">
-                <Border Classes="rule-thick"/>
 
                 <Border Classes="card" Padding="24" MinHeight="400">
                     <StackPanel Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="RECEIPT PREVIEW" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"/>
+                        <TextBlock Text="RECEIPT PREVIEW"
+                                   FontWeight="Bold"
+                                   FontSize="16"
+                                   HorizontalAlignment="Center"/>
                         <Border Classes="rule-thin" Margin="0,8"/>
-                        <TextBlock Text="[Receipt preview will appear here]" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                        <TextBlock Text="[Receipt preview will appear here]"
+                                   Foreground="{StaticResource GrayBrush}"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"/>
                         <!-- Add your receipt preview content here -->
                     </StackPanel>
                 </Border>

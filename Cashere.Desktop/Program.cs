@@ -5,13 +5,12 @@ using Cashere.Server;
 using Microsoft.EntityFrameworkCore;
 using Cashere.Data.Services;
 using Cashere.Services;
+using System.Linq;
 
 namespace Cashere.Desktop;
 
 sealed class Program
 {
-    private static readonly CashereServerHost ServerHost = new();
-
     [STAThread]
     public static void Main(string[] args)
     {
@@ -19,25 +18,37 @@ sealed class Program
 
         ApplyMigrationsAndSeed(dbPath);
 
-        // Started before AppServices are wired up below so ProductAdmin and
-        // PurchaseAdmin can be constructed with ServerHost.CatalogChangeNotifier -
-        // the bridge that lets admin-panel writes (built here, outside the
-        // server's own DI container) push ProductCatalogChanged to connected
-        // mobile clients through the same SignalR hub.
-        ServerHost.StartAsync(dbPath).GetAwaiter().GetResult();
+        var (port, bindAddress) = LoadNetworkSettings(dbPath);
+        var serverHost = new CashereServerHost(port, bindAddress);
+
+        try
+        {
+            serverHost.StartAsync(dbPath).GetAwaiter().GetResult();
+        }
+        catch
+        {
+            // The saved bind address/port may no longer be valid - moved to
+            // a different network, another process already holds the port,
+            // etc. Fall back to the safe defaults rather than let a bad
+            // network setting brick the app on every future launch; the
+            // admin can fix the setting again from the Devices/Settings
+            // screen once the app is up.
+            serverHost = new CashereServerHost();
+            serverHost.StartAsync(dbPath).GetAwaiter().GetResult();
+        }
 
         var dbContextFactory = new SqliteDbContextFactory(dbPath);
         AppServices.ProductCatalog = new ProductCatalogService(dbContextFactory);
         AppServices.SaleService = new SaleService(dbContextFactory);
         AppServices.ShopContext = new ShopContextService(dbContextFactory);
-        AppServices.ProductAdmin = new ProductAdminService(dbContextFactory, ServerHost.CatalogChangeNotifier);
+        AppServices.ProductAdmin = new ProductAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
-        AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, ServerHost.CatalogChangeNotifier);
+        AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
-        AppServices.ConnectedDevices = ServerHost.ConnectedDevices;
+        AppServices.ConnectedDevices = serverHost.ConnectedDevices;
 
         try
         {
@@ -45,7 +56,7 @@ sealed class Program
         }
         finally
         {
-            ServerHost.StopAsync().GetAwaiter().GetResult();
+            serverHost.StopAsync().GetAwaiter().GetResult();
         }
     }
 
@@ -56,6 +67,16 @@ sealed class Program
             .Options);
         db.Database.Migrate();
         SeedData.EnsureSeedDataAsync(db).GetAwaiter().GetResult();
+    }
+
+    private static (int Port, string BindAddress) LoadNetworkSettings(string dbPath)
+    {
+        using var db = new CashereDbContext(new DbContextOptionsBuilder<CashereDbContext>()
+            .UseSqlite($"Data Source={dbPath}")
+            .Options);
+
+        var settings = db.ShopSettings.AsNoTracking().FirstOrDefault();
+        return (settings?.ServerPort ?? 5177, settings?.ServerBindAddress ?? "0.0.0.0");
     }
 
     public static AppBuilder BuildAvaloniaApp()

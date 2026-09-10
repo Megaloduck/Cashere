@@ -57,4 +57,18 @@ public partial class DevicesAdminViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(HasNoDevices));
     }
+
+    [RelayCommand]
+    private async Task Kick(ConnectedDeviceInfo? device)
+    {
+        if (device is null || _connectedDevices is null) return;
+
+        await _connectedDevices.KickDeviceAsync(device.ConnectionId);
+
+        // Optimistic removal for a snappier feel - the server's
+        // RegisterDisconnected also fires DevicesChanged once the phone's
+        // own disconnect completes, which just re-confirms the same state.
+        Devices.Remove(device);
+        OnPropertyChanged(nameof(HasNoDevices));
+    }
 }

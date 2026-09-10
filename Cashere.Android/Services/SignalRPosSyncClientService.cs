@@ -28,6 +28,7 @@ public class SignalRPosSyncClientService : IPosSyncClientService
     public event Action<SyncConnectionState>? StateChanged;
     public event Action<SyncCartSnapshot>? CartUpdated;
     public event Action? ProductCatalogChanged;
+    public event Action<string>? Kicked;
 
     public async Task<PairingResult> ConnectAsync(ShopEndpoint endpoint, CancellationToken cancellationToken = default)
     {
@@ -48,9 +49,9 @@ public class SignalRPosSyncClientService : IPosSyncClientService
                 return new PairingResult(false, null, "The till didn't respond as expected.");
             }
 
-            // Picked up server-side by PosSyncHub.OnConnectedAsync and surfaced
+            // Picked up server-side by PosSyncHub.OnConnectedAsync and shown
             // on the desktop admin's Devices screen - purely informational,
-            // the hub never trusts it for anything else.
+            // the hub never trusts it for anything security-relevant.
             var deviceName = Uri.EscapeDataString(GetDeviceName());
 
             _connection = new HubConnectionBuilder()
@@ -60,11 +61,22 @@ public class SignalRPosSyncClientService : IPosSyncClientService
 
             _connection.On<CartDto>("CartUpdated", dto => CartUpdated?.Invoke(MapCart(dto)));
 
-            // Dispatched onto the UI thread since subscribers (e.g.
-            // LabelingViewModel) mutate ObservableCollections in response,
-            // and this callback otherwise runs on a SignalR threadpool thread.
             _connection.On("ProductCatalogChanged", () =>
                 Dispatcher.UIThread.Post(() => ProductCatalogChanged?.Invoke()));
+
+            // Told by the till's admin Devices screen to disconnect. Offloaded
+            // via Task.Run rather than awaited inline: this handler runs on
+            // the connection's own receive loop, and DisconnectAsync() below
+            // disposes that same connection - awaiting it synchronously here
+            // would deadlock waiting for a loop it's currently blocking.
+            _connection.On<string>("Kicked", reason =>
+            {
+                _ = Task.Run(async () =>
+                {
+                    await DisconnectAsync();
+                    Dispatcher.UIThread.Post(() => Kicked?.Invoke(reason));
+                });
+            });
 
             _connection.Reconnecting += _ => { SetState(SyncConnectionState.Reconnecting); return Task.CompletedTask; };
             _connection.Reconnected += _ => { SetState(SyncConnectionState.Connected); return Task.CompletedTask; };
@@ -141,8 +153,6 @@ public class SignalRPosSyncClientService : IPosSyncClientService
         }
         catch
         {
-            // Best-effort convenience feature - a missing/corrupt file just
-            // means the cashier types the address once.
             return null;
         }
     }
@@ -155,7 +165,6 @@ public class SignalRPosSyncClientService : IPosSyncClientService
         }
         catch
         {
-            // Non-critical - worst case the cashier re-enters the address next time.
         }
     }
 
@@ -166,8 +175,8 @@ public class SignalRPosSyncClientService : IPosSyncClientService
     }
 
     // Best-effort friendly label for the desktop admin's Devices screen -
-    // e.g. "Google Pixel 7". Falls back gracefully if info is missing;
-    // never throws (a device-name failure shouldn't break pairing).
+    // e.g. "Google Pixel 7". Never throws - a device-name failure shouldn't
+    // break pairing.
     private static string GetDeviceName()
     {
         try

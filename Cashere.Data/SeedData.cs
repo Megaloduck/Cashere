@@ -14,7 +14,9 @@ public static class SeedData
             {
                 ShopName = "My Shop",
                 Currency = "IDR",
-                TaxRatePercent = 0
+                TaxRatePercent = 0,
+                ServerBindAddress = "0.0.0.0",
+                ServerPort = 5177
             });
         }
 

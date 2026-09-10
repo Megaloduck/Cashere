@@ -11,11 +11,6 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels.Mobile;
 
-// Connection-only screen now - scanning (camera + manual entry + live cart)
-// moved to ScanningViewModel/ScanningView once the mobile UI grew a sidebar
-// with dedicated Pairing/Scanning/Labeling sections. Shares the same
-// IPosSyncClientService instance as ScanningViewModel, so connecting here is
-// immediately reflected there.
 public partial class PairingViewModel : ViewModelBase
 {
     private readonly IPosSyncClientService _syncClient;
@@ -45,6 +40,7 @@ public partial class PairingViewModel : ViewModelBase
     {
         _syncClient = syncClient;
         _syncClient.StateChanged += HandleSyncStateChanged;
+        _syncClient.Kicked += HandleKicked;
     }
 
     public async Task InitializeAsync()
@@ -56,12 +52,20 @@ public partial class PairingViewModel : ViewModelBase
             PortInput = last.Port.ToString();
         }
 
-        // Reflect current state in case the client is already connected.
         State = _syncClient.State;
         ShopName = _syncClient.ShopName;
     }
 
     private void HandleSyncStateChanged(SyncConnectionState state) => State = state;
+
+    // By the time this fires the client has already disconnected (see
+    // SignalRPosSyncClientService) - just surface why, on the screen the
+    // cashier would naturally look at to reconnect.
+    private void HandleKicked(string reason)
+    {
+        ShopName = null;
+        ErrorMessage = $"Disconnected by the till: {reason}";
+    }
 
     partial void OnStateChanged(SyncConnectionState value)
     {
