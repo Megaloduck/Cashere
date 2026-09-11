@@ -79,13 +79,13 @@
                    IsVisible="{Binding CameraPermissionDenied}" Foreground="{StaticResource RedBrush}"
                    TextWrapping="Wrap" FontWeight="Bold"/>
       </StackPanel>
-      <!-- Camera Placeholder -->
+            <!-- Camera Placeholder -->
       <Border Classes="card" IsVisible="{Binding ShowCameraPreview}" Height="380" Padding="0" ClipToBounds="True">
-        <ContentControl x:Name="CameraPreviewHost"  >
+        <ContentControl x:Name="CameraPreviewHost"/>
       </Border>
 
-        <!-- Camera Actions-->
-            <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+      <!-- Camera Actions -->
+      <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
               Padding="0,16" FontSize="16" IsVisible="{Binding ShowCameraPreview}"
               IsEnabled="{Binding IsCameraStarted}" Command="{Binding CaptureCommand}">
         <StackPanel Orientation="Horizontal" Spacing="8">
