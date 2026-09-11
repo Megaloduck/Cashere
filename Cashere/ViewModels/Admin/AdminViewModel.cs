@@ -20,6 +20,7 @@ public partial class AdminViewModel : ViewModelBase
     public SalesReportViewModel SalesReport { get; }
     public ShopSettingsViewModel Settings { get; }
     public DevicesAdminViewModel Devices { get; }
+    public SyncronizationAdminViewModel Syncronization { get; }
 
     public event Action? BackRequested;
 
@@ -40,6 +41,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.SalesReport => SalesReport,
         AdminSection.Settings => Settings,
         AdminSection.Devices => Devices,
+        AdminSection.Syncronization => Syncronization,
         _ => Products
     };
 
@@ -54,6 +56,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.SalesReport => "REPORTS",
         AdminSection.Settings => "SHOP SETTINGS",
         AdminSection.Devices => "CONNECTED DEVICES",
+        AdminSection.Syncronization => "SYNCHRONIZATION",
         _ => "ADMIN"
     };
 
@@ -66,8 +69,7 @@ public partial class AdminViewModel : ViewModelBase
         ICustomerAdminService customerAdmin,
         ISalesReportService salesReport,
         IProductCatalogService productCatalog,
-        IShopContextService shopContext,
-        int currentCashierId,
+        IShopContextService shopContext, int currentCashierId,
         IConnectedDeviceService? connectedDeviceService = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin);
@@ -79,6 +81,7 @@ public partial class AdminViewModel : ViewModelBase
         SalesReport = new SalesReportViewModel(salesReport);
         Settings = new ShopSettingsViewModel(shopContext);
         Devices = new DevicesAdminViewModel(connectedDeviceService);
+        Syncronization = new SyncronizationAdminViewModel(shopContext);
     }
 
     public async Task InitializeAsync()
@@ -92,6 +95,7 @@ public partial class AdminViewModel : ViewModelBase
         await SalesReport.LoadAsync();
         await Settings.LoadAsync();
         await Devices.LoadAsync();
+        await Syncronization.LoadAsync();   
     }
 
     partial void OnSelectedSectionChanged(AdminSection value)
@@ -105,6 +109,12 @@ public partial class AdminViewModel : ViewModelBase
         if (value == AdminSection.Devices)
         {
             Devices.RefreshCommand.Execute(null);
+        }
+        else if (value == AdminSection.Syncronization)
+        {
+            // Reload in case ShopSettingsViewModel changed the same
+            // bind address/port fields while this tab wasn't active.
+            _ = Syncronization.LoadAsync();
         }
     }
 

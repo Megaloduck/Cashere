@@ -42,26 +42,6 @@
                     <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
                     <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
 
-                    <Border Classes="rule-thick" Margin="0,8"/>
-                    <TextBlock Text="NETWORK (LOCAL SYNC SERVER)" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
-
-                    <TextBlock Text="BIND ADDRESS" Classes="eyebrow"/>
-                    <ComboBox ItemsSource="{Binding AvailableBindAddresses}"
-                              SelectedItem="{Binding ServerBindAddress}"
-                              HorizontalAlignment="Stretch"/>
-                    <TextBlock Text="0.0.0.0 binds every network adapter on this PC - the safe default. Pick a specific address only to restrict which network the till is reachable on."
-                               Foreground="{StaticResource GrayBrush}"
-                               TextWrapping="Wrap"
-                               FontSize="11"/>
-
-                    <TextBlock Text="PORT" Classes="eyebrow"/>
-                    <TextBox Text="{Binding ServerPort}" Watermark="5177"/>
-
-                    <TextBlock Text="Changes take effect the next time Cashere is started."
-                               Foreground="{StaticResource GrayBrush}"
-                               TextWrapping="Wrap"
-                               FontSize="11"/>
-
                     <TextBlock Text="{Binding StatusMessage}"
                                Foreground="{StaticResource BlueBrush}"
                                FontWeight="Bold"

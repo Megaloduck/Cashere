@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:Class="Cashere.SyncronizationAdminView"
+             x:Class="Cashere.Views.Admin.SyncronizationAdminView"
              x:DataType="vm:SyncronizationAdminViewModel">
 
     <Grid RowDefinitions="Auto,*" Margin="12"> 
@@ -17,8 +17,8 @@
         </Grid>
         <!-- Content -->
 
-    <ScrollViewer>
-        <StackPanel>
+    <ScrollViewer Grid.Row="1">
+        <StackPanel Spacing="10">
                     <Border Classes="rule-thick" Margin="0,8"/>
                     <TextBlock Text="NETWORK (LOCAL SYNC SERVER)" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
 

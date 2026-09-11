@@ -112,6 +112,13 @@
                 <TextBlock Text="SHOP SETTINGS"/>
               </StackPanel>
             </Button>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Syncronization}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Syncronization}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="Sync" Width="18" Height="18"/>
+                <TextBlock Text="SYNCHRONIZATION"/>
+              </StackPanel>
+            </Button>
 
           </StackPanel>
         </ScrollViewer>
