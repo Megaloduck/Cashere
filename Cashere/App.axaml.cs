@@ -59,7 +59,8 @@ public partial class App : Application
      AppServices.ProductCatalog,
      AppServices.ShopContext,
      cashier?.Id ?? 0,
-     AppServices.ConnectedDevices);
+     AppServices.ConnectedDevices,
+     AppServices.ReceiptPrinter);
 
                 var shell = new ShellViewModel(posViewModel, adminViewModel);
 

@@ -27,9 +27,6 @@ public partial class AdminViewModel : ViewModelBase
     [ObservableProperty]
     private AdminSection _selectedSection = AdminSection.Products;
 
-    // Resolved via the global ViewLocator exactly like ShellViewModel.CurrentView -
-    // the sidebar just swaps which child ViewModel this points at instead of a
-    // TabControl swapping which TabItem is visible.
     public ViewModelBase CurrentSectionViewModel => SelectedSection switch
     {
         AdminSection.Products => Products,
@@ -70,7 +67,8 @@ public partial class AdminViewModel : ViewModelBase
         ISalesReportService salesReport,
         IProductCatalogService productCatalog,
         IShopContextService shopContext, int currentCashierId,
-        IConnectedDeviceService? connectedDeviceService = null)
+        IConnectedDeviceService? connectedDeviceService = null,
+        IReceiptPrinterService? receiptPrinter = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
@@ -79,7 +77,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new ShopSettingsViewModel(shopContext);
+        Settings = new ShopSettingsViewModel(shopContext, receiptPrinter);
         Devices = new DevicesAdminViewModel(connectedDeviceService);
         Syncronization = new SyncronizationAdminViewModel(shopContext);
     }
@@ -95,7 +93,7 @@ public partial class AdminViewModel : ViewModelBase
         await SalesReport.LoadAsync();
         await Settings.LoadAsync();
         await Devices.LoadAsync();
-        await Syncronization.LoadAsync();   
+        await Syncronization.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(AdminSection value)
@@ -103,17 +101,12 @@ public partial class AdminViewModel : ViewModelBase
         OnPropertyChanged(nameof(CurrentSectionViewModel));
         OnPropertyChanged(nameof(CurrentSectionTitle));
 
-        // Devices is live connection state - refresh whenever the cashier
-        // navigates to it, same reasoning as MobileShellViewModel refreshing
-        // Scanning/Labeling on tab switch.
         if (value == AdminSection.Devices)
         {
             Devices.RefreshCommand.Execute(null);
         }
         else if (value == AdminSection.Syncronization)
         {
-            // Reload in case ShopSettingsViewModel changed the same
-            // bind address/port fields while this tab wasn't active.
             _ = Syncronization.LoadAsync();
         }
     }

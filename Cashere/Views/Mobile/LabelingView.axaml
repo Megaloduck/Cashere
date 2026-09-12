@@ -80,7 +80,10 @@
                    TextWrapping="Wrap" FontWeight="Bold"/>
       </StackPanel>
             <!-- Camera Placeholder -->
-      <Border Classes="card" IsVisible="{Binding ShowCameraPreview}" Height="380" Padding="0" ClipToBounds="True">
+      <Border Classes="card" IsVisible="{Binding ShowCameraPreview}"  Height="500"          Padding="0"
+            ClipToBounds="True"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch">
         <ContentControl x:Name="CameraPreviewHost"/>
       </Border>
 

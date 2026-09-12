@@ -1,82 +1,82 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using System;
-using Avalonia.Interactivity;
-using Cashere.Services;
-using Cashere.ViewModels.Mobile;
+    using Avalonia;
+    using Avalonia.Controls;
+    using Avalonia.Markup.Xaml;
+    using System;
+    using Avalonia.Interactivity;
+    using Cashere.Services;
+    using Cashere.ViewModels.Mobile;
 
-namespace Cashere.Views.Mobile;
+    namespace Cashere.Views.Mobile;
 
-public partial class LabelingView : UserControl
-{
-    private Control? _cameraPreviewControl;
-    private LabelingViewModel? _subscribedViewModel;
-
-    public LabelingView()
+    public partial class LabelingView : UserControl
     {
-        InitializeComponent();
-        DataContextChanged += OnDataContextChanged;
-        Unloaded += (_, _) => Unsubscribe();
-    }
+        private Control? _cameraPreviewControl;
+        private LabelingViewModel? _subscribedViewModel;
 
-    private void OnDataContextChanged(object? sender, EventArgs e)
-    {
-        Unsubscribe();
-
-        if (DataContext is LabelingViewModel vm)
+        public LabelingView()
         {
-            _subscribedViewModel = vm;
-            vm.CameraReadyChanged += OnCameraReadyChanged;
+            InitializeComponent();
+            DataContextChanged += OnDataContextChanged;
+            Unloaded += (_, _) => Unsubscribe();
         }
-    }
 
-    private void Unsubscribe()
-    {
-        if (_subscribedViewModel is not null)
+        private void OnDataContextChanged(object? sender, EventArgs e)
         {
-            _subscribedViewModel.CameraReadyChanged -= OnCameraReadyChanged;
-            _subscribedViewModel = null;
-        }
-    }
+            Unsubscribe();
 
-    private async void OnCameraReadyChanged(bool ready)
-    {
-        if (DataContext is not LabelingViewModel vm || vm.PhotoCapture is null) return;
-
-        if (ready)
-        {
-            // Not actually ready to take a photo until StartAsync below
-            // confirms the camera is bound - keeps TAKE PHOTO disabled for
-            // the brief window while the native preview surface attaches.
-            vm.SetCameraStarted(false);
-
-            _cameraPreviewControl ??= vm.PhotoCapture.CreatePreviewControl();
-            CameraPreviewHost.Content = _cameraPreviewControl;
-
-            try
+            if (DataContext is LabelingViewModel vm)
             {
-                await vm.PhotoCapture.StartAsync();
-                vm.SetCameraStarted(true);
+                _subscribedViewModel = vm;
+                vm.CameraReadyChanged += OnCameraReadyChanged;
             }
-            catch (Exception ex)
+        }
+
+        private void Unsubscribe()
+        {
+            if (_subscribedViewModel is not null)
             {
+                _subscribedViewModel.CameraReadyChanged -= OnCameraReadyChanged;
+                _subscribedViewModel = null;
+            }
+        }
+
+        private async void OnCameraReadyChanged(bool ready)
+        {
+            if (DataContext is not LabelingViewModel vm || vm.PhotoCapture is null) return;
+
+            if (ready)
+            {
+                // Not actually ready to take a photo until StartAsync below
+                // confirms the camera is bound - keeps TAKE PHOTO disabled for
+                // the brief window while the native preview surface attaches.
                 vm.SetCameraStarted(false);
-                vm.ReportCameraError($"Could not start camera: {ex.Message}");
+
+                _cameraPreviewControl ??= vm.PhotoCapture.CreatePreviewControl();
+                CameraPreviewHost.Content = _cameraPreviewControl;
+
+                try
+                {
+                    await vm.PhotoCapture.StartAsync();
+                    vm.SetCameraStarted(true);
+                }
+                catch (Exception ex)
+                {
+                    vm.SetCameraStarted(false);
+                    vm.ReportCameraError($"Could not start camera: {ex.Message}");
+                }
+            }
+            else
+            {
+                CameraPreviewHost.Content = null;
+                vm.SetCameraStarted(false);
             }
         }
-        else
-        {
-            CameraPreviewHost.Content = null;
-            vm.SetCameraStarted(false);
-        }
-    }
 
-    private void OnProductClick(object? sender, RoutedEventArgs e)
-    {
-        if (sender is Button { DataContext: ProductLookupItem item } && DataContext is LabelingViewModel vm)
+        private void OnProductClick(object? sender, RoutedEventArgs e)
         {
-            vm.SelectProductCommand.Execute(item);
+            if (sender is Button { DataContext: ProductLookupItem item } && DataContext is LabelingViewModel vm)
+            {
+                vm.SelectProductCommand.Execute(item);
+            }
         }
     }
-}

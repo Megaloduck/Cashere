@@ -5,6 +5,7 @@ using Cashere.Server;
 using Microsoft.EntityFrameworkCore;
 using Cashere.Data.Services;
 using Cashere.Services;
+using Cashere.Desktop.Services;
 using System.Linq;
 
 namespace Cashere.Desktop;
@@ -49,6 +50,7 @@ sealed class Program
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
+        AppServices.ReceiptPrinter = new WindowsReceiptPrinterService();        
 
         try
         {

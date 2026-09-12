@@ -19,9 +19,6 @@
 
     <ScrollViewer Grid.Row="1">
         <StackPanel Spacing="10">
-                    <Border Classes="rule-thick" Margin="0,8"/>
-                    <TextBlock Text="NETWORK (LOCAL SYNC SERVER)" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
-
                     <TextBlock Text="BIND ADDRESS" Classes="eyebrow"/>
                     <ComboBox ItemsSource="{Binding AvailableBindAddresses}"
                               SelectedItem="{Binding ServerBindAddress}"
