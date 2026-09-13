@@ -10,11 +10,6 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels;
 
-// Top-level navigation host for the desktop app. MainWindow's ContentControl
-// binds to CurrentView; the globally-registered ViewLocator resolves whichever
-// concrete View matches the runtime type assigned here (PosViewModel ->
-// Views.Pos.PosView, AdminViewModel -> Views.Admin.AdminView) - exactly the
-// mechanism the MainWindow.axaml comment already anticipated.
 public partial class ShellViewModel : ViewModelBase
 {
     public PosViewModel Pos { get; }
@@ -37,8 +32,10 @@ public partial class ShellViewModel : ViewModelBase
     private async Task ShowPos()
     {
         CurrentView = Pos;
-        // Catches any product/price/stock changes made while in admin.
+        // Catches any product/price/stock changes, and any payment-method
+        // enable/disable, made while in admin.
         await Pos.ProductPicker.RefreshProductsAsync();
+        await Pos.RefreshPaymentSettingsAsync();
     }
 
     [RelayCommand]

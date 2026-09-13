@@ -16,14 +16,17 @@ public partial class CheckoutViewModel : ViewModelBase
     private readonly ISaleService _saleService;
     private readonly CartViewModel _cart;
     private readonly int _cashierId;
+    private readonly PaymentSettings _paymentSettings;
 
     public event Action<CompletedSaleResult>? SaleCompleted;
     public event Action? Cancelled;
 
-    public IReadOnlyList<PaymentMethod> PaymentMethods { get; } = Enum.GetValues<PaymentMethod>();
+    // Filtered to whatever Settings -> Payments currently has enabled -
+    // SaleService independently re-checks this at completion as a backstop.
+    public IReadOnlyList<PaymentMethod> PaymentMethods { get; }
 
     [ObservableProperty]
-    private PaymentMethod _paymentMethod = PaymentMethod.Cash;
+    private PaymentMethod _paymentMethod;
 
     [ObservableProperty]
     private decimal _amountTendered;
@@ -37,6 +40,9 @@ public partial class CheckoutViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isProcessing;
 
+    [ObservableProperty]
+    private bool _isPaymentConfirmed;
+
     public decimal TotalDue => _cart.TotalAmount;
 
     public decimal ChangeDue => PaymentMethod == PaymentMethod.Cash
@@ -46,16 +52,38 @@ public partial class CheckoutViewModel : ViewModelBase
     public bool IsCashPayment => PaymentMethod == PaymentMethod.Cash;
     public bool IsNonCashPayment => !IsCashPayment;
 
+    // Settings -> Payments -> account info for whichever method is currently
+    // selected, shown as a cashier hint (e.g. which QRIS merchant ID or EDC
+    // terminal to expect the payment on). Only meaningful when non-cash.
+    public string? SelectedMethodAccountInfo => _paymentSettings.AccountInfoFor(PaymentMethod);
+    public bool HasSelectedMethodAccountInfo => !string.IsNullOrWhiteSpace(SelectedMethodAccountInfo);
+
+    public bool IsConfirmationRequired => _paymentSettings.RequireConfirmationForNonCash && IsNonCashPayment;
+
     public bool CanComplete =>
         !IsProcessing &&
         _cart.HasItems &&
-        (!IsCashPayment || AmountTendered >= TotalDue);
+        (!IsCashPayment || AmountTendered >= TotalDue) &&
+        (!IsConfirmationRequired || IsPaymentConfirmed);
 
-    public CheckoutViewModel(ISaleService saleService, CartViewModel cart, int cashierId)
+    public CheckoutViewModel(ISaleService saleService, CartViewModel cart, int cashierId, PaymentSettings paymentSettings)
     {
         _saleService = saleService;
         _cart = cart;
         _cashierId = cashierId;
+        _paymentSettings = paymentSettings;
+
+        PaymentMethods = Enum.GetValues<PaymentMethod>()
+            .Where(m => paymentSettings.IsMethodEnabled(m))
+            .ToList();
+
+        // Falls back to whatever's first enabled if Cash itself got disabled -
+        // PaymentSettingsViewModel.Save() already blocks disabling every
+        // method, so PaymentMethods is guaranteed non-empty here.
+        _paymentMethod = PaymentMethods.Contains(PaymentMethod.Cash)
+            ? PaymentMethod.Cash
+            : PaymentMethods[0];
+
         AmountTendered = TotalDue;
     }
 
@@ -70,7 +98,14 @@ public partial class CheckoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCashPayment));
         OnPropertyChanged(nameof(IsNonCashPayment));
         OnPropertyChanged(nameof(ChangeDue));
+        OnPropertyChanged(nameof(SelectedMethodAccountInfo));
+        OnPropertyChanged(nameof(HasSelectedMethodAccountInfo));
+        OnPropertyChanged(nameof(IsConfirmationRequired));
         OnPropertyChanged(nameof(CanComplete));
+
+        // A confirmation ticked for one method shouldn't silently carry over
+        // if the cashier switches to a different method mid-checkout.
+        IsPaymentConfirmed = false;
 
         if (value != PaymentMethod.Cash)
         {
@@ -79,6 +114,7 @@ public partial class CheckoutViewModel : ViewModelBase
     }
 
     partial void OnIsProcessingChanged(bool value) => OnPropertyChanged(nameof(CanComplete));
+    partial void OnIsPaymentConfirmedChanged(bool value) => OnPropertyChanged(nameof(CanComplete));
 
     [RelayCommand]
     private async Task CompleteAsync()

@@ -38,6 +38,14 @@
     <StackPanel Spacing="4" IsVisible="{Binding IsNonCashPayment}">
       <TextBlock Text="REFERENCE / TRANSACTION NUMBER" Classes="eyebrow"/>
       <TextBox Text="{Binding ReferenceNumber}"/>
+
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" IsVisible="{Binding HasSelectedMethodAccountInfo}">
+        <mi:MaterialIcon Kind="InformationOutline" Width="14" Height="14" Foreground="{StaticResource BlueBrush}"/>
+        <TextBlock Text="{Binding SelectedMethodAccountInfo}" TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+      </StackPanel>
+
+      <CheckBox Content="Payment received and confirmed" IsChecked="{Binding IsPaymentConfirmed}"
+                Margin="0,8,0,0" IsVisible="{Binding IsConfirmationRequired}"/>
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">

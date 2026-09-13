@@ -12,15 +12,26 @@ public class ReceiptAdmin
     public string Currency { get; set; } = "IDR";
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
-
-    // IANA id or a free-text label like "GMT+7" - not validated yet, purely
-    // informational until scheduling/reporting features need to reason about it.
     public string? Timezone { get; set; }
 
-    // Local sync server config, read by Cashere.Desktop/Program.cs at
-    // startup to configure Kestrel. "0.0.0.0" means "bind every network
-    // adapter" - the safe default. Changing either requires an app restart
-    // since Kestrel is already bound by the time this screen is editable.
+    public bool TrackInventory { get; set; } = true;
+    public OutOfStockBehavior OutOfStockBehavior { get; set; } = OutOfStockBehavior.Block;
+    public int DefaultLowStockThreshold { get; set; } = 5;
+    public bool AutoGenerateSku { get; set; }
+    public bool AutoGenerateBarcode { get; set; }
+
+    // Payment method availability and cashier-facing hints, read by
+    // CheckoutViewModel (filters the dropdown, shows the account-info hint,
+    // gates the confirmation checkbox) and re-checked by SaleService at
+    // completion. Fees, refunds, and partial payment aren't stored here yet -
+    // none of those have a checkout flow to configure.
+    public bool CashEnabled { get; set; } = true;
+    public bool QrisEnabled { get; set; } = true;
+    public bool EdcEnabled { get; set; } = true;
+    public string? QrisAccountInfo { get; set; }
+    public string? EdcAccountInfo { get; set; }
+    public bool RequireConfirmationForNonCash { get; set; }
+
     public string ServerBindAddress { get; set; } = "0.0.0.0";
     public int ServerPort { get; set; } = 5177;
-}
+}   

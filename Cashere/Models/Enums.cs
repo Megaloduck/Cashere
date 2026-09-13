@@ -28,3 +28,11 @@ public enum InventoryMovementType
     Adjustment,
     Return
 }
+
+// Read by SaleService at checkout, only when TrackInventory is on - see
+// ReceiptAdmin.OutOfStockBehavior.
+public enum OutOfStockBehavior
+{
+    Block,
+    AllowNegativeStock
+}   

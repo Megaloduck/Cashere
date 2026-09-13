@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="720"
+             x:Class="Cashere.Views.Admin.Settings.PaymentSettingsView"
+             x:DataType="vm:PaymentSettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12" MaxWidth="560">
+      <TextBlock Text="PAYMENTS" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="CASH" FontWeight="Bold" VerticalAlignment="Center"/>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashEnabled}"/>
+      </Grid>
+
+      <Border Classes="rule-thick" Margin="0,2"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="QRIS" FontWeight="Bold" VerticalAlignment="Center"/>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding QrisEnabled}"/>
+      </Grid>
+      <StackPanel Spacing="4" IsVisible="{Binding QrisEnabled}">
+        <TextBlock Text="QRIS ACCOUNT / PROVIDER INFO (OPTIONAL)" Classes="eyebrow"/>
+        <TextBox Text="{Binding QrisAccountInfo}" Watermark="e.g. Merchant ID 123456"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,2"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="EDC" FontWeight="Bold" VerticalAlignment="Center"/>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding EdcEnabled}"/>
+      </Grid>
+      <StackPanel Spacing="4" IsVisible="{Binding EdcEnabled}">
+        <TextBlock Text="EDC ACCOUNT / PROVIDER INFO (OPTIONAL)" Classes="eyebrow"/>
+        <TextBox Text="{Binding EdcAccountInfo}" Watermark="e.g. BCA EDC Terminal 1"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="REQUIRE CONFIRMATION FOR NON-CASH" FontWeight="Bold"/>
+          <TextBlock Text="Cashier must tick a confirmation box before completing a QRIS or EDC sale."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding RequireConfirmationForNonCash}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock Text="{Binding StatusMessage}"
+                 Foreground="{StaticResource BlueBrush}"
+                 FontWeight="Bold"
+                 TextWrapping="Wrap"/>
+
+      <Button Content="SAVE"
+              Classes="accent-blue"
+              Command="{Binding SaveCommand}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Padding="0,14"
+              Margin="0,8,0,4"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="Per-method payment fees, refunds, and partial/split payments aren't built yet - none of those exist as checkout flows to configure."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

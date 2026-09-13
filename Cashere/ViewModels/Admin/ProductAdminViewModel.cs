@@ -15,9 +15,11 @@ public partial class ProductAdminViewModel : ViewModelBase
 {
     private readonly IProductAdminService _productAdmin;
     private readonly ICategoryAdminService _categoryAdmin;
+    private readonly IShopContextService? _shopContext;
 
     private List<Product> _allProducts = new();
     private int? _editingProductId;
+    private int _defaultLowStockThreshold = 5;
 
     public ObservableCollection<Product> FilteredProducts { get; } = new();
     public ObservableCollection<Category> Categories { get; } = new();
@@ -34,8 +36,6 @@ public partial class ProductAdminViewModel : ViewModelBase
     [ObservableProperty]
     private string? _errorMessage;
 
-    // Form fields are plain strings (not decimal/int) so a TextBox can hold
-    // an empty or partially-typed value while editing; parsed on Save.
     [ObservableProperty] private string _formSku = string.Empty;
     [ObservableProperty] private string _formBarcode = string.Empty;
     [ObservableProperty] private string _formName = string.Empty;
@@ -47,10 +47,20 @@ public partial class ProductAdminViewModel : ViewModelBase
     [ObservableProperty] private string _formLowStockThreshold = "5";
     [ObservableProperty] private string _newCategoryName = string.Empty;
 
-    public ProductAdminViewModel(IProductAdminService productAdmin, ICategoryAdminService categoryAdmin)
+    // Reflect Settings -> Inventory, refreshed on every LoadAsync() so this
+    // screen never needs its own reload-on-nav wiring - it simply picks up
+    // whatever was true the last time an admin visited Products.
+    [ObservableProperty] private bool _autoGenerateSkuEnabled;
+    [ObservableProperty] private bool _autoGenerateBarcodeEnabled;
+
+    public ProductAdminViewModel(
+        IProductAdminService productAdmin,
+        ICategoryAdminService categoryAdmin,
+        IShopContextService? shopContext = null)
     {
         _productAdmin = productAdmin;
         _categoryAdmin = categoryAdmin;
+        _shopContext = shopContext;
     }
 
     public async Task LoadAsync()
@@ -58,6 +68,14 @@ public partial class ProductAdminViewModel : ViewModelBase
         var categories = await _categoryAdmin.GetAllCategoriesAsync();
         Categories.Clear();
         foreach (var category in categories) Categories.Add(category);
+
+        if (_shopContext is not null)
+        {
+            var settings = await _shopContext.GetSettingsAsync();
+            _defaultLowStockThreshold = settings?.DefaultLowStockThreshold ?? 5;
+            AutoGenerateSkuEnabled = settings?.AutoGenerateSku ?? false;
+            AutoGenerateBarcodeEnabled = settings?.AutoGenerateBarcode ?? false;
+        }
 
         _allProducts = await _productAdmin.GetAllProductsAsync();
         ApplyFilter();
@@ -94,7 +112,7 @@ public partial class ProductAdminViewModel : ViewModelBase
         FormCostPrice = "0";
         FormSellingPrice = "0";
         FormStockQuantity = "0";
-        FormLowStockThreshold = "5";
+        FormLowStockThreshold = _defaultLowStockThreshold.ToString();
         ErrorMessage = null;
         IsEditorOpen = true;
     }
@@ -127,11 +145,6 @@ public partial class ProductAdminViewModel : ViewModelBase
         await LoadAsync();
     }
 
-    // Manual escape hatch for a bad/wrong photo captured from the mobile
-    // labeling flow - clears Product.PhotoPath so the tile/row falls back to
-    // the category-colored placeholder. Doesn't touch the file on disk
-    // (CashereServerHost's upload endpoint overwrites it on next upload
-    // regardless), just the DB reference.
     [RelayCommand]
     private async Task RemovePhoto(Product? product)
     {
@@ -163,9 +176,12 @@ public partial class ProductAdminViewModel : ViewModelBase
     {
         ErrorMessage = null;
 
-        if (string.IsNullOrWhiteSpace(FormSku) || string.IsNullOrWhiteSpace(FormName))
+        var isNewProduct = _editingProductId is null;
+        var skuRequired = !(isNewProduct && AutoGenerateSkuEnabled);
+
+        if ((skuRequired && string.IsNullOrWhiteSpace(FormSku)) || string.IsNullOrWhiteSpace(FormName))
         {
-            ErrorMessage = "SKU and name are required.";
+            ErrorMessage = skuRequired ? "SKU and name are required." : "Name is required.";
             return;
         }
 

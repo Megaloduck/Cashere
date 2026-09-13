@@ -45,37 +45,41 @@ public class ShopContextService : IShopContextService
         return await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
     }
 
+    // Attaches and marks the whole entity Modified (or Adds it, if no row
+    // exists yet) instead of copying fields one by one onto a separately
+    // fetched, separately tracked instance. The old field-by-field version
+    // silently dropped every property added to ReceiptAdmin after it was
+    // written - Email/TaxId/Timezone from Business Info, and TrackInventory/
+    // OutOfStockBehavior/DefaultLowStockThreshold/AutoGenerateSku/
+    // AutoGenerateBarcode from Inventory all went unsaved. This version
+    // can't drift out of sync with the model again.
     public async Task UpdateSettingsAsync(ReceiptAdmin settings)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
 
-        var existing = await db.ReceiptAdmin.FirstOrDefaultAsync();
-        if (existing is null)
+        if (settings.Id == 0)
         {
-            db.ReceiptAdmin.Add(new ReceiptAdmin
-            {
-                ShopName = settings.ShopName,
-                Address = settings.Address,
-                Phone = settings.Phone,
-                Currency = settings.Currency,
-                TaxRatePercent = settings.TaxRatePercent,
-                ReceiptFooterText = settings.ReceiptFooterText,
-                ServerBindAddress = settings.ServerBindAddress,
-                ServerPort = settings.ServerPort
-            });
+            db.ReceiptAdmin.Add(settings);
         }
         else
         {
-            existing.ShopName = settings.ShopName;
-            existing.Address = settings.Address;
-            existing.Phone = settings.Phone;
-            existing.Currency = settings.Currency;
-            existing.TaxRatePercent = settings.TaxRatePercent;
-            existing.ReceiptFooterText = settings.ReceiptFooterText;
-            existing.ServerBindAddress = settings.ServerBindAddress;
-            existing.ServerPort = settings.ServerPort;
+            db.ReceiptAdmin.Update(settings);
         }
 
         await db.SaveChangesAsync();
+    }
+
+    public async Task<PaymentSettings> GetPaymentSettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        return new PaymentSettings(
+            settings?.CashEnabled ?? true,
+            settings?.QrisEnabled ?? true,
+            settings?.EdcEnabled ?? true,
+            settings?.QrisAccountInfo,
+            settings?.EdcAccountInfo,
+            settings?.RequireConfirmationForNonCash ?? false);
     }
 }

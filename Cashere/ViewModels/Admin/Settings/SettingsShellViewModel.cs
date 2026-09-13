@@ -13,10 +13,10 @@ public partial class SettingsShellViewModel : ViewModelBase
 {
     public BusinessInfoViewModel Business { get; }
     public ReceiptAdminViewModel Receipts { get; }
+    public PaymentSettingsViewModel Payments { get; }
+    public InventorySettingsViewModel Inventory { get; }
     public NetworkSettingsViewModel Network { get; }
 
-    public SettingsPlaceholderViewModel Payments { get; }
-    public SettingsPlaceholderViewModel Inventory { get; }
     public SettingsPlaceholderViewModel Staff { get; }
     public SettingsPlaceholderViewModel Hardware { get; }
     public SettingsPlaceholderViewModel CashRegister { get; }
@@ -54,32 +54,9 @@ public partial class SettingsShellViewModel : ViewModelBase
     {
         Business = new BusinessInfoViewModel(shopContext);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
+        Payments = new PaymentSettingsViewModel(shopContext);
+        Inventory = new InventorySettingsViewModel(shopContext);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
-
-        Payments = new SettingsPlaceholderViewModel(
-            "Payments",
-            "Cash, QRIS and EDC already work as payment methods at checkout. This screen will control which methods are offered and how each behaves.",
-            new[]
-            {
-                "Enable/disable individual payment methods",
-                "Payment fee per method",
-                "Account / provider details",
-                "Require confirmation before completing",
-                "Allow refund",
-                "Allow partial payment"
-            });
-
-        Inventory = new SettingsPlaceholderViewModel(
-            "Inventory",
-            "Per-product stock and low-stock threshold already work from the Products screen. This adds store-wide defaults and rules.",
-            new[]
-            {
-                "Stock tracking ON/OFF",
-                "Allow negative stock",
-                "Default low-stock threshold",
-                "Out-of-stock behavior at checkout",
-                "SKU / barcode auto-generation"
-            });
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -181,6 +158,8 @@ public partial class SettingsShellViewModel : ViewModelBase
     {
         await Business.LoadAsync();
         await Receipts.LoadAsync();
+        await Payments.LoadAsync();
+        await Inventory.LoadAsync();
         await Network.InitializeAsync();
     }
 
@@ -188,9 +167,6 @@ public partial class SettingsShellViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(CurrentSettingsView));
 
-        // Business, Receipts and Network all read/write the same underlying
-        // ReceiptAdmin row - reload on nav so switching tabs always shows
-        // whatever another tab most recently saved in this same session.
         if (value == SettingsSection.Network)
         {
             _ = Network.RefreshAsync();
@@ -202,6 +178,14 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.Receipts)
         {
             _ = Receipts.LoadAsync();
+        }
+        else if (value == SettingsSection.Payments)
+        {
+            _ = Payments.LoadAsync();
+        }
+        else if (value == SettingsSection.Inventory)
+        {
+            _ = Inventory.LoadAsync();
         }
     }
 

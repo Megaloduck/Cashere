@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
+             x:Class="Cashere.Views.Admin.Settings.InventorySettingsView"
+             x:DataType="vm:InventorySettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12" MaxWidth="560">
+      <TextBlock Text="INVENTORY" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="TRACK INVENTORY" FontWeight="Bold"/>
+          <TextBlock Text="When off, stock levels are no longer enforced at checkout."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding TrackInventory}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <StackPanel Spacing="4" IsVisible="{Binding ShowOutOfStockBehavior}">
+        <TextBlock Text="OUT-OF-STOCK BEHAVIOR" Classes="eyebrow"/>
+        <ComboBox ItemsSource="{Binding OutOfStockBehaviors}" SelectedItem="{Binding OutOfStockBehavior}" HorizontalAlignment="Stretch"/>
+      </StackPanel>
+
+      <TextBlock Text="DEFAULT LOW-STOCK THRESHOLD" Classes="eyebrow"/>
+      <TextBox Text="{Binding DefaultLowStockThreshold}" Watermark="5"/>
+      <TextBlock Text="Prefilled on new products in the Products screen - existing products keep whatever they already have."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="AUTO-GENERATE SKU" FontWeight="Bold"/>
+          <TextBlock Text="Leave the SKU field blank when adding a product and one will be generated."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoGenerateSku}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="AUTO-GENERATE BARCODE" FontWeight="Bold"/>
+          <TextBlock Text="Leave the barcode field blank when adding a product and one will be generated (internal-use EAN-13, prefix 2)."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoGenerateBarcode}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock Text="{Binding StatusMessage}"
+                 Foreground="{StaticResource BlueBrush}"
+                 FontWeight="Bold"
+                 TextWrapping="Wrap"/>
+
+      <Button Content="SAVE"
+              Classes="accent-blue"
+              Command="{Binding SaveCommand}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Padding="0,14"
+              Margin="0,8,0,4"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="Per-product out-of-stock overrides and SKU/barcode format customization aren't built yet."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

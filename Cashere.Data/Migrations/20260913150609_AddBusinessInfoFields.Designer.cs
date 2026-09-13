@@ -3,6 +3,7 @@ using System;
 using Cashere.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cashere.Data.Migrations
 {
     [DbContext(typeof(CashereDbContext))]
-    partial class CashereDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913150609_AddBusinessInfoFields")]
+    partial class AddBusinessInfoFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -319,51 +322,19 @@ namespace Cashere.Data.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("AutoGenerateBarcode")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("AutoGenerateSku")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("CashEnabled")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("DefaultLowStockThreshold")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EdcAccountInfo")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("EdcEnabled")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OutOfStockBehavior")
-                        .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("QrisAccountInfo")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("QrisEnabled")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("ReceiptFooterText")
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("RequireConfirmationForNonCash")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ServerBindAddress")
                         .IsRequired()
@@ -387,9 +358,6 @@ namespace Cashere.Data.Migrations
 
                     b.Property<string>("Timezone")
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("TrackInventory")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

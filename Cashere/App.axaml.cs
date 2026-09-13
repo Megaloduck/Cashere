@@ -42,11 +42,12 @@ public partial class App : Application
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
 
                 var posViewModel = new PosViewModel(
-                    AppServices.ProductCatalog,
-                    AppServices.SaleService,
-                    taxRatePercent,
-                    cashier?.Id ?? 0,
-                    cashier?.DisplayName ?? "Unknown");
+    AppServices.ProductCatalog,
+    AppServices.SaleService,
+    AppServices.ShopContext,
+    taxRatePercent,
+    cashier?.Id ?? 0,
+    cashier?.DisplayName ?? "Unknown");
 
                 var adminViewModel = new AdminViewModel(
      AppServices.ProductAdmin,

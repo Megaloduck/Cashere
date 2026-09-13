@@ -70,7 +70,7 @@ public partial class AdminViewModel : ViewModelBase
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null)
     {
-        Products = new ProductAdminViewModel(productAdmin, categoryAdmin);
+        Products = new ProductAdminViewModel(productAdmin, categoryAdmin, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
         Purchases = new PurchaseAdminViewModel(purchaseAdmin, supplierAdmin, productCatalog, currentCashierId);
         Cashiers = new CashierAdminViewModel(cashierAdmin);

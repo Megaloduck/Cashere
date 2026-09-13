@@ -5,6 +5,13 @@ using Cashere.Models;
 using Cashere.Services;
 using Microsoft.EntityFrameworkCore;
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Cashere.Models;
+using Cashere.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace Cashere.Data.Services;
 
 public class SaleService : ISaleService
@@ -26,12 +33,33 @@ public class SaleService : ISaleService
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         await using var transaction = await db.Database.BeginTransactionAsync();
 
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        var trackInventory = settings?.TrackInventory ?? true;
+        var outOfStockBehavior = settings?.OutOfStockBehavior ?? OutOfStockBehavior.Block;
+        var enforceStock = trackInventory && outOfStockBehavior == OutOfStockBehavior.Block;
+
+        // Defense-in-depth: Checkout already filters its payment dropdown to
+        // enabled methods (see PosViewModel/CheckoutViewModel), but a stale
+        // UI (settings changed elsewhere mid-sale) or a future non-desktop
+        // client shouldn't be able to bypass this.
+        var methodEnabled = request.PaymentMethod switch
+        {
+            PaymentMethod.Cash => settings?.CashEnabled ?? true,
+            PaymentMethod.Qris => settings?.QrisEnabled ?? true,
+            PaymentMethod.Edc => settings?.EdcEnabled ?? true,
+            _ => true
+        };
+        if (!methodEnabled)
+        {
+            throw new InvalidOperationException(
+                $"{request.PaymentMethod} is currently disabled in Settings -> Payments.");
+        }
+
         var productIds = request.Lines.Select(l => l.ProductId).ToList();
         var productList = await db.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
         var products = productList.ToDictionary(p => p.Id);
 
-        // Validate everything up front before writing anything, so a bad line
-        // never leaves a partial sale behind.
         foreach (var line in request.Lines)
         {
             if (!products.TryGetValue(line.ProductId, out var product))
@@ -39,7 +67,7 @@ public class SaleService : ISaleService
                 throw new InvalidOperationException($"Product {line.ProductId} was not found.");
             }
 
-            if (product.StockQuantity < line.Quantity)
+            if (enforceStock && product.StockQuantity < line.Quantity)
             {
                 throw new InsufficientStockException(product.Name, line.Quantity, product.StockQuantity);
             }
@@ -76,8 +104,6 @@ public class SaleService : ISaleService
                 ProductId = product.Id,
                 Quantity = line.Quantity,
                 UnitPrice = line.UnitPrice,
-                // Frozen at sale time so profit reports stay accurate even if
-                // the product's cost changes later.
                 UnitCostAtSale = product.CostPrice,
                 Subtotal = line.UnitPrice * line.Quantity
             });

@@ -95,10 +95,14 @@
             <Border Classes="rule-thick"/>
 
             <TextBlock Text="SKU" Classes="eyebrow"/>
-            <TextBox Text="{Binding FormSku}"/>
+<TextBox Text="{Binding FormSku}"/>
+<TextBlock Text="Leave blank to auto-generate (Settings → Inventory)" FontSize="10" Foreground="{StaticResource GrayBrush}"
+           IsVisible="{Binding AutoGenerateSkuEnabled}"/>
 
-            <TextBlock Text="BARCODE (OPTIONAL)" Classes="eyebrow"/>
-            <TextBox Text="{Binding FormBarcode}"/>
+<TextBlock Text="BARCODE (OPTIONAL)" Classes="eyebrow"/>
+<TextBox Text="{Binding FormBarcode}"/>
+<TextBlock Text="Leave blank to auto-generate (Settings → Inventory)" FontSize="10" Foreground="{StaticResource GrayBrush}"
+           IsVisible="{Binding AutoGenerateBarcodeEnabled}"/>
 
             <TextBlock Text="NAME" Classes="eyebrow"/>
             <TextBox Text="{Binding FormName}"/>

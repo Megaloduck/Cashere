@@ -36,19 +36,42 @@ public class ProductAdminService : IProductAdminService
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
 
-        await EnsureSkuAndBarcodeAreUniqueAsync(db, input, existingProductId: null);
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        var sku = input.Sku;
+        if (string.IsNullOrWhiteSpace(sku))
+        {
+            if (settings?.AutoGenerateSku != true)
+            {
+                throw new AdminValidationException("SKU is required.");
+            }
+            sku = await GenerateUniqueSkuAsync(db);
+        }
+
+        var barcode = NormalizeBarcode(input.Barcode);
+        if (barcode is null && settings?.AutoGenerateBarcode == true)
+        {
+            barcode = await GenerateUniqueBarcodeAsync(db);
+        }
+
+        // Re-project through the record so downstream logic (uniqueness
+        // check, entity creation) never has to know whether Sku/Barcode came
+        // from the form or were just generated above.
+        var effectiveInput = input with { Sku = sku, Barcode = barcode };
+
+        await EnsureSkuAndBarcodeAreUniqueAsync(db, effectiveInput, existingProductId: null);
 
         var product = new Product
         {
-            Sku = input.Sku.Trim(),
-            Barcode = NormalizeBarcode(input.Barcode),
-            Name = input.Name.Trim(),
-            CategoryId = input.CategoryId,
-            Unit = input.Unit.Trim(),
-            CostPrice = input.CostPrice,
-            SellingPrice = input.SellingPrice,
-            StockQuantity = input.StockQuantity,
-            LowStockThreshold = input.LowStockThreshold,
+            Sku = effectiveInput.Sku.Trim(),
+            Barcode = effectiveInput.Barcode,
+            Name = effectiveInput.Name.Trim(),
+            CategoryId = effectiveInput.CategoryId,
+            Unit = effectiveInput.Unit.Trim(),
+            CostPrice = effectiveInput.CostPrice,
+            SellingPrice = effectiveInput.SellingPrice,
+            StockQuantity = effectiveInput.StockQuantity,
+            LowStockThreshold = effectiveInput.LowStockThreshold,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -108,9 +131,6 @@ public class ProductAdminService : IProductAdminService
         await NotifyCatalogChangedAsync();
     }
 
-    // Checked up front rather than relying on catching the unique-index
-    // violation, so the cashier gets a clear message instead of a raw
-    // SQLite constraint error.
     private static async Task EnsureSkuAndBarcodeAreUniqueAsync(CashereDbContext db, ProductInput input, int? existingProductId)
     {
         var sku = input.Sku.Trim();
@@ -133,6 +153,68 @@ public class ProductAdminService : IProductAdminService
 
     private static string? NormalizeBarcode(string? barcode) =>
         string.IsNullOrWhiteSpace(barcode) ? null : barcode.Trim();
+
+    // Sequential-looking (SKU-000042), falling back to a timestamp if the
+    // count-based guess somehow collides five times in a row.
+    private static async Task<string> GenerateUniqueSkuAsync(CashereDbContext db)
+    {
+        var baseCount = await db.Products.CountAsync();
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var candidate = $"SKU-{baseCount + 1 + attempt:D6}";
+            if (!await db.Products.AnyAsync(p => p.Sku == candidate))
+            {
+                return candidate;
+            }
+        }
+        return $"SKU-{DateTime.UtcNow:yyMMddHHmmssfff}";
+    }
+
+    private static async Task<string> GenerateUniqueBarcodeAsync(CashereDbContext db)
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var candidate = GenerateEan13InternalUseBarcode();
+            if (!await db.Products.AnyAsync(p => p.Barcode == candidate))
+            {
+                return candidate;
+            }
+        }
+        return GenerateEan13InternalUseBarcode();
+    }
+
+    // GS1 reserves the "20"-"29" prefix range for internal/in-store use, so
+    // this is safe to generate locally without a real GS1 company prefix -
+    // it's still a valid EAN-13 (correct check digit), just not globally
+    // unique the way a purchased barcode would be.
+    private static string GenerateEan13InternalUseBarcode()
+    {
+        var random = Random.Shared;
+        var digits = new int[12];
+        digits[0] = 2;
+        for (var i = 1; i < 12; i++)
+        {
+            digits[i] = random.Next(0, 10);
+        }
+
+        var checkDigit = ComputeEan13CheckDigit(digits);
+
+        var sb = new StringBuilder(13);
+        foreach (var digit in digits) sb.Append(digit);
+        sb.Append(checkDigit);
+        return sb.ToString();
+    }
+
+    private static int ComputeEan13CheckDigit(int[] first12Digits)
+    {
+        var sum = 0;
+        for (var i = 0; i < 12; i++)
+        {
+            sum += first12Digits[i] * (i % 2 == 0 ? 1 : 3);
+        }
+        var mod = sum % 10;
+        return mod == 0 ? 0 : 10 - mod;
+    }
 
     // Best-effort push to any connected mobile clients so their Labeling
     // product list picks up the change without needing a manual refresh or

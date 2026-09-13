@@ -12,6 +12,13 @@ public partial class PosViewModel : ViewModelBase
 {
     private readonly IProductCatalogService _catalog;
     private readonly ISaleService _saleService;
+    private readonly IShopContextService _shopContext;
+
+    // Refreshed on InitializeAsync and whenever the cashier returns from
+    // Admin (see ShellViewModel.ShowPos) so a payment method enabled or
+    // disabled in Settings -> Payments takes effect on the very next
+    // checkout, without an app restart.
+    private PaymentSettings _paymentSettings = new(true, true, true, null, null, false);
 
     public ProductPickerViewModel ProductPicker { get; }
     public CartViewModel Cart { get; }
@@ -19,9 +26,6 @@ public partial class PosViewModel : ViewModelBase
     public int CurrentCashierId { get; }
     public string CurrentCashierName { get; }
 
-    // Raised when the cashier taps ADMIN in the header - ShellViewModel
-    // subscribes to swap the current screen without PosViewModel needing to
-    // know anything about navigation itself.
     public event Action? AdminRequested;
 
     [ObservableProperty]
@@ -36,12 +40,14 @@ public partial class PosViewModel : ViewModelBase
     public PosViewModel(
         IProductCatalogService catalog,
         ISaleService saleService,
+        IShopContextService shopContext,
         decimal taxRatePercent,
         int cashierId,
         string cashierName)
     {
         _catalog = catalog;
         _saleService = saleService;
+        _shopContext = shopContext;
         CurrentCashierId = cashierId;
         CurrentCashierName = cashierName;
 
@@ -54,6 +60,12 @@ public partial class PosViewModel : ViewModelBase
     public async Task InitializeAsync()
     {
         await ProductPicker.LoadAsync();
+        await RefreshPaymentSettingsAsync();
+    }
+
+    public async Task RefreshPaymentSettingsAsync()
+    {
+        _paymentSettings = await _shopContext.GetPaymentSettingsAsync();
     }
 
     private void OnProductSelected(Product product)
@@ -66,7 +78,7 @@ public partial class PosViewModel : ViewModelBase
     {
         if (!Cart.HasItems) return;
 
-        Checkout = new CheckoutViewModel(_saleService, Cart, CurrentCashierId);
+        Checkout = new CheckoutViewModel(_saleService, Cart, CurrentCashierId, _paymentSettings);
         Checkout.SaleCompleted += OnSaleCompleted;
         Checkout.Cancelled += OnCheckoutCancelled;
         IsCheckoutOpen = true;
