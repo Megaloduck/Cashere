@@ -77,7 +77,7 @@ sealed class Program
             .UseSqlite($"Data Source={dbPath}")
             .Options);
 
-        var settings = db.ShopSettings.AsNoTracking().FirstOrDefault();
+        var settings = db.ReceiptAdmin.AsNoTracking().FirstOrDefault();
         return (settings?.ServerPort ?? 5177, settings?.ServerBindAddress ?? "0.0.0.0");
     }
 

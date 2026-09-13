@@ -41,9 +41,9 @@ public class CashierConfiguration : IEntityTypeConfiguration<Cashier>
     }
 }
 
-public class ShopSettingsConfiguration : IEntityTypeConfiguration<ShopSettings>
+public class ReceiptAdminConfiguration : IEntityTypeConfiguration<ReceiptAdmin>
 {
-    public void Configure(EntityTypeBuilder<ShopSettings> builder)
+    public void Configure(EntityTypeBuilder<ReceiptAdmin> builder)
     {
         builder.Property(s => s.ShopName).IsRequired().HasMaxLength(200);
         builder.Property(s => s.Currency).IsRequired().HasMaxLength(10);

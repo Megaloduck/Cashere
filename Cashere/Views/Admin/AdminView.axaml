@@ -104,12 +104,12 @@
               </StackPanel>
             </Button>
 
-            <TextBlock Text="CONFIGURATION" Classes="nav-group-label"/>
+            <TextBlock Text="SETTINGS" Classes="nav-group-label"/>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
               <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
-                <TextBlock Text="SHOP SETTINGS"/>
+                <mi:MaterialIcon Kind="ReceiptTextEditOutline" Width="18" Height="18"/>
+                <TextBlock Text="RECEIPT"/>
               </StackPanel>
             </Button>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Syncronization}"

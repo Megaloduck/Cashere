@@ -11,15 +11,15 @@ using System.Threading.Tasks;
 namespace Cashere.ViewModels.Admin;
 
 // Sole owner of ServerBindAddress/ServerPort - previously lived on
-// ShopSettingsViewModel, split out into its own Configuration menu item.
-// Holds the loaded ShopSettings entity so Save() can round-trip the
+// ReceiptAdminViewModel, split out into its own Configuration menu item.
+// Holds the loaded ReceiptAdmin entity so Save() can round-trip the
 // shop-profile fields (ShopName, Address, etc.) this screen doesn't edit,
-// the mirror image of what ShopSettingsViewModel now does for these two.
+// the mirror image of what ReceiptAdminViewModel now does for these two.
 public partial class SyncronizationAdminViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
 
-    private ShopSettings? _loadedSettings;
+    private ReceiptAdmin? _loadedSettings;
     private string _loadedServerBindAddress = "0.0.0.0";
     private int _loadedServerPort = 5177;
 
@@ -49,7 +49,7 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         PopulateAvailableBindAddresses(settings.ServerBindAddress);
     }
 
-    // Same best-effort LAN-adapter discovery ShopSettingsViewModel used to
+    // Same best-effort LAN-adapter discovery ReceiptAdminViewModel used to
     // do - moved here since bind address is now this screen's concern.
     private void PopulateAvailableBindAddresses(string currentlySaved)
     {

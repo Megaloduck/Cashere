@@ -22,7 +22,7 @@ public sealed record ReceiptPreviewLine(string Name, int Quantity, decimal UnitP
     public decimal Subtotal => Quantity * UnitPrice;
 }
 
-public partial class ShopSettingsViewModel : ViewModelBase
+public partial class ReceiptAdminViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
     private readonly IReceiptPrinterService? _receiptPrinter;
@@ -30,7 +30,7 @@ public partial class ShopSettingsViewModel : ViewModelBase
     // Captured on load so Save() can round-trip ServerBindAddress/ServerPort -
     // now owned by SyncronizationAdminViewModel - without clobbering whatever
     // was last saved there.
-    private ShopSettings? _loadedSettings;
+    private ReceiptAdmin? _loadedSettings;
 
     [ObservableProperty] private string _shopName = string.Empty;
     [ObservableProperty] private string _address = string.Empty;
@@ -100,7 +100,7 @@ public partial class ShopSettingsViewModel : ViewModelBase
     public string PreviewAmountTenderedDisplay => $"{PreviewCurrency} {PreviewAmountTendered:N0}";
     public string PreviewChangeDueDisplay => $"{PreviewCurrency} {PreviewChangeDue:N0}";
 
-    public ShopSettingsViewModel(IShopContextService shopContext, IReceiptPrinterService? receiptPrinter = null)
+    public ReceiptAdminViewModel(IShopContextService shopContext, IReceiptPrinterService? receiptPrinter = null)
     {
         _shopContext = shopContext;
         _receiptPrinter = receiptPrinter;
@@ -180,7 +180,7 @@ public partial class ShopSettingsViewModel : ViewModelBase
             return;
         }
 
-        var settings = _loadedSettings ?? new ShopSettings();
+        var settings = _loadedSettings ?? new ReceiptAdmin();
         settings.ShopName = ShopName.Trim();
         settings.Address = string.IsNullOrWhiteSpace(Address) ? null : Address.Trim();
         settings.Phone = string.IsNullOrWhiteSpace(Phone) ? null : Phone.Trim();

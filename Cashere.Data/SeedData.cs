@@ -8,9 +8,9 @@ public static class SeedData
 {
     public static async Task EnsureSeedDataAsync(CashereDbContext db)
     {
-        if (!await db.ShopSettings.AnyAsync())
+        if (!await db.ReceiptAdmin.AnyAsync())
         {
-            db.ShopSettings.Add(new ShopSettings
+            db.ReceiptAdmin.Add(new ReceiptAdmin
             {
                 ShopName = "My Shop",
                 Currency = "IDR",

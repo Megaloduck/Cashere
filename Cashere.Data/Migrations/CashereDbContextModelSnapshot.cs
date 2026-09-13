@@ -401,7 +401,7 @@ namespace Cashere.Data.Migrations
                 b.ToTable("SaleItems");
             });
 
-            modelBuilder.Entity("Cashere.Models.ShopSettings", b =>
+            modelBuilder.Entity("Cashere.Models.ReceiptAdmin", b =>
             {
                 b.Property<int>("Id")
                     .ValueGeneratedOnAdd()
@@ -440,7 +440,7 @@ namespace Cashere.Data.Migrations
 
                 b.HasKey("Id");
 
-                b.ToTable("ShopSettings");
+                b.ToTable("ReceiptAdmin");
             });
 
             modelBuilder.Entity("Cashere.Models.Supplier", b =>

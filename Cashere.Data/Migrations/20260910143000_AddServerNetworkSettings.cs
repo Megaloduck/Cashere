@@ -18,7 +18,7 @@ namespace Cashere.Data.Migrations
         {
             migrationBuilder.AddColumn<string>(
                 name: "ServerBindAddress",
-                table: "ShopSettings",
+                table: "ReceiptAdmin",
                 type: "TEXT",
                 maxLength: 64,
                 nullable: false,
@@ -26,7 +26,7 @@ namespace Cashere.Data.Migrations
 
             migrationBuilder.AddColumn<int>(
                 name: "ServerPort",
-                table: "ShopSettings",
+                table: "ReceiptAdmin",
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: 5177);
@@ -37,11 +37,11 @@ namespace Cashere.Data.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "ServerBindAddress",
-                table: "ShopSettings");
+                table: "ReceiptAdmin");
 
             migrationBuilder.DropColumn(
                 name: "ServerPort",
-                table: "ShopSettings");
+                table: "ReceiptAdmin");
         }
     }
 }

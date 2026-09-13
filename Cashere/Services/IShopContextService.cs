@@ -12,7 +12,7 @@ namespace Cashere.Services
         Task<Cashier?> GetDefaultCashierAsync();
         Task<decimal> GetTaxRatePercentAsync();
         Task<string> GetShopNameAsync();
-        Task<ShopSettings?> GetSettingsAsync();
-        Task UpdateSettingsAsync(ShopSettings settings);
+        Task<ReceiptAdmin?> GetSettingsAsync();
+        Task UpdateSettingsAsync(ReceiptAdmin settings);
     }
 }

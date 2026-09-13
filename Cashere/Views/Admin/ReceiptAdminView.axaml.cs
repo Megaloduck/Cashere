@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Cashere.Views.Admin;
 
-public partial class ShopSettingsView : UserControl
+public partial class ReceiptAdminView : UserControl
 {
-    public ShopSettingsView()
+    public ReceiptAdminView()
     {
         InitializeComponent();
     }

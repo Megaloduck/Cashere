@@ -28,31 +28,31 @@ public class ShopContextService : IShopContextService
     public async Task<decimal> GetTaxRatePercentAsync()
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
-        var settings = await db.ShopSettings.AsNoTracking().FirstOrDefaultAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
         return settings?.TaxRatePercent ?? 0;
     }
 
     public async Task<string> GetShopNameAsync()
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
-        var settings = await db.ShopSettings.AsNoTracking().FirstOrDefaultAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
         return settings?.ShopName ?? "Cashere";
     }
 
-    public async Task<ShopSettings?> GetSettingsAsync()
+    public async Task<ReceiptAdmin?> GetSettingsAsync()
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
-        return await db.ShopSettings.AsNoTracking().FirstOrDefaultAsync();
+        return await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
     }
 
-    public async Task UpdateSettingsAsync(ShopSettings settings)
+    public async Task UpdateSettingsAsync(ReceiptAdmin settings)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
 
-        var existing = await db.ShopSettings.FirstOrDefaultAsync();
+        var existing = await db.ReceiptAdmin.FirstOrDefaultAsync();
         if (existing is null)
         {
-            db.ShopSettings.Add(new ShopSettings
+            db.ReceiptAdmin.Add(new ReceiptAdmin
             {
                 ShopName = settings.ShopName,
                 Address = settings.Address,

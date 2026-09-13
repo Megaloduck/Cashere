@@ -1,7 +1,7 @@
 namespace Cashere.Models;
 
 // Single-row table holding shop-wide configuration (name, receipt footer, tax rate, etc).
-public class ShopSettings
+public class ReceiptAdmin
 {
     public int Id { get; set; }
     public string ShopName { get; set; } = string.Empty;

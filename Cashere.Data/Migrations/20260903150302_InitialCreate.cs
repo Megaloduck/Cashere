@@ -61,7 +61,7 @@ namespace Cashere.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShopSettings",
+                name: "ReceiptAdmin",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -75,7 +75,7 @@ namespace Cashere.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShopSettings", x => x.Id);
+                    table.PrimaryKey("PK_ReceiptAdmin", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -408,7 +408,7 @@ namespace Cashere.Data.Migrations
                 name: "SaleItems");
 
             migrationBuilder.DropTable(
-                name: "ShopSettings");
+                name: "ReceiptAdmin");
 
             migrationBuilder.DropTable(
                 name: "Purchases");

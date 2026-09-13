@@ -22,4 +22,10 @@
     <PackageReference Include="CommunityToolkit.Mvvm" />
 	<PackageReference Include="Material.Icons.Avalonia" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\Admin\ReceiptAdminView.axaml.cs">
+      <DependentUpon>ReceiptAdminView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

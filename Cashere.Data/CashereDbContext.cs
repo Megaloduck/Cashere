@@ -13,7 +13,7 @@ public class CashereDbContext : DbContext
     {
     }
 
-    public DbSet<ShopSettings> ShopSettings => Set<ShopSettings>();
+    public DbSet<ReceiptAdmin> ReceiptAdmin => Set<ReceiptAdmin>();
     public DbSet<Cashier> Cashiers => Set<Cashier>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();

@@ -19,7 +19,7 @@ using Cashere.Services;
 namespace Cashere.Server;
 
 // Boots an embedded Kestrel server inside the Avalonia desktop process.
-// Bind address/port are configurable (see ShopSettings.ServerBindAddress /
+// Bind address/port are configurable (see ReceiptAdmin.ServerBindAddress /
 // ServerPort) - "0.0.0.0" binds every network adapter so the Android app
 // can reach it over LAN, which is the safe default; a specific address
 // restricts which interface is reachable. Call StartAsync once on app

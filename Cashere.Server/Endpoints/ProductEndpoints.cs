@@ -40,7 +40,7 @@ public static class ProductEndpoints
         // QR code, to confirm it reached the right shop before syncing.
         app.MapGet("/api/health", async (CashereDbContext db) =>
         {
-            var shop = await db.ShopSettings.FirstOrDefaultAsync();
+            var shop = await db.ReceiptAdmin.FirstOrDefaultAsync();
             return Results.Ok(new { shopName = shop?.ShopName ?? "Cashere", status = "ok" });
         });
     }

@@ -5,13 +5,13 @@
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:Class="Cashere.Views.Admin.ShopSettingsView"
-             x:DataType="vm:ShopSettingsViewModel">
+             x:Class="Cashere.Views.Admin.ReceiptAdminView"
+             x:DataType="vm:ReceiptAdminViewModel">
     <Grid RowDefinitions="Auto,*" Margin="12">
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <StackPanel Grid.Column="0" Spacing="10">
-                <TextBlock  Text="SHOP SETTINGS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock  Text="RECEIPT CONFIGURATIONS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
                 <Border Classes="rule-thick"/>
             </StackPanel>            
         </Grid>

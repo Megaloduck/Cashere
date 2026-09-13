@@ -18,7 +18,7 @@ public partial class AdminViewModel : ViewModelBase
     public CustomerAdminViewModel Customers { get; }
     public SalesHistoryViewModel SalesHistory { get; }
     public SalesReportViewModel SalesReport { get; }
-    public ShopSettingsViewModel Settings { get; }
+    public ReceiptAdminViewModel Settings { get; }
     public DevicesAdminViewModel Devices { get; }
     public SyncronizationAdminViewModel Syncronization { get; }
 
@@ -77,7 +77,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new ShopSettingsViewModel(shopContext, receiptPrinter);
+        Settings = new ReceiptAdminViewModel(shopContext, receiptPrinter);
         Devices = new DevicesAdminViewModel(connectedDeviceService);
         Syncronization = new SyncronizationAdminViewModel(shopContext);
     }
