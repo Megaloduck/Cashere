@@ -7,9 +7,15 @@ public class ReceiptAdmin
     public string ShopName { get; set; } = string.Empty;
     public string? Address { get; set; }
     public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? TaxId { get; set; }
     public string Currency { get; set; } = "IDR";
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
+
+    // IANA id or a free-text label like "GMT+7" - not validated yet, purely
+    // informational until scheduling/reporting features need to reason about it.
+    public string? Timezone { get; set; }
 
     // Local sync server config, read by Cashere.Desktop/Program.cs at
     // startup to configure Kestrel. "0.0.0.0" means "bind every network

@@ -15,7 +15,5 @@ public enum AdminSection
     Cashiers,
     SalesHistory,
     SalesReport,
-    Settings,
-    Devices,
-    Syncronization
+    Settings
 }

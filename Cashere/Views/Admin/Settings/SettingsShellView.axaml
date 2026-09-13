@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:converters="clr-namespace:Cashere.Converters"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+             x:Class="Cashere.Views.Admin.Settings.SettingsShellView"
+             x:DataType="vm:SettingsShellViewModel">
+
+  <UserControl.Resources>
+    <converters:EnumMatchConverter x:Key="EnumMatch"/>
+  </UserControl.Resources>
+
+  <Grid ColumnDefinitions="210,*">
+
+    <Border Grid.Column="0" Background="{StaticResource InkBrush}">
+      <ScrollViewer>
+        <StackPanel Margin="0,16">
+
+          <TextBlock Text="BUSINESS" Classes="nav-group-label"/>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Business}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Business}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="StorefrontOutline" Width="18" Height="18"/>
+              <TextBlock Text="BUSINESS INFO"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Receipts}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Receipts}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="ReceiptTextEditOutline" Width="18" Height="18"/>
+              <TextBlock Text="RECEIPTS"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Payments}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Payments}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="CreditCardOutline" Width="18" Height="18"/>
+              <TextBlock Text="PAYMENTS"/>
+            </StackPanel>
+          </Button>
+
+          <TextBlock Text="OPERATIONS" Classes="nav-group-label"/>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Inventory}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Inventory}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18"/>
+              <TextBlock Text="INVENTORY"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesBehavior}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.SalesBehavior}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="CartOutline" Width="18" Height="18"/>
+              <TextBlock Text="SALES BEHAVIOR"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=CashRegister}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.CashRegister}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="CashRegister" Width="18" Height="18"/>
+              <TextBlock Text="CASH REGISTER"/>
+            </StackPanel>
+          </Button>
+
+          <TextBlock Text="PEOPLE &amp; ACCESS" Classes="nav-group-label"/>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Staff}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Staff}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
+              <TextBlock Text="STAFF &amp; PERMISSIONS"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Security}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Security}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="ShieldLockOutline" Width="18" Height="18"/>
+              <TextBlock Text="SECURITY"/>
+            </StackPanel>
+          </Button>
+
+          <TextBlock Text="DEVICES &amp; NETWORK" Classes="nav-group-label"/>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Hardware}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Hardware}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="PrinterOutline" Width="18" Height="18"/>
+              <TextBlock Text="HARDWARE"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Network}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Network}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="Lan" Width="18" Height="18"/>
+              <TextBlock Text="NETWORK"/>
+            </StackPanel>
+          </Button>
+
+          <TextBlock Text="SYSTEM" Classes="nav-group-label"/>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=DataBackup}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.DataBackup}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="Database" Width="18" Height="18"/>
+              <TextBlock Text="DATA &amp; BACKUP"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Preferences}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Preferences}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="Palette" Width="18" Height="18"/>
+              <TextBlock Text="PREFERENCES"/>
+            </StackPanel>
+          </Button>
+          <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=About}"
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.About}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <mi:MaterialIcon Kind="InformationOutline" Width="18" Height="18"/>
+              <TextBlock Text="ABOUT"/>
+            </StackPanel>
+          </Button>
+
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <Border Grid.Column="1" Padding="16">
+      <ContentControl Content="{Binding CurrentSettingsView}"/>
+    </Border>
+
+  </Grid>
+</UserControl>

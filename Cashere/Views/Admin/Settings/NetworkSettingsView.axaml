@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:adminViews="clr-namespace:Cashere.Views.Admin"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="760"
+             x:Class="Cashere.Views.Admin.Settings.NetworkSettingsView"
+             x:DataType="vm:NetworkSettingsViewModel">
+  <!--
+    Both child views already render their own header/rule-thick, so this just
+    stacks them - no duplicate titles needed. DevicesAdminView gets an
+    explicit Height because its internal Grid relies on a "*" row for the
+    device list's ScrollViewer, which collapses to zero inside a StackPanel's
+    Auto-height layout unless the control itself has a bounded height.
+  -->
+  <ScrollViewer>
+    <StackPanel Spacing="4">
+      <adminViews:SyncronizationAdminView DataContext="{Binding Synchronization}"/>
+      <Border Classes="rule-thick" Margin="12,8"/>
+      <adminViews:DevicesAdminView DataContext="{Binding ConnectedDevices}" Height="420"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -80,14 +80,6 @@
               </StackPanel>
             </Button>
 
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Devices}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Devices}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="Devices" Width="18" Height="18"/>
-                <TextBlock Text="DEVICES"/>
-              </StackPanel>
-            </Button>
-
             <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">
@@ -104,19 +96,12 @@
               </StackPanel>
             </Button>
 
-            <TextBlock Text="SETTINGS" Classes="nav-group-label"/>
+            <TextBlock Text="SYSTEM" Classes="nav-group-label"/>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
               <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="ReceiptTextEditOutline" Width="18" Height="18"/>
-                <TextBlock Text="RECEIPT"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Syncronization}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Syncronization}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="Sync" Width="18" Height="18"/>
-                <TextBlock Text="SYNCHRONIZATION"/>
+                <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
+                <TextBlock Text="SETTINGS"/>
               </StackPanel>
             </Button>
 

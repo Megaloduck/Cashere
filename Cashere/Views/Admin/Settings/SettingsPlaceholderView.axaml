@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:sys="using:System"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="520"
+             x:Class="Cashere.Views.Admin.Settings.SettingsPlaceholderView"
+             x:DataType="vm:SettingsPlaceholderViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="14" MaxWidth="640">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="{Binding Title}" Classes="headline" FontSize="20" VerticalAlignment="Center"/>
+        <Border Grid.Column="1" Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}"
+                Padding="10,5" VerticalAlignment="Center">
+          <TextBlock Text="ON THE ROADMAP" FontSize="10" FontWeight="Bold" LetterSpacing="1" Foreground="{StaticResource InkBrush}"/>
+        </Border>
+      </Grid>
+      <Border Classes="rule-thick"/>
+
+      <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"/>
+
+      <TextBlock Text="PLANNED SETTINGS" Classes="eyebrow"/>
+      <ItemsControl ItemsSource="{Binding PlannedItems}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="sys:String">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,8">
+              <mi:MaterialIcon Kind="CircleSmall" Width="14" Height="14" Foreground="{StaticResource BlueBrush}" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

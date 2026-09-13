@@ -1,0 +1,210 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Cashere.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace Cashere.ViewModels.Admin.Settings;
+
+public partial class SettingsShellViewModel : ViewModelBase
+{
+    public BusinessInfoViewModel Business { get; }
+    public ReceiptAdminViewModel Receipts { get; }
+    public NetworkSettingsViewModel Network { get; }
+
+    public SettingsPlaceholderViewModel Payments { get; }
+    public SettingsPlaceholderViewModel Inventory { get; }
+    public SettingsPlaceholderViewModel Staff { get; }
+    public SettingsPlaceholderViewModel Hardware { get; }
+    public SettingsPlaceholderViewModel CashRegister { get; }
+    public SettingsPlaceholderViewModel SalesBehavior { get; }
+    public SettingsPlaceholderViewModel Security { get; }
+    public SettingsPlaceholderViewModel DataBackup { get; }
+    public SettingsPlaceholderViewModel Preferences { get; }
+    public SettingsPlaceholderViewModel About { get; }
+
+    [ObservableProperty]
+    private SettingsSection _selectedSection = SettingsSection.Business;
+
+    public ViewModelBase CurrentSettingsView => SelectedSection switch
+    {
+        SettingsSection.Business => Business,
+        SettingsSection.Receipts => Receipts,
+        SettingsSection.Payments => Payments,
+        SettingsSection.Inventory => Inventory,
+        SettingsSection.Staff => Staff,
+        SettingsSection.Hardware => Hardware,
+        SettingsSection.Network => Network,
+        SettingsSection.CashRegister => CashRegister,
+        SettingsSection.SalesBehavior => SalesBehavior,
+        SettingsSection.Security => Security,
+        SettingsSection.DataBackup => DataBackup,
+        SettingsSection.Preferences => Preferences,
+        SettingsSection.About => About,
+        _ => Business
+    };
+
+    public SettingsShellViewModel(
+        IShopContextService shopContext,
+        IReceiptPrinterService? receiptPrinter,
+        IConnectedDeviceService? connectedDevices)
+    {
+        Business = new BusinessInfoViewModel(shopContext);
+        Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
+        Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
+
+        Payments = new SettingsPlaceholderViewModel(
+            "Payments",
+            "Cash, QRIS and EDC already work as payment methods at checkout. This screen will control which methods are offered and how each behaves.",
+            new[]
+            {
+                "Enable/disable individual payment methods",
+                "Payment fee per method",
+                "Account / provider details",
+                "Require confirmation before completing",
+                "Allow refund",
+                "Allow partial payment"
+            });
+
+        Inventory = new SettingsPlaceholderViewModel(
+            "Inventory",
+            "Per-product stock and low-stock threshold already work from the Products screen. This adds store-wide defaults and rules.",
+            new[]
+            {
+                "Stock tracking ON/OFF",
+                "Allow negative stock",
+                "Default low-stock threshold",
+                "Out-of-stock behavior at checkout",
+                "SKU / barcode auto-generation"
+            });
+
+        Staff = new SettingsPlaceholderViewModel(
+            "Staff & Permissions",
+            "Cashiers already have a Role (Owner/Manager/Cashier), but nothing in the app checks it yet - login itself is still a plaintext placeholder. This screen will turn Role into an actual capability matrix.",
+            new[]
+            {
+                "Void sale / refund",
+                "Apply discount / change price",
+                "Open cash drawer",
+                "View profit / reports",
+                "Edit inventory, delete products",
+                "Change settings"
+            });
+
+        Hardware = new SettingsPlaceholderViewModel(
+            "Hardware",
+            "The receipt printer already works (Test Print under Receipts, via the Windows default printer). This screen will grow to cover the rest of the till's physical devices.",
+            new[]
+            {
+                "Printer type & paper size (58mm / 80mm)",
+                "Barcode scanner configuration",
+                "Cash drawer (kick on sale)",
+                "Customer-facing display",
+                "EDC terminal pairing"
+            });
+
+        CashRegister = new SettingsPlaceholderViewModel(
+            "Cash Register",
+            "Shift and cash-drawer reconciliation - not started yet.",
+            new[]
+            {
+                "Starting cash",
+                "Opening / closing a shift",
+                "Cash withdrawal & deposit",
+                "Expected vs. actual cash at close-out",
+                "Shift discrepancies surfaced in Reports"
+            });
+
+        SalesBehavior = new SettingsPlaceholderViewModel(
+            "Sales Behavior",
+            "Controls for what happens at checkout. Some of this is already hardcoded (e.g. the cart auto-clears after a sale) - this screen will make it configurable.",
+            new[]
+            {
+                "Default order type (dine-in / takeaway / delivery)",
+                "Require a customer before checkout",
+                "Allow suspended (held) orders",
+                "Require confirmation before void",
+                "Auto-print receipt after payment",
+                "Order numbering scheme"
+            });
+
+        Security = new SettingsPlaceholderViewModel(
+            "Security",
+            "No PIN, lock screen, or manager-approval gate exists yet - cashier login itself is still a placeholder (see Staff & Permissions).",
+            new[]
+            {
+                "PIN requirement",
+                "Auto-lock timeout",
+                "Manager authorization for sensitive actions",
+                "Audit log",
+                "Local database encryption"
+            });
+
+        DataBackup = new SettingsPlaceholderViewModel(
+            "Data & Backup",
+            "Cashere is local-first, so this matters more than it would for a cloud POS. Not started yet.",
+            new[]
+            {
+                "Database status",
+                "Backup / restore database",
+                "Automatic backup schedule & retention",
+                "Export / import data"
+            });
+
+        Preferences = new SettingsPlaceholderViewModel(
+            "Preferences",
+            "App-level look and feel, separate from business configuration. Not started yet.",
+            new[]
+            {
+                "Light / Dark / System theme",
+                "Language",
+                "Date, time & number format",
+                "Sound & notifications",
+                "UI density"
+            });
+
+        About = new SettingsPlaceholderViewModel(
+            "About",
+            "Cashere Point of Sale — 1.0.0 (Preview).",
+            new[]
+            {
+                "Version",
+                "Database status",
+                "Licenses"
+            });
+    }
+
+    public async Task InitializeAsync()
+    {
+        await Business.LoadAsync();
+        await Receipts.LoadAsync();
+        await Network.InitializeAsync();
+    }
+
+    partial void OnSelectedSectionChanged(SettingsSection value)
+    {
+        OnPropertyChanged(nameof(CurrentSettingsView));
+
+        // Business, Receipts and Network all read/write the same underlying
+        // ReceiptAdmin row - reload on nav so switching tabs always shows
+        // whatever another tab most recently saved in this same session.
+        if (value == SettingsSection.Network)
+        {
+            _ = Network.RefreshAsync();
+        }
+        else if (value == SettingsSection.Business)
+        {
+            _ = Business.LoadAsync();
+        }
+        else if (value == SettingsSection.Receipts)
+        {
+            _ = Receipts.LoadAsync();
+        }
+    }
+
+    [RelayCommand]
+    private void SelectSection(SettingsSection section) => SelectedSection = section;
+}

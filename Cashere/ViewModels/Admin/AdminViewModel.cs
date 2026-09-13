@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cashere.Services;
+using Cashere.ViewModels.Admin.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -18,9 +19,12 @@ public partial class AdminViewModel : ViewModelBase
     public CustomerAdminViewModel Customers { get; }
     public SalesHistoryViewModel SalesHistory { get; }
     public SalesReportViewModel SalesReport { get; }
-    public ReceiptAdminViewModel Settings { get; }
-    public DevicesAdminViewModel Devices { get; }
-    public SyncronizationAdminViewModel Syncronization { get; }
+
+    // Hub for Receipts, Payments, Inventory, Staff, Hardware, Network
+    // (Synchronization + Connected Devices), Cash Register, Sales Behavior,
+    // Security, Data & Backup, Preferences and About - see
+    // ViewModels/Admin/Settings/SettingsShellViewModel.
+    public SettingsShellViewModel Settings { get; }
 
     public event Action? BackRequested;
 
@@ -37,8 +41,6 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.SalesHistory => SalesHistory,
         AdminSection.SalesReport => SalesReport,
         AdminSection.Settings => Settings,
-        AdminSection.Devices => Devices,
-        AdminSection.Syncronization => Syncronization,
         _ => Products
     };
 
@@ -51,9 +53,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.Cashiers => "CASHIERS",
         AdminSection.SalesHistory => "SALES HISTORY",
         AdminSection.SalesReport => "REPORTS",
-        AdminSection.Settings => "SHOP SETTINGS",
-        AdminSection.Devices => "CONNECTED DEVICES",
-        AdminSection.Syncronization => "SYNCHRONIZATION",
+        AdminSection.Settings => "SETTINGS",
         _ => "ADMIN"
     };
 
@@ -77,9 +77,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new ReceiptAdminViewModel(shopContext, receiptPrinter);
-        Devices = new DevicesAdminViewModel(connectedDeviceService);
-        Syncronization = new SyncronizationAdminViewModel(shopContext);
+        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService);
     }
 
     public async Task InitializeAsync()
@@ -91,24 +89,13 @@ public partial class AdminViewModel : ViewModelBase
         await Customers.LoadAsync();
         await SalesHistory.LoadAsync();
         await SalesReport.LoadAsync();
-        await Settings.LoadAsync();
-        await Devices.LoadAsync();
-        await Syncronization.LoadAsync();
+        await Settings.InitializeAsync();
     }
 
     partial void OnSelectedSectionChanged(AdminSection value)
     {
         OnPropertyChanged(nameof(CurrentSectionViewModel));
         OnPropertyChanged(nameof(CurrentSectionTitle));
-
-        if (value == AdminSection.Devices)
-        {
-            Devices.RefreshCommand.Execute(null);
-        }
-        else if (value == AdminSection.Syncronization)
-        {
-            _ = Syncronization.LoadAsync();
-        }
     }
 
     [RelayCommand]
