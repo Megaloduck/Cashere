@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Cashere.Data.Services;
 using Cashere.Services;
 using Cashere.Desktop.Services;
-using System.Linq;
+using System.Linq;  
 
 namespace Cashere.Desktop;
 
@@ -49,6 +49,7 @@ sealed class Program
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
         AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
         AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);
+        AppServices.DataBackup = new DataBackupService(dbPath);
 
         try
         {

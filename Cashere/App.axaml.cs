@@ -37,7 +37,8 @@ public partial class App : Application
      AppServices.CashierAdmin is not null &&
      AppServices.CustomerAdmin is not null &&
      AppServices.SalesReport is not null &&
-     AppServices.ShiftAdmin is not null)
+     AppServices.ShiftAdmin is not null &&
+     AppServices.DataBackup is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
@@ -53,19 +54,20 @@ public partial class App : Application
                     AppServices.ReceiptPrinter);
 
                 var adminViewModel = new AdminViewModel(
-     AppServices.ProductAdmin,
-     AppServices.CategoryAdmin,
-     AppServices.SupplierAdmin,
-     AppServices.PurchaseAdmin,
-     AppServices.CashierAdmin,
-     AppServices.CustomerAdmin,
-     AppServices.SalesReport,
-     AppServices.ProductCatalog,
-     AppServices.ShopContext,
-     AppServices.ShiftAdmin,
-     cashier?.Id ?? 0,
-     AppServices.ConnectedDevices,
-     AppServices.ReceiptPrinter);
+                    AppServices.ProductAdmin,
+                    AppServices.CategoryAdmin,
+                    AppServices.SupplierAdmin,
+                    AppServices.PurchaseAdmin,
+                    AppServices.CashierAdmin,
+                    AppServices.CustomerAdmin,
+                    AppServices.SalesReport,
+                    AppServices.ProductCatalog,
+                    AppServices.ShopContext,
+                    AppServices.ShiftAdmin,
+                    AppServices.DataBackup,
+                    cashier?.Id ?? 0,
+                    AppServices.ConnectedDevices,
+                    AppServices.ReceiptPrinter);
 
                 var shell = new ShellViewModel(posViewModel, adminViewModel);
 

@@ -64,6 +64,7 @@ public partial class AdminViewModel : ViewModelBase
         IProductCatalogService productCatalog,
         IShopContextService shopContext,
         IShiftAdminService shiftAdmin,
+        IDataBackupService dataBackup,
         int currentCashierId,
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null)
@@ -75,7 +76,8 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, currentCashierId);
+        Settings = new SettingsShellViewModel(
+            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, currentCashierId);
     }
 
     public async Task InitializeAsync()

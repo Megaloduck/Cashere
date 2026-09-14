@@ -28,5 +28,6 @@ namespace Cashere.Services
         public static IConnectedDeviceService? ConnectedDevices { get; set; }
         public static IReceiptPrinterService? ReceiptPrinter { get; set; }
         public static IShiftAdminService? ShiftAdmin { get; set; }
+        public static IDataBackupService? DataBackup { get; set; }
     }
 }

@@ -19,10 +19,10 @@ public partial class SettingsShellViewModel : ViewModelBase
     public NetworkSettingsViewModel Network { get; }
     public CashRegisterViewModel CashRegister { get; }
     public SalesBehaviorSettingsViewModel SalesBehavior { get; }
+    public DataBackupSettingsViewModel DataBackup { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
     public SettingsPlaceholderViewModel Security { get; }
-    public SettingsPlaceholderViewModel DataBackup { get; }
     public SettingsPlaceholderViewModel Preferences { get; }
     public SettingsPlaceholderViewModel About { get; }
 
@@ -52,6 +52,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         IReceiptPrinterService? receiptPrinter,
         IConnectedDeviceService? connectedDevices,
         IShiftAdminService shiftAdmin,
+        IDataBackupService dataBackup,
         int currentCashierId)
     {
         Business = new BusinessInfoViewModel(shopContext);
@@ -62,6 +63,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
+        DataBackup = new DataBackupSettingsViewModel(dataBackup);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -79,7 +81,7 @@ public partial class SettingsShellViewModel : ViewModelBase
 
         Security = new SettingsPlaceholderViewModel(
             "Security",
-            "No PIN, lock screen, or manager-approval gate exists yet - cashier login itself is still a placeholder (see Staff & Permissions).",
+            "No PIN, lock screen, or manager-approval gate exists yet - cashier login itself is still a placeholder (see Staff & Permissions), so there's nothing yet for these controls to attach to.",
             new[]
             {
                 "PIN requirement",
@@ -87,17 +89,6 @@ public partial class SettingsShellViewModel : ViewModelBase
                 "Manager authorization for sensitive actions",
                 "Audit log",
                 "Local database encryption"
-            });
-
-        DataBackup = new SettingsPlaceholderViewModel(
-            "Data & Backup",
-            "Cashere is local-first, so this matters more than it would for a cloud POS. Not started yet.",
-            new[]
-            {
-                "Database status",
-                "Backup / restore database",
-                "Automatic backup schedule & retention",
-                "Export / import data"
             });
 
         Preferences = new SettingsPlaceholderViewModel(
@@ -133,6 +124,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Network.InitializeAsync();
         await CashRegister.LoadAsync();
         await SalesBehavior.LoadAsync();
+        await DataBackup.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(SettingsSection value)
@@ -170,6 +162,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.SalesBehavior)
         {
             _ = SalesBehavior.LoadAsync();
+        }
+        else if (value == SettingsSection.DataBackup)
+        {
+            _ = DataBackup.LoadAsync();
         }
     }
 
