@@ -32,10 +32,13 @@ public partial class ShellViewModel : ViewModelBase
     private async Task ShowPos()
     {
         CurrentView = Pos;
-        // Catches any product/price/stock changes, and any payment-method
-        // enable/disable, made while in admin.
+        // Catches any product/price/stock changes, any payment-method
+        // enable/disable, any sales-behavior change, and any new/edited
+        // customer made while in admin.
         await Pos.ProductPicker.RefreshProductsAsync();
         await Pos.RefreshPaymentSettingsAsync();
+        await Pos.RefreshSalesBehaviorSettingsAsync();
+        await Pos.RefreshCustomersAsync();
     }
 
     [RelayCommand]

@@ -18,9 +18,9 @@ public partial class SettingsShellViewModel : ViewModelBase
     public HardwareSettingsViewModel Hardware { get; }
     public NetworkSettingsViewModel Network { get; }
     public CashRegisterViewModel CashRegister { get; }
+    public SalesBehaviorSettingsViewModel SalesBehavior { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
-    public SettingsPlaceholderViewModel SalesBehavior { get; }
     public SettingsPlaceholderViewModel Security { get; }
     public SettingsPlaceholderViewModel DataBackup { get; }
     public SettingsPlaceholderViewModel Preferences { get; }
@@ -61,6 +61,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         Hardware = new HardwareSettingsViewModel(shopContext, receiptPrinter);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
+        SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -74,19 +75,6 @@ public partial class SettingsShellViewModel : ViewModelBase
                 "View profit / reports",
                 "Edit inventory, delete products",
                 "Change settings"
-            });
-
-        SalesBehavior = new SettingsPlaceholderViewModel(
-            "Sales Behavior",
-            "Controls for what happens at checkout. Some of this is already hardcoded (e.g. the cart auto-clears after a sale) - this screen will make it configurable.",
-            new[]
-            {
-                "Default order type (dine-in / takeaway / delivery)",
-                "Require a customer before checkout",
-                "Allow suspended (held) orders",
-                "Require confirmation before void",
-                "Auto-print receipt after payment",
-                "Order numbering scheme"
             });
 
         Security = new SettingsPlaceholderViewModel(
@@ -144,6 +132,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Hardware.LoadAsync();
         await Network.InitializeAsync();
         await CashRegister.LoadAsync();
+        await SalesBehavior.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(SettingsSection value)
@@ -177,6 +166,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.CashRegister)
         {
             _ = CashRegister.LoadAsync();
+        }
+        else if (value == SettingsSection.SalesBehavior)
+        {
+            _ = SalesBehavior.LoadAsync();
         }
     }
 

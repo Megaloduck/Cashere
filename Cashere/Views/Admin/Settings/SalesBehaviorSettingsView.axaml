@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="620"
+             x:Class="Cashere.Views.Admin.Settings.SalesBehaviorSettingsView"
+             x:DataType="vm:SalesBehaviorSettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12" MaxWidth="560">
+      <TextBlock Text="SALES BEHAVIOR" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="REQUIRE CUSTOMER BEFORE CHECKOUT" FontWeight="Bold"/>
+          <TextBlock Text="Cashier must pick a customer in Checkout before Complete Sale is enabled."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding RequireCustomerBeforeCheckout}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <Border Classes="rule-thick" Margin="0,2"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="AUTO-PRINT RECEIPT AFTER PAYMENT" FontWeight="Bold"/>
+          <TextBlock Text="Sends a receipt to whatever printer is configured under Settings -> Hardware automatically when a sale completes."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoPrintReceiptAfterPayment}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock Text="{Binding StatusMessage}"
+                 Foreground="{StaticResource BlueBrush}"
+                 FontWeight="Bold"
+                 TextWrapping="Wrap"/>
+
+      <Button Content="SAVE"
+              Classes="accent-blue"
+              Command="{Binding SaveCommand}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Padding="0,14"
+              Margin="0,8,0,4"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="Default order type, held/suspended orders, confirmation before void, and a configurable order numbering scheme don't have an underlying feature to gate yet."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

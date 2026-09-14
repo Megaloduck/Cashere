@@ -9,6 +9,16 @@ using Cashere.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Cashere.Models;
+using Cashere.Services;
+using Cashere.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 namespace Cashere.ViewModels.Pos;
 
 public partial class CheckoutViewModel : ViewModelBase
@@ -17,16 +27,19 @@ public partial class CheckoutViewModel : ViewModelBase
     private readonly CartViewModel _cart;
     private readonly int _cashierId;
     private readonly PaymentSettings _paymentSettings;
+    private readonly SalesBehaviorSettings _salesBehaviorSettings;
 
     public event Action<CompletedSaleResult>? SaleCompleted;
     public event Action? Cancelled;
 
-    // Filtered to whatever Settings -> Payments currently has enabled -
-    // SaleService independently re-checks this at completion as a backstop.
     public IReadOnlyList<PaymentMethod> PaymentMethods { get; }
+    public IReadOnlyList<Customer> Customers { get; }
 
     [ObservableProperty]
     private PaymentMethod _paymentMethod;
+
+    [ObservableProperty]
+    private Customer? _selectedCustomer;
 
     [ObservableProperty]
     private decimal _amountTendered;
@@ -52,34 +65,42 @@ public partial class CheckoutViewModel : ViewModelBase
     public bool IsCashPayment => PaymentMethod == PaymentMethod.Cash;
     public bool IsNonCashPayment => !IsCashPayment;
 
-    // Settings -> Payments -> account info for whichever method is currently
-    // selected, shown as a cashier hint (e.g. which QRIS merchant ID or EDC
-    // terminal to expect the payment on). Only meaningful when non-cash.
     public string? SelectedMethodAccountInfo => _paymentSettings.AccountInfoFor(PaymentMethod);
     public bool HasSelectedMethodAccountInfo => !string.IsNullOrWhiteSpace(SelectedMethodAccountInfo);
 
     public bool IsConfirmationRequired => _paymentSettings.RequireConfirmationForNonCash && IsNonCashPayment;
 
+    // Settings -> Sales Behavior. When on, Complete Sale stays disabled
+    // until a customer is picked - SaleService independently re-checks this
+    // at completion as a backstop, same pattern as payment methods.
+    public bool IsCustomerRequired => _salesBehaviorSettings.RequireCustomerBeforeCheckout;
+
     public bool CanComplete =>
         !IsProcessing &&
         _cart.HasItems &&
         (!IsCashPayment || AmountTendered >= TotalDue) &&
-        (!IsConfirmationRequired || IsPaymentConfirmed);
+        (!IsConfirmationRequired || IsPaymentConfirmed) &&
+        (!IsCustomerRequired || SelectedCustomer is not null);
 
-    public CheckoutViewModel(ISaleService saleService, CartViewModel cart, int cashierId, PaymentSettings paymentSettings)
+    public CheckoutViewModel(
+        ISaleService saleService,
+        CartViewModel cart,
+        int cashierId,
+        PaymentSettings paymentSettings,
+        SalesBehaviorSettings salesBehaviorSettings,
+        IReadOnlyList<Customer> customers)
     {
         _saleService = saleService;
         _cart = cart;
         _cashierId = cashierId;
         _paymentSettings = paymentSettings;
+        _salesBehaviorSettings = salesBehaviorSettings;
+        Customers = customers;
 
         PaymentMethods = Enum.GetValues<PaymentMethod>()
             .Where(m => paymentSettings.IsMethodEnabled(m))
             .ToList();
 
-        // Falls back to whatever's first enabled if Cash itself got disabled -
-        // PaymentSettingsViewModel.Save() already blocks disabling every
-        // method, so PaymentMethods is guaranteed non-empty here.
         _paymentMethod = PaymentMethods.Contains(PaymentMethod.Cash)
             ? PaymentMethod.Cash
             : PaymentMethods[0];
@@ -93,6 +114,8 @@ public partial class CheckoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(CanComplete));
     }
 
+    partial void OnSelectedCustomerChanged(Customer? value) => OnPropertyChanged(nameof(CanComplete));
+
     partial void OnPaymentMethodChanged(PaymentMethod value)
     {
         OnPropertyChanged(nameof(IsCashPayment));
@@ -103,8 +126,6 @@ public partial class CheckoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsConfirmationRequired));
         OnPropertyChanged(nameof(CanComplete));
 
-        // A confirmation ticked for one method shouldn't silently carry over
-        // if the cashier switches to a different method mid-checkout.
         IsPaymentConfirmed = false;
 
         if (value != PaymentMethod.Cash)
@@ -125,7 +146,7 @@ public partial class CheckoutViewModel : ViewModelBase
         {
             var request = new CompleteSaleRequest(
                 CashierId: _cashierId,
-                CustomerId: null,
+                CustomerId: SelectedCustomer?.Id,
                 Lines: _cart.Lines.Select(l => new SaleLineRequest(l.ProductId, l.Quantity, l.UnitPrice)).ToList(),
                 DiscountAmount: _cart.DiscountAmount,
                 TaxRatePercent: _cart.TaxRatePercent,

@@ -45,14 +45,6 @@ public class ShopContextService : IShopContextService
         return await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
     }
 
-    // Attaches and marks the whole entity Modified (or Adds it, if no row
-    // exists yet) instead of copying fields one by one onto a separately
-    // fetched, separately tracked instance. The old field-by-field version
-    // silently dropped every property added to ReceiptAdmin after it was
-    // written - Email/TaxId/Timezone from Business Info, and TrackInventory/
-    // OutOfStockBehavior/DefaultLowStockThreshold/AutoGenerateSku/
-    // AutoGenerateBarcode from Inventory all went unsaved. This version
-    // can't drift out of sync with the model again.
     public async Task UpdateSettingsAsync(ReceiptAdmin settings)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
@@ -82,4 +74,14 @@ public class ShopContextService : IShopContextService
             settings?.EdcAccountInfo,
             settings?.RequireConfirmationForNonCash ?? false);
     }
-}
+
+    public async Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        return new SalesBehaviorSettings(
+            settings?.RequireCustomerBeforeCheckout ?? false,
+            settings?.AutoPrintReceiptAfterPayment ?? false);
+    }
+}   

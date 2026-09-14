@@ -5,13 +5,6 @@ using Cashere.Models;
 using Cashere.Services;
 using Microsoft.EntityFrameworkCore;
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Cashere.Models;
-using Cashere.Services;
-using Microsoft.EntityFrameworkCore;
-
 namespace Cashere.Data.Services;
 
 public class SaleService : ISaleService
@@ -39,10 +32,6 @@ public class SaleService : ISaleService
         var outOfStockBehavior = settings?.OutOfStockBehavior ?? OutOfStockBehavior.Block;
         var enforceStock = trackInventory && outOfStockBehavior == OutOfStockBehavior.Block;
 
-        // Defense-in-depth: Checkout already filters its payment dropdown to
-        // enabled methods (see PosViewModel/CheckoutViewModel), but a stale
-        // UI (settings changed elsewhere mid-sale) or a future non-desktop
-        // client shouldn't be able to bypass this.
         var methodEnabled = request.PaymentMethod switch
         {
             PaymentMethod.Cash => settings?.CashEnabled ?? true,
@@ -54,6 +43,15 @@ public class SaleService : ISaleService
         {
             throw new InvalidOperationException(
                 $"{request.PaymentMethod} is currently disabled in Settings -> Payments.");
+        }
+
+        // Defense-in-depth: CheckoutViewModel already disables Complete Sale
+        // until a customer is picked when this is on, but a stale UI or a
+        // future non-desktop client shouldn't be able to bypass it.
+        if ((settings?.RequireCustomerBeforeCheckout ?? false) && request.CustomerId is null)
+        {
+            throw new InvalidOperationException(
+                "A customer is required before completing this sale (Settings -> Sales Behavior).");
         }
 
         var productIds = request.Lines.Select(l => l.ProductId).ToList();

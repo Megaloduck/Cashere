@@ -3,8 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+             xmlns:models="clr-namespace:Cashere.Models"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="460"
+             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="540"
              x:Class="Cashere.Views.Pos.CheckoutView"
              x:DataType="vm:CheckoutViewModel">
   <StackPanel Spacing="12">
@@ -20,6 +21,20 @@
         <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="White"/>
       </Grid>
     </Border>
+
+    <StackPanel Spacing="4">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="CUSTOMER (OPTIONAL)" Classes="eyebrow" IsVisible="{Binding !IsCustomerRequired}"/>
+        <TextBlock Grid.Column="0" Text="CUSTOMER (REQUIRED)" Classes="eyebrow" Foreground="{StaticResource RedBrush}" IsVisible="{Binding IsCustomerRequired}"/>
+      </Grid>
+      <ComboBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}" HorizontalAlignment="Stretch">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="models:Customer">
+            <TextBlock Text="{Binding Name}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </StackPanel>
 
     <StackPanel Spacing="4">
       <TextBlock Text="PAYMENT METHOD" Classes="eyebrow"/>

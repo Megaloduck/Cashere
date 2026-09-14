@@ -27,14 +27,15 @@ public class ReceiptAdmin
     public string? EdcAccountInfo { get; set; }
     public bool RequireConfirmationForNonCash { get; set; }
 
-    // Receipt printer selection & paper width - read by
-    // WindowsReceiptPrinterService on every PrintAsync call. Null
-    // PrinterName means "use whatever Windows has set as its own default
-    // printer" - the exact behavior this app always had before this
-    // setting existed, so an empty/never-visited Hardware screen changes
-    // nothing.
     public string? PrinterName { get; set; }
     public int PrinterPaperWidthMm { get; set; } = 80;
+
+    // Read by CheckoutViewModel (gates Complete Sale on a customer pick) and
+    // re-checked by SaleService at completion; and by PosViewModel right
+    // after a sale completes (fires a best-effort print through whatever
+    // Settings -> Hardware has configured).
+    public bool RequireCustomerBeforeCheckout { get; set; }
+    public bool AutoPrintReceiptAfterPayment { get; set; }
 
     public string ServerBindAddress { get; set; } = "0.0.0.0";
     public int ServerPort { get; set; } = 5177;

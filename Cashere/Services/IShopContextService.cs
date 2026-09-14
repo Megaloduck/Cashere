@@ -5,12 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Cashere.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Cashere.Services
 {
-    // Enabled/disabled state and cashier-facing hints for each payment
-    // method - read by CheckoutViewModel and re-checked by SaleService at
-    // completion. Deliberately excludes fees/refunds/partial payment - none
-    // of those have a checkout flow to configure yet.
     public record PaymentSettings(
         bool CashEnabled,
         bool QrisEnabled,
@@ -35,6 +38,13 @@ namespace Cashere.Services
         };
     }
 
+    // Read by CheckoutViewModel/SaleService (RequireCustomerBeforeCheckout)
+    // and PosViewModel (AutoPrintReceiptAfterPayment) - see Settings ->
+    // Sales Behavior.
+    public record SalesBehaviorSettings(
+        bool RequireCustomerBeforeCheckout,
+        bool AutoPrintReceiptAfterPayment);
+
     public interface IShopContextService
     {
         Task<Cashier?> GetDefaultCashierAsync();
@@ -43,5 +53,6 @@ namespace Cashere.Services
         Task<ReceiptAdmin?> GetSettingsAsync();
         Task UpdateSettingsAsync(ReceiptAdmin settings);
         Task<PaymentSettings> GetPaymentSettingsAsync();
+        Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync();
     }
 }
