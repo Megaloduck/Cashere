@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             x:Class="Cashere.Views.Admin.Settings.CashRegisterView"
+             x:DataType="vm:CashRegisterViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12" MaxWidth="640">
+      <TextBlock Text="CASH REGISTER" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <StackPanel Spacing="10" IsVisible="{Binding !HasOpenShift}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <mi:MaterialIcon Kind="CashRegister" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+          <TextBlock Text="NO SHIFT CURRENTLY OPEN" Classes="eyebrow"/>
+        </StackPanel>
+
+        <TextBlock Text="STARTING CASH" Classes="eyebrow"/>
+        <TextBox Text="{Binding FormStartingCash}" Watermark="0"/>
+
+        <TextBlock Text="NOTES (OPTIONAL)" Classes="eyebrow"/>
+        <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="60"/>
+
+        <Button Content="OPEN SHIFT" Classes="accent-blue" Command="{Binding OpenShiftCommand}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+      </StackPanel>
+
+      <StackPanel Spacing="10" IsVisible="{Binding HasOpenShift}">
+        <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
+          <StackPanel Spacing="4">
+            <TextBlock Text="SHIFT OPEN" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+            <TextBlock Text="{Binding OpenedAt, StringFormat='Opened {0:dd MMM yyyy HH:mm}'}" Foreground="{StaticResource InkBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="*,*">
+          <Border Grid.Column="0" Classes="card" Padding="12" Margin="0,0,6,0">
+            <StackPanel Spacing="4">
+              <TextBlock Text="STARTING CASH" Classes="eyebrow"/>
+              <TextBlock Text="{Binding StartingCash, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="18"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="1" Classes="card" Padding="12" Margin="6,0,0,0">
+            <StackPanel Spacing="4">
+              <TextBlock Text="EXPECTED CASH NOW" Classes="eyebrow"/>
+              <TextBlock Text="{Binding ExpectedCash, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="18"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <Border Classes="rule-thick" Margin="0,4"/>
+        <TextBlock Text="CLOSE SHIFT" Classes="eyebrow"/>
+
+        <TextBlock Text="ACTUAL CASH COUNTED" Classes="eyebrow" FontSize="9"/>
+        <TextBox Text="{Binding FormActualCash}"/>
+
+        <TextBlock Text="CLOSING NOTES (OPTIONAL)" Classes="eyebrow" FontSize="9"/>
+        <TextBox Text="{Binding FormCloseNotes}" AcceptsReturn="True" Height="60"/>
+
+        <Button Content="CLOSE SHIFT" Classes="accent-red" Command="{Binding CloseShiftCommand}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+      </StackPanel>
+
+      <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="RECENT SHIFTS" Classes="eyebrow" VerticalAlignment="Center"/>
+        <Button Grid.Column="1" Classes="ghost" Command="{Binding RefreshCommand}">
+          <mi:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
+        </Button>
+      </Grid>
+
+      <Grid ColumnDefinitions="120,1.2*,90,90,90,90" Margin="0,0,0,4">
+        <TextBlock Grid.Column="0" Text="OPENED" Classes="eyebrow" FontSize="9"/>
+        <TextBlock Grid.Column="1" Text="CASHIER" Classes="eyebrow" FontSize="9"/>
+        <TextBlock Grid.Column="2" Text="START" Classes="eyebrow" FontSize="9"/>
+        <TextBlock Grid.Column="3" Text="EXPECTED" Classes="eyebrow" FontSize="9"/>
+        <TextBlock Grid.Column="4" Text="ACTUAL" Classes="eyebrow" FontSize="9"/>
+        <TextBlock Grid.Column="5" Text="DIFF" Classes="eyebrow" FontSize="9"/>
+      </Grid>
+      <Border Classes="rule-thick"/>
+
+      <ItemsControl ItemsSource="{Binding RecentShifts}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="services:ShiftListItem">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+              <Grid ColumnDefinitions="120,1.2*,90,90,90,90">
+                <TextBlock Grid.Column="0" Text="{Binding OpenedAt, StringFormat='{}{0:dd MMM HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock Grid.Column="1" Text="{Binding CashierName}" VerticalAlignment="Center" FontWeight="Bold" FontSize="11"/>
+                <TextBlock Grid.Column="2" Text="{Binding StartingCash, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock Grid.Column="3" Text="{Binding ExpectedCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock Grid.Column="4" Text="{Binding ActualCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock Grid.Column="5" Text="{Binding DiscrepancyAmount, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11" FontWeight="Bold"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

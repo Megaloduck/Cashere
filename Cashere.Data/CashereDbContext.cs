@@ -15,6 +15,7 @@ public class CashereDbContext : DbContext
 
     public DbSet<ReceiptAdmin> ReceiptAdmin => Set<ReceiptAdmin>();
     public DbSet<Cashier> Cashiers => Set<Cashier>();
+    public DbSet<Shift> Shifts => Set<Shift>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();

@@ -15,4 +15,5 @@ public class Cashier
 
     public ICollection<Sale> Sales { get; set; } = new List<Sale>();
     public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+    public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
 }

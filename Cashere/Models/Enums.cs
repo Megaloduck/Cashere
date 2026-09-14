@@ -35,4 +35,10 @@ public enum OutOfStockBehavior
 {
     Block,
     AllowNegativeStock
-}   
+}
+
+public enum ShiftStatus
+{
+    Open,
+    Closed
+}

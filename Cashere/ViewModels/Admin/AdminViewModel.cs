@@ -20,10 +20,6 @@ public partial class AdminViewModel : ViewModelBase
     public SalesHistoryViewModel SalesHistory { get; }
     public SalesReportViewModel SalesReport { get; }
 
-    // Hub for Receipts, Payments, Inventory, Staff, Hardware, Network
-    // (Synchronization + Connected Devices), Cash Register, Sales Behavior,
-    // Security, Data & Backup, Preferences and About - see
-    // ViewModels/Admin/Settings/SettingsShellViewModel.
     public SettingsShellViewModel Settings { get; }
 
     public event Action? BackRequested;
@@ -66,7 +62,9 @@ public partial class AdminViewModel : ViewModelBase
         ICustomerAdminService customerAdmin,
         ISalesReportService salesReport,
         IProductCatalogService productCatalog,
-        IShopContextService shopContext, int currentCashierId,
+        IShopContextService shopContext,
+        IShiftAdminService shiftAdmin,
+        int currentCashierId,
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null)
     {
@@ -77,7 +75,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService);
+        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, currentCashierId);
     }
 
     public async Task InitializeAsync()

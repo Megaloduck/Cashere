@@ -36,7 +36,8 @@ public partial class App : Application
      AppServices.PurchaseAdmin is not null &&
      AppServices.CashierAdmin is not null &&
      AppServices.CustomerAdmin is not null &&
-     AppServices.SalesReport is not null)
+     AppServices.SalesReport is not null &&
+     AppServices.ShiftAdmin is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
@@ -59,6 +60,7 @@ public partial class App : Application
      AppServices.SalesReport,
      AppServices.ProductCatalog,
      AppServices.ShopContext,
+     AppServices.ShiftAdmin,
      cashier?.Id ?? 0,
      AppServices.ConnectedDevices,
      AppServices.ReceiptPrinter);

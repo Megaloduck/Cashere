@@ -17,9 +17,9 @@ public partial class SettingsShellViewModel : ViewModelBase
     public InventorySettingsViewModel Inventory { get; }
     public HardwareSettingsViewModel Hardware { get; }
     public NetworkSettingsViewModel Network { get; }
+    public CashRegisterViewModel CashRegister { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
-    public SettingsPlaceholderViewModel CashRegister { get; }
     public SettingsPlaceholderViewModel SalesBehavior { get; }
     public SettingsPlaceholderViewModel Security { get; }
     public SettingsPlaceholderViewModel DataBackup { get; }
@@ -50,7 +50,9 @@ public partial class SettingsShellViewModel : ViewModelBase
     public SettingsShellViewModel(
         IShopContextService shopContext,
         IReceiptPrinterService? receiptPrinter,
-        IConnectedDeviceService? connectedDevices)
+        IConnectedDeviceService? connectedDevices,
+        IShiftAdminService shiftAdmin,
+        int currentCashierId)
     {
         Business = new BusinessInfoViewModel(shopContext);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
@@ -58,6 +60,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         Inventory = new InventorySettingsViewModel(shopContext);
         Hardware = new HardwareSettingsViewModel(shopContext, receiptPrinter);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
+        CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -71,18 +74,6 @@ public partial class SettingsShellViewModel : ViewModelBase
                 "View profit / reports",
                 "Edit inventory, delete products",
                 "Change settings"
-            });
-
-        CashRegister = new SettingsPlaceholderViewModel(
-            "Cash Register",
-            "Shift and cash-drawer reconciliation - not started yet.",
-            new[]
-            {
-                "Starting cash",
-                "Opening / closing a shift",
-                "Cash withdrawal & deposit",
-                "Expected vs. actual cash at close-out",
-                "Shift discrepancies surfaced in Reports"
             });
 
         SalesBehavior = new SettingsPlaceholderViewModel(
@@ -152,6 +143,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Inventory.LoadAsync();
         await Hardware.LoadAsync();
         await Network.InitializeAsync();
+        await CashRegister.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(SettingsSection value)
@@ -181,6 +173,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.Hardware)
         {
             _ = Hardware.LoadAsync();
+        }
+        else if (value == SettingsSection.CashRegister)
+        {
+            _ = CashRegister.LoadAsync();
         }
     }
 

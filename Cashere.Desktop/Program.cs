@@ -28,12 +28,6 @@ sealed class Program
         }
         catch
         {
-            // The saved bind address/port may no longer be valid - moved to
-            // a different network, another process already holds the port,
-            // etc. Fall back to the safe defaults rather than let a bad
-            // network setting brick the app on every future launch; the
-            // admin can fix the setting again from the Devices/Settings
-            // screen once the app is up.
             serverHost = new CashereServerHost();
             serverHost.StartAsync(dbPath).GetAwaiter().GetResult();
         }
@@ -54,6 +48,7 @@ sealed class Program
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
         AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
+        AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);
 
         try
         {
