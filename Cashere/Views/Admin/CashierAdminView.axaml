@@ -89,7 +89,7 @@
           <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
 
           <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
-            <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
             <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
           </Grid>
         </StackPanel>

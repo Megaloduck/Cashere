@@ -7,7 +7,7 @@
              x:Class="Cashere.Views.Admin.Settings.SalesBehaviorSettingsView"
              x:DataType="vm:SalesBehaviorSettingsViewModel">
   <ScrollViewer>
-    <StackPanel Margin="12" Spacing="12" MaxWidth="560">
+    <StackPanel Margin="12" Spacing="12" >
       <TextBlock Text="SALES BEHAVIOR" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 
@@ -20,7 +20,6 @@
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding RequireCustomerBeforeCheckout}" VerticalAlignment="Center"/>
       </Grid>
 
-      <Border Classes="rule-thick" Margin="0,2"/>
 
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Grid.Column="0" Spacing="2">

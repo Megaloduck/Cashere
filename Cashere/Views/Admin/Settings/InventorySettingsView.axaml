@@ -7,7 +7,7 @@
              x:Class="Cashere.Views.Admin.Settings.InventorySettingsView"
              x:DataType="vm:InventorySettingsViewModel">
   <ScrollViewer>
-    <StackPanel Margin="12" Spacing="12" MaxWidth="560">
+    <StackPanel Margin="12" Spacing="12"    >
       <TextBlock Text="INVENTORY" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 

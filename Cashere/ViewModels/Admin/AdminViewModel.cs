@@ -48,7 +48,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.Customers => "CUSTOMERS",
         AdminSection.Cashiers => "CASHIERS",
         AdminSection.SalesHistory => "SALES HISTORY",
-        AdminSection.SalesReport => "REPORTS",
+        AdminSection.SalesReport => "SALES REPORTS",
         AdminSection.Settings => "SETTINGS",
         _ => "ADMIN"
     };

@@ -92,7 +92,7 @@
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}">
               <StackPanel Orientation="Horizontal" Spacing="10">
                 <mi:MaterialIcon Kind="ChartBar" Width="18" Height="18"/>
-                <TextBlock Text="REPORTS"/>
+                <TextBlock Text="SALES REPORTS"/>
               </StackPanel>
             </Button>
 

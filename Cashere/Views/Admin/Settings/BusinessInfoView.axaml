@@ -8,7 +8,7 @@
              x:Class="Cashere.Views.Admin.Settings.BusinessInfoView"
              x:DataType="vm:BusinessInfoViewModel">
   <ScrollViewer>
-    <StackPanel Margin="12" Spacing="10" MaxWidth="560">
+    <StackPanel Margin="12" Spacing="10" >
       <TextBlock Text="BUSINESS INFO" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 

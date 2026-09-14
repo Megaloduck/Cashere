@@ -9,7 +9,7 @@
              x:Class="Cashere.Views.Admin.Settings.DataBackupSettingsView"
              x:DataType="vm:DataBackupSettingsViewModel">
   <ScrollViewer>
-    <StackPanel Margin="12" Spacing="12" MaxWidth="640">
+    <StackPanel Margin="12" Spacing="12" >
       <TextBlock Text="DATA &amp; BACKUP" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 

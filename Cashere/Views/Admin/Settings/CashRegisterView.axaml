@@ -9,7 +9,7 @@
              x:Class="Cashere.Views.Admin.Settings.CashRegisterView"
              x:DataType="vm:CashRegisterViewModel">
   <ScrollViewer>
-    <StackPanel Margin="12" Spacing="12" MaxWidth="640">
+    <StackPanel Margin="12" Spacing="12" >
       <TextBlock Text="CASH REGISTER" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 
@@ -52,7 +52,6 @@
           </Border>
         </Grid>
 
-        <Border Classes="rule-thick" Margin="0,4"/>
         <TextBlock Text="CLOSE SHIFT" Classes="eyebrow"/>
 
         <TextBlock Text="ACTUAL CASH COUNTED" Classes="eyebrow" FontSize="9"/>
