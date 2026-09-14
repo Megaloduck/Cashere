@@ -17,4 +17,10 @@ public interface ICashierAdminService
     Task<Cashier> CreateCashierAsync(CashierInput input);
     Task UpdateCashierAsync(int cashierId, CashierInput input);
     Task SetActiveAsync(int cashierId, bool isActive);
+
+    // Not called anywhere yet - there's no login screen. Exists so whenever
+    // one gets built, it can authenticate against real hashed passwords
+    // through this one method instead of reaching past the service boundary
+    // to hash/compare passwords itself.
+    Task<Cashier?> VerifyCredentialsAsync(string username, string password);
 }

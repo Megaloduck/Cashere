@@ -1,22 +1,23 @@
 ﻿#pragma warning disable CA1416 // Windows-only APIs - Cashere.Desktop only ships for Windows today.
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Linq;
 using System.Threading.Tasks;
 using Cashere.Services;
 
 namespace Cashere.Desktop.Services;
 
-// Prints through whatever printer Windows currently has set as default -
-// works out of the box for thermal printers that install as a normal
-// Windows print queue (most ESC/POS receipt printers do). Renders the
-// receipt as plain monospaced text sized for narrow thermal paper.
-// Change PaperWidthMillimeters below if the printer uses 58mm rolls
-// instead of the 80mm assumed here.
+// Prints through the printer configured in Settings -> Hardware, falling
+// back to whatever printer Windows currently has set as default when none
+// is configured (PrinterName null/blank) or the configured one is no
+// longer installed. Renders the receipt as plain monospaced text sized for
+// narrow thermal paper - PaperWidthMillimeters now comes from Settings ->
+// Hardware too, instead of the fixed 80mm this used to assume.
 public class WindowsReceiptPrinterService : IReceiptPrinterService
 {
-    private const float PaperWidthMillimeters = 80f;
     private const float FontSizePoints = 9f;
 
     // Extra vertical breathing room between lines, as a multiplier of the
@@ -24,17 +25,39 @@ public class WindowsReceiptPrinterService : IReceiptPrinterService
     // lines sit flush against each other, so a small gap helps legibility.
     private const float LineSpacingMultiplier = 1.15f;
 
-    public Task<ReceiptPrintResult> PrintAsync(string receiptText)
+    private readonly IShopContextService _shopContext;
+
+    public WindowsReceiptPrinterService(IShopContextService shopContext)
+    {
+        _shopContext = shopContext;
+    }
+
+    public IReadOnlyList<string> GetInstalledPrinterNames()
+    {
+        return PrinterSettings.InstalledPrinters.Cast<string>().OrderBy(n => n).ToList();
+    }
+
+    public async Task<ReceiptPrintResult> PrintAsync(string receiptText)
     {
         try
         {
+            var settings = await _shopContext.GetSettingsAsync();
+            var paperWidthMillimeters =
+                settings is not null && settings.PrinterPaperWidthMm > 0 ? settings.PrinterPaperWidthMm : 80;
+            var printerName = settings?.PrinterName;
+
             using var document = new PrintDocument();
+
+            if (!string.IsNullOrWhiteSpace(printerName))
+            {
+                document.PrinterSettings.PrinterName = printerName;
+            }
 
             if (string.IsNullOrWhiteSpace(document.PrinterSettings.PrinterName) ||
                 !document.PrinterSettings.IsValid)
             {
-                return Task.FromResult(new ReceiptPrintResult(
-                    false, "No default printer is configured on this PC."));
+                return new ReceiptPrintResult(
+                    false, "No valid printer is configured - check Settings -> Hardware or set a Windows default printer.");
             }
 
             var lines = receiptText.Replace("\r\n", "\n").Split('\n');
@@ -44,9 +67,6 @@ public class WindowsReceiptPrinterService : IReceiptPrinterService
             {
                 using var font = new Font("Consolas", FontSizePoints);
 
-                // GetHeight(Graphics) returns float; declare explicitly so the
-                // arithmetic below stays in float instead of inferring int
-                // from MarginBounds.Top.
                 float lineHeight = font.GetHeight(e.Graphics) * LineSpacingMultiplier;
                 float y = e.MarginBounds.Top;
 
@@ -68,12 +88,10 @@ public class WindowsReceiptPrinterService : IReceiptPrinterService
 
             // Narrow custom page size roughly matching common thermal roll
             // widths. PaperSize's unit is hundredths of an inch.
-            var widthHundredthsInch = (int)(PaperWidthMillimeters / 25.4 * 100);
+            var widthHundredthsInch = (int)(paperWidthMillimeters / 25.4 * 100);
 
             // Height: size the page to fit the actual receipt when it's short,
             // so we don't feed a full page of blank paper on small orders.
-            // Fall back to a sensible tall default when the content is long
-            // (the driver will handle pagination via HasMorePages).
             var estimatedHeightInches = (lines.Length * FontSizePoints * LineSpacingMultiplier) / 72f;
             var heightHundredthsInch = Math.Max(
                 200, // minimum ~2 inches so the header isn't clipped
@@ -84,11 +102,11 @@ public class WindowsReceiptPrinterService : IReceiptPrinterService
             document.DefaultPageSettings.Margins = new Margins(10, 10, 10, 10);
 
             document.Print();
-            return Task.FromResult(new ReceiptPrintResult(true, null));
+            return new ReceiptPrintResult(true, null);
         }
         catch (Exception ex)
         {
-            return Task.FromResult(new ReceiptPrintResult(false, ex.Message));
+            return new ReceiptPrintResult(false, ex.Message);
         }
     }
 }

@@ -15,10 +15,10 @@ public partial class SettingsShellViewModel : ViewModelBase
     public ReceiptAdminViewModel Receipts { get; }
     public PaymentSettingsViewModel Payments { get; }
     public InventorySettingsViewModel Inventory { get; }
+    public HardwareSettingsViewModel Hardware { get; }
     public NetworkSettingsViewModel Network { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
-    public SettingsPlaceholderViewModel Hardware { get; }
     public SettingsPlaceholderViewModel CashRegister { get; }
     public SettingsPlaceholderViewModel SalesBehavior { get; }
     public SettingsPlaceholderViewModel Security { get; }
@@ -56,31 +56,21 @@ public partial class SettingsShellViewModel : ViewModelBase
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
         Payments = new PaymentSettingsViewModel(shopContext);
         Inventory = new InventorySettingsViewModel(shopContext);
+        Hardware = new HardwareSettingsViewModel(shopContext, receiptPrinter);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
-            "Cashiers already have a Role (Owner/Manager/Cashier), but nothing in the app checks it yet - login itself is still a plaintext placeholder. This screen will turn Role into an actual capability matrix.",
+            "Cashiers already have a Role (Owner/Manager/Cashier), and passwords are now hashed with PBKDF2 instead of stored as plaintext. There's still no login screen - the app auto-picks the first active cashier the same way it always has - and nothing checks Role yet.",
             new[]
             {
+                "Login screen (gate the POS shell on real sign-in)",
                 "Void sale / refund",
                 "Apply discount / change price",
                 "Open cash drawer",
                 "View profit / reports",
                 "Edit inventory, delete products",
                 "Change settings"
-            });
-
-        Hardware = new SettingsPlaceholderViewModel(
-            "Hardware",
-            "The receipt printer already works (Test Print under Receipts, via the Windows default printer). This screen will grow to cover the rest of the till's physical devices.",
-            new[]
-            {
-                "Printer type & paper size (58mm / 80mm)",
-                "Barcode scanner configuration",
-                "Cash drawer (kick on sale)",
-                "Customer-facing display",
-                "EDC terminal pairing"
             });
 
         CashRegister = new SettingsPlaceholderViewModel(
@@ -160,6 +150,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Receipts.LoadAsync();
         await Payments.LoadAsync();
         await Inventory.LoadAsync();
+        await Hardware.LoadAsync();
         await Network.InitializeAsync();
     }
 
@@ -186,6 +177,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.Inventory)
         {
             _ = Inventory.LoadAsync();
+        }
+        else if (value == SettingsSection.Hardware)
+        {
+            _ = Hardware.LoadAsync();
         }
     }
 

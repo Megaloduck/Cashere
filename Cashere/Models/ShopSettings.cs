@@ -20,11 +20,6 @@ public class ReceiptAdmin
     public bool AutoGenerateSku { get; set; }
     public bool AutoGenerateBarcode { get; set; }
 
-    // Payment method availability and cashier-facing hints, read by
-    // CheckoutViewModel (filters the dropdown, shows the account-info hint,
-    // gates the confirmation checkbox) and re-checked by SaleService at
-    // completion. Fees, refunds, and partial payment aren't stored here yet -
-    // none of those have a checkout flow to configure.
     public bool CashEnabled { get; set; } = true;
     public bool QrisEnabled { get; set; } = true;
     public bool EdcEnabled { get; set; } = true;
@@ -32,6 +27,15 @@ public class ReceiptAdmin
     public string? EdcAccountInfo { get; set; }
     public bool RequireConfirmationForNonCash { get; set; }
 
+    // Receipt printer selection & paper width - read by
+    // WindowsReceiptPrinterService on every PrintAsync call. Null
+    // PrinterName means "use whatever Windows has set as its own default
+    // printer" - the exact behavior this app always had before this
+    // setting existed, so an empty/never-visited Hardware screen changes
+    // nothing.
+    public string? PrinterName { get; set; }
+    public int PrinterPaperWidthMm { get; set; } = 80;
+
     public string ServerBindAddress { get; set; } = "0.0.0.0";
     public int ServerPort { get; set; } = 5177;
-}   
+}

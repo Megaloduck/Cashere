@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="720"
+             x:Class="Cashere.Views.Admin.Settings.HardwareSettingsView"
+             x:DataType="vm:HardwareSettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="10" MaxWidth="560">
+      <TextBlock Text="HARDWARE" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <StackPanel Spacing="10" IsVisible="{Binding IsPrinterServiceAvailable}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <mi:MaterialIcon Kind="PrinterOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
+          <TextBlock Text="RECEIPT PRINTER" Classes="eyebrow"/>
+        </StackPanel>
+
+        <TextBlock Text="PRINTER" Classes="eyebrow" FontSize="9"/>
+        <ComboBox ItemsSource="{Binding AvailablePrinters}" SelectedItem="{Binding SelectedPrinterName}" HorizontalAlignment="Stretch"/>
+
+        <TextBlock Text="PAPER WIDTH" Classes="eyebrow" FontSize="9"/>
+        <ComboBox ItemsSource="{Binding PaperWidths}" SelectedItem="{Binding PaperWidthMm}" HorizontalAlignment="Stretch">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding StringFormat='{}{0}mm'}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="{Binding StatusMessage}"
+                   Foreground="{StaticResource BlueBrush}"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"/>
+
+        <Button Content="SAVE"
+                Classes="accent-blue"
+                Command="{Binding SaveCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Padding="0,14"/>
+
+        <Button Classes="ghost" Command="{Binding TestPrintCommand}" IsEnabled="{Binding !IsTestPrinting}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <mi:MaterialIcon Kind="PrinterOutline" Width="16" Height="16"/>
+            <TextBlock Text="TEST PRINT" IsVisible="{Binding !IsTestPrinting}"/>
+            <TextBlock Text="PRINTING..." IsVisible="{Binding IsTestPrinting}"/>
+          </StackPanel>
+        </Button>
+        <TextBlock Text="{Binding TestPrintStatusMessage}"
+                   Foreground="{StaticResource BlueBrush}"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+
+      <StackPanel Spacing="10" IsVisible="{Binding !IsPrinterServiceAvailable}">
+        <mi:MaterialIcon Kind="AlertCircleOutline" Width="24" Height="24" Foreground="{StaticResource RedBrush}"/>
+        <TextBlock Text="PRINTER SERVICE UNAVAILABLE IN THIS BUILD" Classes="eyebrow"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="Barcode scanner configuration, cash drawer (kick on sale), customer-facing display, and EDC terminal pairing don't have any hardware integration built yet - there's nothing here to configure until those exist."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -13,11 +13,11 @@
     <converters:EnumMatchConverter x:Key="EnumMatch"/>
   </UserControl.Resources>
 
-  <Grid ColumnDefinitions="210,*">
+  <Grid ColumnDefinitions="230,*">
 
-    <Border Grid.Column="0" Background="{StaticResource InkBrush}">
+    <Border Grid.Column="0" Background="{StaticResource InkBrush}" CornerRadius="5">
       <ScrollViewer>
-        <StackPanel Margin="0,16">
+        <StackPanel Spacing="2">
 
           <TextBlock Text="BUSINESS" Classes="nav-group-label"/>
           <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Business}"

@@ -12,10 +12,12 @@ namespace Cashere.Data.Services;
 public class CashierAdminService : ICashierAdminService
 {
     private readonly IDbContextFactory<CashereDbContext> _dbContextFactory;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public CashierAdminService(IDbContextFactory<CashereDbContext> dbContextFactory)
+    public CashierAdminService(IDbContextFactory<CashereDbContext> dbContextFactory, IPasswordHasher passwordHasher)
     {
         _dbContextFactory = dbContextFactory;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<List<Cashier>> GetAllCashiersAsync()
@@ -42,9 +44,7 @@ public class CashierAdminService : ICashierAdminService
         var cashier = new Cashier
         {
             Username = username,
-            // Placeholder only, same as SeedData - there's no real hashing until
-            // the login/authentication phase. Replace before going live.
-            PasswordHash = input.Password,
+            PasswordHash = _passwordHasher.Hash(input.Password),
             DisplayName = input.DisplayName.Trim(),
             Role = input.Role,
             IsActive = true,
@@ -75,7 +75,7 @@ public class CashierAdminService : ICashierAdminService
 
         if (!string.IsNullOrWhiteSpace(input.Password))
         {
-            cashier.PasswordHash = input.Password;
+            cashier.PasswordHash = _passwordHasher.Hash(input.Password);
         }
 
         await db.SaveChangesAsync();
@@ -89,5 +89,19 @@ public class CashierAdminService : ICashierAdminService
 
         cashier.IsActive = isActive;
         await db.SaveChangesAsync();
+    }
+
+    public async Task<Cashier?> VerifyCredentialsAsync(string username, string password)
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+
+        var trimmed = username.Trim();
+        var cashier = await db.Cashiers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Username == trimmed && c.IsActive);
+
+        if (cashier is null) return null;
+
+        return _passwordHasher.Verify(password, cashier.PasswordHash) ? cashier : null;
     }
 }

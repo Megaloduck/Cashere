@@ -39,18 +39,21 @@ sealed class Program
         }
 
         var dbContextFactory = new SqliteDbContextFactory(dbPath);
+        var passwordHasher = new Pbkdf2PasswordHasher();
+        var shopContextService = new ShopContextService(dbContextFactory);
+
         AppServices.ProductCatalog = new ProductCatalogService(dbContextFactory);
         AppServices.SaleService = new SaleService(dbContextFactory);
-        AppServices.ShopContext = new ShopContextService(dbContextFactory);
+        AppServices.ShopContext = shopContextService;
         AppServices.ProductAdmin = new ProductAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
         AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
-        AppServices.CashierAdmin = new CashierAdminService(dbContextFactory);
+        AppServices.CashierAdmin = new CashierAdminService(dbContextFactory, passwordHasher);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
-        AppServices.ReceiptPrinter = new WindowsReceiptPrinterService();        
+        AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
 
         try
         {
