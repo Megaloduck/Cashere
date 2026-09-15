@@ -8,6 +8,16 @@ using Cashere.ViewModels.Admin.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Cashere.Services;
+using Cashere.ViewModels.Admin.Settings;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 namespace Cashere.ViewModels.Admin;
 
 public partial class AdminViewModel : ViewModelBase
@@ -23,6 +33,11 @@ public partial class AdminViewModel : ViewModelBase
     public SettingsShellViewModel Settings { get; }
 
     public event Action? BackRequested;
+
+    // Raised by the sidebar's LOGOUT item - ShellViewModel re-raises this as
+    // its own LogoutRequested event for RootViewModel to handle, same
+    // relay-upward pattern as BackRequested.
+    public event Action? LogoutRequested;
 
     [ObservableProperty]
     private AdminSection _selectedSection = AdminSection.Products;
@@ -103,4 +118,7 @@ public partial class AdminViewModel : ViewModelBase
 
     [RelayCommand]
     private void Back() => BackRequested?.Invoke();
+
+    [RelayCommand]
+    private void Logout() => LogoutRequested?.Invoke();
 }

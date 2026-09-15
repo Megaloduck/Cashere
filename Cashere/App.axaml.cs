@@ -11,7 +11,7 @@ using Cashere.Services;
 using Cashere.ViewModels.Pos;
 using Cashere.ViewModels.Mobile;
 using Cashere.Views.Mobile;
-using Cashere.ViewModels.Admin;
+using Cashere.ViewModels.Admin;     
 
 namespace Cashere;
 
@@ -42,23 +42,13 @@ public partial class App : Application
      AppServices.DataBackup is not null &&
      AppServices.AboutInfo is not null)
             {
-                var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
-                var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
-
                 var startupSettings = AppServices.ShopContext.GetSettingsAsync().GetAwaiter().GetResult();
                 ThemeApplier.Apply(startupSettings?.ThemeMode ?? AppThemeMode.System);
 
-                var posViewModel = new PosViewModel(
+                var root = new RootViewModel(
                     AppServices.ProductCatalog,
                     AppServices.SaleService,
                     AppServices.ShopContext,
-                    taxRatePercent,
-                    cashier?.Id ?? 0,
-                    cashier?.DisplayName ?? "Unknown",
-                    AppServices.CustomerAdmin,
-                    AppServices.ReceiptPrinter);
-
-                var adminViewModel = new AdminViewModel(
                     AppServices.ProductAdmin,
                     AppServices.CategoryAdmin,
                     AppServices.SupplierAdmin,
@@ -66,24 +56,19 @@ public partial class App : Application
                     AppServices.CashierAdmin,
                     AppServices.CustomerAdmin,
                     AppServices.SalesReport,
-                    AppServices.ProductCatalog,
-                    AppServices.ShopContext,
                     AppServices.ShiftAdmin,
                     AppServices.DataBackup,
                     AppServices.AboutInfo,
-                    cashier?.Id ?? 0,
                     AppServices.ConnectedDevices,
                     AppServices.ReceiptPrinter);
 
-                var shell = new ShellViewModel(posViewModel, adminViewModel);
-
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = shell
+                    DataContext = root
                 };
 
-                _ = posViewModel.InitializeAsync();
-            }   
+                _ = root.InitializeAsync();
+            }
             else
             {
                 desktop.MainWindow = new MainWindow

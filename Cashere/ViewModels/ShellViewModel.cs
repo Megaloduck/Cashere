@@ -8,6 +8,16 @@ using Cashere.ViewModels.Pos;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Cashere.ViewModels.Admin;
+using Cashere.ViewModels.Pos;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 namespace Cashere.ViewModels;
 
 public partial class ShellViewModel : ViewModelBase
@@ -18,6 +28,11 @@ public partial class ShellViewModel : ViewModelBase
     [ObservableProperty]
     private ViewModelBase _currentView;
 
+    // Bubbled up from AdminViewModel.LogoutRequested (its sidebar LOGOUT
+    // item) so RootViewModel can tear this shell down and show LoginView
+    // again - mirrors how AdminRequested/BackRequested already wire Pos<->Admin.
+    public event Action? LogoutRequested;
+
     public ShellViewModel(PosViewModel pos, AdminViewModel admin)
     {
         Pos = pos;
@@ -26,6 +41,7 @@ public partial class ShellViewModel : ViewModelBase
 
         Pos.AdminRequested += () => _ = ShowAdmin();
         Admin.BackRequested += () => _ = ShowPos();
+        Admin.LogoutRequested += () => LogoutRequested?.Invoke();
     }
 
     [RelayCommand]

@@ -105,6 +105,14 @@
               </StackPanel>
             </Button>
 
+            <Border Height="2" Background="#2A2A2A" Margin="16,16,16,8"/>
+            <Button Classes="nav-item" Command="{Binding LogoutCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="LogoutVariant" Width="18" Height="18" Foreground="{StaticResource RedBrush}"/>
+                <TextBlock Text="LOGOUT" Foreground="{StaticResource RedBrush}"/>
+              </StackPanel>
+            </Button>
+
           </StackPanel>
         </ScrollViewer>
       </Border>
