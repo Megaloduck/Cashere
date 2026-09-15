@@ -39,13 +39,12 @@ public partial class App : Application
      AppServices.CustomerAdmin is not null &&
      AppServices.SalesReport is not null &&
      AppServices.ShiftAdmin is not null &&
-     AppServices.DataBackup is not null)
+     AppServices.DataBackup is not null &&
+     AppServices.AboutInfo is not null)
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
 
-                // Applied before MainWindow is created, so there's no
-                // visible flash of the wrong theme on startup.
                 var startupSettings = AppServices.ShopContext.GetSettingsAsync().GetAwaiter().GetResult();
                 ThemeApplier.Apply(startupSettings?.ThemeMode ?? AppThemeMode.System);
 
@@ -71,6 +70,7 @@ public partial class App : Application
                     AppServices.ShopContext,
                     AppServices.ShiftAdmin,
                     AppServices.DataBackup,
+                    AppServices.AboutInfo,
                     cashier?.Id ?? 0,
                     AppServices.ConnectedDevices,
                     AppServices.ReceiptPrinter);
@@ -83,7 +83,7 @@ public partial class App : Application
                 };
 
                 _ = posViewModel.InitializeAsync();
-            }
+            }   
             else
             {
                 desktop.MainWindow = new MainWindow

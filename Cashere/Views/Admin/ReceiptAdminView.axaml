@@ -10,14 +10,14 @@
     <Grid RowDefinitions="Auto,*" Margin="12">
         <!-- Header -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-            <StackPanel Grid.Column="0" Spacing="10">
+            <StackPanel Grid.Column="0" Spacing="12" >
                 <TextBlock  Text="RECEIPT CONFIGURATIONS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
                 <Border Classes="rule-thick"/>
             </StackPanel>            
         </Grid>
 
         <!-- Content -->
-        <Grid Grid.Row="1" ColumnDefinitions="2*,1*">
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <!-- Receipt Configuration (scrollable) -->
             <ScrollViewer Grid.Column="0"
                           VerticalScrollBarVisibility="Auto"
@@ -27,10 +27,15 @@
 
     <StackPanel Orientation="Horizontal" Spacing="8">
       <mi:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
-      <TextBlock Text="Shop name, address, phone, tax ID, currency and tax rate now live under Settings → Business Info."
+      <TextBlock Text="Shop name, address, phone, tax ID, currency and tax rate are live under Settings → Business Info."
                  TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
     </StackPanel>
+
     <Border Classes="rule-thick"/>
+             
+                <TextBlock Text="PREVIEW AS PAYMENT METHOD" Classes="eyebrow"/>
+                <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PreviewPaymentMethod}"    HorizontalAlignment="Stretch"/>
+              
 
     <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
     <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
@@ -59,11 +64,7 @@
                 <TextBlock Grid.Column="0" Text="RECEIPT PREVIEW" Classes="eyebrow" VerticalAlignment="Center"/>
               </Grid>
 
-              <StackPanel MaxWidth="300" HorizontalAlignment="Center" Spacing="4">
-                <TextBlock Text="PREVIEW AS PAYMENT METHOD" Classes="eyebrow" FontSize="9"/>
-                <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PreviewPaymentMethod}"
-                          HorizontalAlignment="Stretch"/>
-              </StackPanel>
+              
 
               <Border CornerRadius="4" BorderThickness="3" BorderBrush="{StaticResource InkBrush}" Padding="0" MaxWidth="300" HorizontalAlignment="Center" ClipToBounds="True">
                 <StackPanel Background="White">

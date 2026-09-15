@@ -29,5 +29,6 @@ namespace Cashere.Services
         public static IReceiptPrinterService? ReceiptPrinter { get; set; }
         public static IShiftAdminService? ShiftAdmin { get; set; }
         public static IDataBackupService? DataBackup { get; set; }
+        public static IAboutInfoService? AboutInfo { get; set; }
     }
 }

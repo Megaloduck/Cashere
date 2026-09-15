@@ -68,7 +68,7 @@
 
       <Border Classes="rule-thick" Margin="0,8"/>
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Grid.Column="0" Text="RECENT SHIFTS" Classes="eyebrow" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="0" Text="RECENT SHIFTS" Classes="headline"  VerticalAlignment="Center"/>
         <Button Grid.Column="1" Classes="ghost" Command="{Binding RefreshCommand}">
           <mi:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
         </Button>

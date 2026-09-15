@@ -48,7 +48,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.Customers => "CUSTOMERS",
         AdminSection.Cashiers => "CASHIERS",
         AdminSection.SalesHistory => "SALES HISTORY",
-        AdminSection.SalesReport => "SALES REPORTS",
+        AdminSection.SalesReport => "REPORTS",
         AdminSection.Settings => "SETTINGS",
         _ => "ADMIN"
     };
@@ -65,6 +65,7 @@ public partial class AdminViewModel : ViewModelBase
         IShopContextService shopContext,
         IShiftAdminService shiftAdmin,
         IDataBackupService dataBackup,
+        IAboutInfoService aboutInfo,
         int currentCashierId,
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null)
@@ -76,8 +77,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new SettingsShellViewModel(
-            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, currentCashierId);
+        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, currentCashierId);
     }
 
     public async Task InitializeAsync()

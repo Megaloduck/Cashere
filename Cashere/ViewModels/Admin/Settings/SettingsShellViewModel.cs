@@ -21,10 +21,10 @@ public partial class SettingsShellViewModel : ViewModelBase
     public SalesBehaviorSettingsViewModel SalesBehavior { get; }
     public DataBackupSettingsViewModel DataBackup { get; }
     public PreferencesViewModel Preferences { get; }
+    public AboutViewModel About { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
     public SettingsPlaceholderViewModel Security { get; }
-    public SettingsPlaceholderViewModel About { get; }
 
     [ObservableProperty]
     private SettingsSection _selectedSection = SettingsSection.Business;
@@ -53,6 +53,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         IConnectedDeviceService? connectedDevices,
         IShiftAdminService shiftAdmin,
         IDataBackupService dataBackup,
+        IAboutInfoService aboutInfo,
         int currentCashierId)
     {
         Business = new BusinessInfoViewModel(shopContext);
@@ -65,6 +66,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
         DataBackup = new DataBackupSettingsViewModel(dataBackup);
         Preferences = new PreferencesViewModel(shopContext);
+        About = new AboutViewModel(aboutInfo);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -91,16 +93,6 @@ public partial class SettingsShellViewModel : ViewModelBase
                 "Audit log",
                 "Local database encryption"
             });
-
-        About = new SettingsPlaceholderViewModel(
-            "About",
-            "Cashere Point of Sale — 1.0.0 (Preview).",
-            new[]
-            {
-                "Version",
-                "Database status",
-                "Licenses"
-            });
     }
 
     public async Task InitializeAsync()
@@ -115,6 +107,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await SalesBehavior.LoadAsync();
         await DataBackup.LoadAsync();
         await Preferences.LoadAsync();
+        await About.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(SettingsSection value)
@@ -160,6 +153,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.Preferences)
         {
             _ = Preferences.LoadAsync();
+        }
+        else if (value == SettingsSection.About)
+        {
+            _ = About.LoadAsync();
         }
     }
 
