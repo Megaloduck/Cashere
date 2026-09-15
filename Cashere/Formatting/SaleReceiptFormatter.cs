@@ -4,10 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Cashere.Formatting;
 
 public record SaleReceiptLine(string Name, int Quantity, decimal Subtotal);

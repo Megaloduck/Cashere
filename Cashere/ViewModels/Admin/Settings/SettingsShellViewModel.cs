@@ -20,10 +20,10 @@ public partial class SettingsShellViewModel : ViewModelBase
     public CashRegisterViewModel CashRegister { get; }
     public SalesBehaviorSettingsViewModel SalesBehavior { get; }
     public DataBackupSettingsViewModel DataBackup { get; }
+    public PreferencesViewModel Preferences { get; }
 
     public SettingsPlaceholderViewModel Staff { get; }
     public SettingsPlaceholderViewModel Security { get; }
-    public SettingsPlaceholderViewModel Preferences { get; }
     public SettingsPlaceholderViewModel About { get; }
 
     [ObservableProperty]
@@ -64,6 +64,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
         DataBackup = new DataBackupSettingsViewModel(dataBackup);
+        Preferences = new PreferencesViewModel(shopContext);
 
         Staff = new SettingsPlaceholderViewModel(
             "Staff & Permissions",
@@ -91,18 +92,6 @@ public partial class SettingsShellViewModel : ViewModelBase
                 "Local database encryption"
             });
 
-        Preferences = new SettingsPlaceholderViewModel(
-            "Preferences",
-            "App-level look and feel, separate from business configuration. Not started yet.",
-            new[]
-            {
-                "Light / Dark / System theme",
-                "Language",
-                "Date, time & number format",
-                "Sound & notifications",
-                "UI density"
-            });
-
         About = new SettingsPlaceholderViewModel(
             "About",
             "Cashere Point of Sale — 1.0.0 (Preview).",
@@ -125,6 +114,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         await CashRegister.LoadAsync();
         await SalesBehavior.LoadAsync();
         await DataBackup.LoadAsync();
+        await Preferences.LoadAsync();
     }
 
     partial void OnSelectedSectionChanged(SettingsSection value)
@@ -166,6 +156,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.DataBackup)
         {
             _ = DataBackup.LoadAsync();
+        }
+        else if (value == SettingsSection.Preferences)
+        {
+            _ = Preferences.LoadAsync();
         }
     }
 

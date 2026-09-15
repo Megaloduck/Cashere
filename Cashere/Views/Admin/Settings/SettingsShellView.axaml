@@ -15,7 +15,7 @@
 
   <Grid ColumnDefinitions="230,*">
 
-    <Border Grid.Column="0" Background="{StaticResource InkBrush}" CornerRadius="5">
+    <Border Grid.Column="0" Background="{StaticResource ChromeBrush}" CornerRadius="5">
       <ScrollViewer>
         <StackPanel Spacing="2">
 

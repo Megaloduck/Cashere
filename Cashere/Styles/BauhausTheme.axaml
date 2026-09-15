@@ -8,43 +8,74 @@
     square - it still reads as Bauhaus through the color blocking + thick
     borders, just friendlier on a touch/mouse UI.
     Loaded in App.axaml after FluentTheme so these setters win.
+
+    Light/Dark: BauhausInk and BauhausPaper are opposites of each other in
+    both variants (Dark simply swaps which literal value each name points
+    to), so every existing usage of InkBrush/PaperBrush - text, borders,
+    the Button:pointerover "invert" hover pattern - keeps working with zero
+    changes to individual view files. BauhausChrome is deliberately NOT
+    theme-variant-bound: header bars and nav rails (which carry hardcoded
+    white text) need to stay a fixed dark block in both themes, or that
+    text becomes unreadable in Dark mode.
   -->
   <Styles.Resources>
-    <Color x:Key="BauhausInk">#141414</Color>
-    <Color x:Key="BauhausPaper">#F5F1E6</Color>
-    <Color x:Key="BauhausRed">#D7263D</Color>
-    <Color x:Key="BauhausBlue">#1D4E89</Color>
-    <Color x:Key="BauhausYellow">#F2B705</Color>
-    <Color x:Key="BauhausGray">#8A8A8A</Color>
-    <Color x:Key="BauhausGrayLight">#E2DED2</Color>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <Color x:Key="BauhausInk">#141414</Color>
+          <Color x:Key="BauhausPaper">#F5F1E6</Color>
+          <Color x:Key="BauhausGrayLight">#E2DED2</Color>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <Color x:Key="BauhausInk">#F5F1E6</Color>
+          <Color x:Key="BauhausPaper">#141414</Color>
+          <Color x:Key="BauhausGrayLight">#33312D</Color>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
 
-    <SolidColorBrush x:Key="InkBrush" Color="{DynamicResource BauhausInk}"/>
-    <SolidColorBrush x:Key="PaperBrush" Color="{DynamicResource BauhausPaper}"/>
-    <SolidColorBrush x:Key="RedBrush" Color="{DynamicResource BauhausRed}"/>
-    <SolidColorBrush x:Key="BlueBrush" Color="{DynamicResource BauhausBlue}"/>
-    <SolidColorBrush x:Key="YellowBrush" Color="{DynamicResource BauhausYellow}"/>
-    <SolidColorBrush x:Key="GrayBrush" Color="{DynamicResource BauhausGray}"/>
-    <SolidColorBrush x:Key="GrayLightBrush" Color="{DynamicResource BauhausGrayLight}"/>
+      <!-- Accent triad stays identical in both themes on purpose - see the
+           "known follow-up" note about a few colored-accent surfaces that
+           pair these with text that DOES flip (InkBrush/PaperBrush), which
+           is where contrast may need a second look after visual testing. -->
+      <Color x:Key="BauhausRed">#D7263D</Color>
+      <Color x:Key="BauhausBlue">#1D4E89</Color>
+      <Color x:Key="BauhausYellow">#F2B705</Color>
+      <Color x:Key="BauhausGray">#8A8A8A</Color>
+
+      <!-- Fixed dark chrome - never theme-bound. Used only for header bars
+           and nav rail backgrounds; see PosView/AdminView/MobileShellView/
+           SettingsShellView, which were switched from InkBrush to this. -->
+      <Color x:Key="BauhausChrome">#141414</Color>
+
+      <SolidColorBrush x:Key="InkBrush" Color="{DynamicResource BauhausInk}"/>
+      <SolidColorBrush x:Key="PaperBrush" Color="{DynamicResource BauhausPaper}"/>
+      <SolidColorBrush x:Key="RedBrush" Color="{DynamicResource BauhausRed}"/>
+      <SolidColorBrush x:Key="BlueBrush" Color="{DynamicResource BauhausBlue}"/>
+      <SolidColorBrush x:Key="YellowBrush" Color="{DynamicResource BauhausYellow}"/>
+      <SolidColorBrush x:Key="GrayBrush" Color="{DynamicResource BauhausGray}"/>
+      <SolidColorBrush x:Key="GrayLightBrush" Color="{DynamicResource BauhausGrayLight}"/>
+      <SolidColorBrush x:Key="ChromeBrush" Color="{DynamicResource BauhausChrome}"/>
 
       <!-- Hides Fluent's default selected-tab underline/pipe, which our
      TabItem:selected yellow background already communicates on its own. -->
-<SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill">Transparent</SolidColorBrush>
+      <SolidColorBrush x:Key="TabItemHeaderSelectedPipeFill">Transparent</SolidColorBrush>
 
-    <!-- Corner radius scale - reference these instead of hardcoding
-         numbers, so the whole app can be re-tuned from one place. -->
-    <CornerRadius x:Key="RadiusSmall">4</CornerRadius>
-    <CornerRadius x:Key="RadiusMedium">8</CornerRadius>
-    <CornerRadius x:Key="RadiusLarge">14</CornerRadius>
-    <CornerRadius x:Key="RadiusPill">999</CornerRadius>
+      <!-- Corner radius scale - reference these instead of hardcoding
+           numbers, so the whole app can be re-tuned from one place. -->
+      <CornerRadius x:Key="RadiusSmall">4</CornerRadius>
+      <CornerRadius x:Key="RadiusMedium">8</CornerRadius>
+      <CornerRadius x:Key="RadiusLarge">14</CornerRadius>
+      <CornerRadius x:Key="RadiusPill">999</CornerRadius>
 
-    <!-- Spacing scale (4pt grid). Use these numbers directly for
-         Margin/Padding in view XAML instead of ad-hoc values like 10, 14,
-         18, 20 - keeps every screen breathing at the same rhythm. -->
-    <Thickness x:Key="SpaceXS">4</Thickness>
-    <Thickness x:Key="SpaceS">8</Thickness>
-    <Thickness x:Key="SpaceM">12</Thickness>
-    <Thickness x:Key="SpaceL">16</Thickness>
-    <Thickness x:Key="SpaceXL">24</Thickness>
+      <!-- Spacing scale (4pt grid). Use these numbers directly for
+           Margin/Padding in view XAML instead of ad-hoc values like 10, 14,
+           18, 20 - keeps every screen breathing at the same rhythm. -->
+      <Thickness x:Key="SpaceXS">4</Thickness>
+      <Thickness x:Key="SpaceS">8</Thickness>
+      <Thickness x:Key="SpaceM">12</Thickness>
+      <Thickness x:Key="SpaceL">16</Thickness>
+      <Thickness x:Key="SpaceXL">24</Thickness>
+    </ResourceDictionary>
   </Styles.Resources>
 
   <!-- Surfaces -->

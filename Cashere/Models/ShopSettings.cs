@@ -30,12 +30,13 @@ public class ReceiptAdmin
     public string? PrinterName { get; set; }
     public int PrinterPaperWidthMm { get; set; } = 80;
 
-    // Read by CheckoutViewModel (gates Complete Sale on a customer pick) and
-    // re-checked by SaleService at completion; and by PosViewModel right
-    // after a sale completes (fires a best-effort print through whatever
-    // Settings -> Hardware has configured).
     public bool RequireCustomerBeforeCheckout { get; set; }
     public bool AutoPrintReceiptAfterPayment { get; set; }
+
+    // Read by ThemeApplier at startup (desktop only - Android doesn't wire
+    // IShopContextService, so the mobile app always renders Light,
+    // unchanged from before this setting existed).
+    public AppThemeMode ThemeMode { get; set; } = AppThemeMode.System;
 
     public string ServerBindAddress { get; set; } = "0.0.0.0";
     public int ServerPort { get; set; } = 5177;

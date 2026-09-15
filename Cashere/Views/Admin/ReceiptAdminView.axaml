@@ -1,4 +1,4 @@
-    <UserControl xmlns="https://github.com/avaloniaui"
+        <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -65,57 +65,56 @@
                           HorizontalAlignment="Stretch"/>
               </StackPanel>
 
-              <Border Classes="card" Padding="0" MaxWidth="300" HorizontalAlignment="Center" ClipToBounds="True">
+              <Border CornerRadius="4" BorderThickness="3" BorderBrush="{StaticResource InkBrush}" Padding="0" MaxWidth="300" HorizontalAlignment="Center" ClipToBounds="True">
                 <StackPanel Background="White">
 
                   <!-- Shop header -->
                   <StackPanel Margin="20,22,20,10" Spacing="3">
                     <TextBlock Text="{Binding ShopName}" FontFamily="Consolas,Courier New,monospace"
                                FontWeight="Black" FontSize="15" HorizontalAlignment="Center"
-                               TextAlignment="Center" TextWrapping="Wrap"/>
+                               TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource InkBrush}"/>
                     <TextBlock Text="{Binding Address}" FontFamily="Consolas,Courier New,monospace"
                                FontSize="10.5" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
-                               IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                               IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource InkBrush}"/>
                     <TextBlock Text="{Binding Phone}" FontFamily="Consolas,Courier New,monospace"
                                FontSize="10.5" HorizontalAlignment="Center"
-                               IsVisible="{Binding Phone, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                               IsVisible="{Binding Phone, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource InkBrush}"/>
                   </StackPanel>
 
                   <TextBlock Text="------------------------------------"
                              FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                             Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            Foreground="{DynamicResource InkBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
 
                   <!-- Date / receipt number / cashier -->
                   <StackPanel Margin="20,0,20,8" Spacing="2">
                     <Grid ColumnDefinitions="*,*">
                       <TextBlock Grid.Column="0" Text="{Binding PreviewDateTime}"
                                  FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                                 Foreground="{StaticResource GrayBrush}"/>
+                                 Foreground="{DynamicResource InkBrush}"/>
                       <TextBlock Grid.Column="1" Text="{Binding PreviewReceiptNumber}"
                                  FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                                 Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Right"/>
+                                 Foreground="{DynamicResource InkBrush}" HorizontalAlignment="Right"/>
                     </Grid>
                     <TextBlock Text="{Binding PreviewCashierName, StringFormat='Cashier: {0}'}"
                                FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                               Foreground="{StaticResource GrayBrush}"/>
+                               Foreground="{DynamicResource InkBrush}"/>
                   </StackPanel>
 
                   <TextBlock Text="------------------------------------"
                              FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                             Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            Foreground="{DynamicResource InkBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
 
                   <!-- Sample line items -->
                   <ItemsControl ItemsSource="{Binding PreviewLines}" Margin="20,0,20,4">
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="vm:ReceiptPreviewLine">
                         <StackPanel Margin="0,0,0,6">
-                          <TextBlock Text="{Binding Name}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
+                          <TextBlock Text="{Binding Name}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
                           <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Grid.Column="0" Text="{Binding Quantity, StringFormat='  {0} x'}"
-                                       FontFamily="Consolas,Courier New,monospace" FontSize="10.5"
-                                       Foreground="{StaticResource GrayBrush}"/>
+                                       FontFamily="Consolas,Courier New,monospace" FontSize="10.5" Foreground="{DynamicResource InkBrush}"/>
                             <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat={}{0:N0}}"
-                                       FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
+                                       FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
                           </Grid>
                         </StackPanel>
                       </DataTemplate>
@@ -124,17 +123,17 @@
 
                   <TextBlock Text="------------------------------------"
                              FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                             Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                             HorizontalAlignment="Center" Margin="0,0,0,8" Foreground="{DynamicResource InkBrush}"/>
 
                   <!-- Subtotal / tax / total -->
                   <StackPanel Margin="20,0,20,10" Spacing="4">
                     <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="SUBTOTAL" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
-                      <TextBlock Grid.Column="1" Text="{Binding PreviewSubtotalDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
+                      <TextBlock Grid.Column="0" Text="SUBTOTAL" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding PreviewSubtotalDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="{Binding PreviewTaxLabel}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
-                      <TextBlock Grid.Column="1" Text="{Binding PreviewTaxDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
+                      <TextBlock Grid.Column="0" Text="{Binding PreviewTaxLabel}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding PreviewTaxDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                   </StackPanel>
 
@@ -142,21 +141,21 @@
                   <Border Background="{StaticResource YellowBrush}" Margin="16,0,16,10" Padding="10,8">
                     <Grid ColumnDefinitions="*,Auto">
                       <TextBlock Grid.Column="0" Text="TOTAL" FontFamily="Consolas,Courier New,monospace"
-                                 FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                                 FontWeight="Black" Foreground="{DynamicResource InkBrush}"/>
                       <TextBlock Grid.Column="1" Text="{Binding PreviewTotalDisplay}" FontFamily="Consolas,Courier New,monospace"
-                                 FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                                 FontWeight="Black" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                   </Border>
 
                   <!-- Cash: tendered + change -->
                   <StackPanel Margin="20,0,20,10" Spacing="4" IsVisible="{Binding IsPreviewCashPayment}">
                     <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="CASH" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
-                      <TextBlock Grid.Column="1" Text="{Binding PreviewAmountTenderedDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5"/>
+                      <TextBlock Grid.Column="0" Text="CASH" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding PreviewAmountTenderedDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="CHANGE" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" FontWeight="Bold"/>
-                      <TextBlock Grid.Column="1" Text="{Binding PreviewChangeDueDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" FontWeight="Bold"/>
+                      <TextBlock Grid.Column="0" Text="CHANGE" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource InkBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding PreviewChangeDueDisplay}" FontFamily="Consolas,Courier New,monospace" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                   </StackPanel>
 
@@ -164,22 +163,22 @@
                   <StackPanel Margin="20,0,20,10" Spacing="4" IsVisible="{Binding IsPreviewNonCashPayment}">
                     <Grid ColumnDefinitions="*,Auto">
                       <TextBlock Grid.Column="0" Text="{Binding PreviewPaymentMethod, StringFormat='PAID VIA {0}'}"
-                                 FontFamily="Consolas,Courier New,monospace" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                 FontFamily="Consolas,Courier New,monospace" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Column="0" Text="REF" FontFamily="Consolas,Courier New,monospace" FontSize="10.5" Foreground="{StaticResource GrayBrush}"/>
-                      <TextBlock Grid.Column="1" Text="{Binding PreviewReferenceNumber}" FontFamily="Consolas,Courier New,monospace" FontSize="10.5" Foreground="{StaticResource GrayBrush}"/>
+                      <TextBlock Grid.Column="0" Text="REF" FontFamily="Consolas,Courier New,monospace" FontSize="10.5" Foreground="{DynamicResource InkBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding PreviewReferenceNumber}" FontFamily="Consolas,Courier New,monospace" FontSize="10.5" Foreground="{DynamicResource InkBrush}"/>
                     </Grid>
                   </StackPanel>
 
                   <!-- Footer text (only if set) -->
                   <TextBlock Text="------------------------------------"
                              FontFamily="Consolas,Courier New,monospace" FontSize="10"
-                             Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"
+                             Foreground="{DynamicResource InkBrush}" HorizontalAlignment="Center" Margin="0,0,0,8"
                              IsVisible="{Binding ReceiptFooterText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                   <TextBlock Text="{Binding ReceiptFooterText}" FontFamily="Consolas,Courier New,monospace"
                              FontSize="10.5" FontStyle="Italic" HorizontalAlignment="Center"
-                             TextAlignment="Center" TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"
+                             TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource InkBrush}"
                              Margin="20,0,20,22"
                              IsVisible="{Binding ReceiptFooterText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 

@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="560"
+             x:Class="Cashere.Views.Admin.Settings.PreferencesView"
+             x:DataType="vm:PreferencesViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12" >
+      <TextBlock Text="PREFERENCES" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <TextBlock Text="THEME" Classes="eyebrow"/>
+      <ComboBox ItemsSource="{Binding ThemeModes}" SelectedItem="{Binding SelectedTheme}" HorizontalAlignment="Stretch"/>
+      <TextBlock Text="System follows your OS's light/dark setting, including if you change it while Cashere is running."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <TextBlock Text="{Binding StatusMessage}"
+                 Foreground="{StaticResource BlueBrush}"
+                 FontWeight="Bold"
+                 TextWrapping="Wrap"/>
+
+      <Button Content="SAVE"
+              Classes="accent-blue"
+              Command="{Binding SaveCommand}"
+              HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center"
+              Padding="0,14"
+              Margin="0,8,0,4"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="Language, date/time/number format, sound &amp; notifications, and UI density all need infrastructure that doesn't exist yet in this app."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

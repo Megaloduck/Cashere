@@ -4,6 +4,7 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using Cashere.Models;
 using Cashere.ViewModels;
 using Cashere.Views;
 using Cashere.Services;
@@ -42,6 +43,11 @@ public partial class App : Application
             {
                 var cashier = AppServices.ShopContext.GetDefaultCashierAsync().GetAwaiter().GetResult();
                 var taxRatePercent = AppServices.ShopContext.GetTaxRatePercentAsync().GetAwaiter().GetResult();
+
+                // Applied before MainWindow is created, so there's no
+                // visible flash of the wrong theme on startup.
+                var startupSettings = AppServices.ShopContext.GetSettingsAsync().GetAwaiter().GetResult();
+                ThemeApplier.Apply(startupSettings?.ThemeMode ?? AppThemeMode.System);
 
                 var posViewModel = new PosViewModel(
                     AppServices.ProductCatalog,
