@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Cashere.Models;
 using Cashere.Services;
@@ -32,6 +29,12 @@ public partial class LoginViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _pin = string.Empty;
+
+    // Drives TextBox.RevealPassword on the PIN field via the eye icon in
+    // its InnerRightContent - purely a display concern, never changes what
+    // actually gets sent to VerifyCredentialsAsync.
+    [ObservableProperty]
+    private bool _isPinVisible;
 
     [ObservableProperty]
     private string? _errorMessage;
@@ -77,6 +80,9 @@ public partial class LoginViewModel : ViewModelBase
 
     [RelayCommand]
     private void ClearPin() => Pin = string.Empty;
+
+    [RelayCommand]
+    private void TogglePinVisibility() => IsPinVisible = !IsPinVisible;
 
     [RelayCommand]
     private async Task Login()

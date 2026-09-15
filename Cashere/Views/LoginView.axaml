@@ -109,10 +109,19 @@
           </TextBox>
 
           <TextBlock Text="PIN" Classes="eyebrow" FontSize="9"/>
-          <TextBox Text="{Binding Pin}" PasswordChar="•" Watermark="PIN" MaxLength="12" KeyDown="OnFieldKeyDown">
+          <TextBox Text="{Binding Pin}" PasswordChar="•" RevealPassword="{Binding IsPinVisible}"
+                    Watermark="PIN" MaxLength="12" KeyDown="OnFieldKeyDown">
             <TextBox.InnerLeftContent>
               <mi:MaterialIcon Kind="LockOutline" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
             </TextBox.InnerLeftContent>
+            <TextBox.InnerRightContent>
+              <Button Classes="ghost" Padding="4" Command="{Binding TogglePinVisibilityCommand}" ToolTip.Tip="Show/hide PIN">
+                <Grid>
+                  <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16" IsVisible="{Binding !IsPinVisible}"/>
+                  <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16" IsVisible="{Binding IsPinVisible}"/>
+                </Grid>
+              </Button>
+            </TextBox.InnerRightContent>
           </TextBox>
 
           <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">

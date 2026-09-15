@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Cashere.ViewModels"
+             x:Class="Cashere.Views.ShellView"
+             x:DataType="vm:ShellViewModel">
+  <!--
+    Thin wrapper so the ViewLocator (App.axaml) has something to resolve
+    ShellViewModel to now that MainWindow's DataContext is RootViewModel
+    rather than ShellViewModel itself. This is exactly what MainWindow's
+    own ContentControl used to do directly before the login gate existed -
+    just extracted into its own View so the Pos<->Admin switch still works
+    once RootViewModel.CurrentView holds a ShellViewModel.
+  -->
+  <ContentControl Content="{Binding CurrentView}"/>
+</UserControl>
