@@ -5,9 +5,10 @@
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.SupplierAdminView"
              x:DataType="vm:SupplierAdminViewModel">
+
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="SUPPLIERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
@@ -75,7 +76,7 @@
           <TextBlock Text="NOTES" Classes="eyebrow"/>
           <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="60"/>
 
-          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
           <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
             <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>

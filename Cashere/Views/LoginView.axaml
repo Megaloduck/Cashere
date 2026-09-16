@@ -9,21 +9,26 @@
              x:DataType="vm:LoginViewModel">
 
   <UserControl.Styles>
-    <!-- Entrance fade for the three signature squares + wordmark/subtitle -
-         each starts invisible and fades in on its own Delay once the view
-         enters the tree. Deliberately opacity-only (no transform) so the
-         animation stays simple and predictable. -->
-    <Style Selector="Border.anim-square-1, Border.anim-square-2, Border.anim-square-3, TextBlock.anim-mark, TextBlock.anim-sub">
+    <!-- ============================================================
+         Wordmark triad squares + text entrance (top-left brand block)
+         ============================================================ -->
+    <Style Selector="Border.anim-square-1,
+                     Border.anim-square-2,
+                     Border.anim-square-3,
+                     TextBlock.anim-mark,
+                     TextBlock.anim-sub">
       <Setter Property="Opacity" Value="0"/>
     </Style>
+
     <Style Selector="Border.anim-square-1">
       <Style.Animations>
-        <Animation Duration="0:0:0.5" Delay="0:0:0.1" FillMode="Forward">
+        <Animation Duration="0:0:0.5" Delay="0:0:0.10" FillMode="Forward">
           <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
           <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
         </Animation>
       </Style.Animations>
     </Style>
+
     <Style Selector="Border.anim-square-2">
       <Style.Animations>
         <Animation Duration="0:0:0.5" Delay="0:0:0.25" FillMode="Forward">
@@ -32,14 +37,16 @@
         </Animation>
       </Style.Animations>
     </Style>
+
     <Style Selector="Border.anim-square-3">
       <Style.Animations>
-        <Animation Duration="0:0:0.5" Delay="0:0:0.4" FillMode="Forward">
+        <Animation Duration="0:0:0.5" Delay="0:0:0.40" FillMode="Forward">
           <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
           <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
         </Animation>
       </Style.Animations>
     </Style>
+
     <Style Selector="TextBlock.anim-mark">
       <Style.Animations>
         <Animation Duration="0:0:0.6" Delay="0:0:0.55" FillMode="Forward">
@@ -48,6 +55,7 @@
         </Animation>
       </Style.Animations>
     </Style>
+
     <Style Selector="TextBlock.anim-sub">
       <Style.Animations>
         <Animation Duration="0:0:0.6" Delay="0:0:0.75" FillMode="Forward">
@@ -57,20 +65,73 @@
       </Style.Animations>
     </Style>
 
-    <!-- Gentle ambient pulse on the yellow square once everything has
-         settled in, so the panel doesn't feel static while someone types. -->
+    <!-- Gentle ambient pulse on the yellow wordmark square -->
     <Style Selector="Border.anim-pulse">
       <Style.Animations>
-        <Animation Duration="0:0:2.2" Delay="0:0:1.2" IterationCount="INFINITE" PlaybackDirection="Alternate">
+        <Animation Duration="0:0:2.2" Delay="0:0:1.20"
+                   IterationCount="INFINITE" PlaybackDirection="Alternate">
           <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1"/></KeyFrame>
           <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.5"/></KeyFrame>
         </Animation>
       </Style.Animations>
     </Style>
 
+    <!-- ============================================================
+         Bauhaus poster backdrop (left column)
+         Each shape starts invisible and fades in on its own delay.
+         Opacity-only, no transforms - safe on all compositors.
+         ============================================================ -->
+    <Style Selector="Ellipse.bh-circle">
+      <Setter Property="Opacity" Value="0"/>
+      <Style.Animations>
+        <Animation Duration="0:0:0.7" Delay="0:0:0.10" FillMode="Forward">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="Border.bh-square">
+      <Setter Property="Opacity" Value="0"/>
+      <Style.Animations>
+        <Animation Duration="0:0:0.6" Delay="0:0:0.30" FillMode="Forward">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- Every blue bar + the ink rule share this entrance -->
+    <Style Selector="Border.bh-bar">
+      <Setter Property="Opacity" Value="0"/>
+      <Style.Animations>
+        <Animation Duration="0:0:0.5" Delay="0:0:0.55" FillMode="Forward"
+                   Easing="CubicEaseOut">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- Slow ambient pulse on the middle blue bar only.
+         Applied as an ADDITIONAL class so it layers cleanly. -->
+    <Style Selector="Border.bh-bar-pulse">
+      <Style.Animations>
+        <Animation Duration="0:0:3.6" Delay="0:0:1.50"
+                   IterationCount="INFINITE" PlaybackDirection="Alternate">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.7"/></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- ============================================================
+         Keypad button sizing (unchanged from your original)
+         ============================================================ -->
     <Style Selector="Button.keypad">
       <Setter Property="FontSize" Value="20"/>
       <Setter Property="FontWeight" Value="Black"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
       <Setter Property="HorizontalContentAlignment" Value="Center"/>
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Padding" Value="0"/>
@@ -80,77 +141,209 @@
 
   <Grid ColumnDefinitions="*,460">
 
-    <!-- Left: Bauhaus splash panel -->
-    <Border Grid.Column="0" Background="{StaticResource BlueBrush}">
-      <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="64,0,0,0" Spacing="6">
-        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,4">
-          <Border Width="26" Height="26" Background="{StaticResource RedBrush}" Classes="anim-square-1"/>
-          <Border Width="26" Height="26" Background="{StaticResource YellowBrush}" Classes="anim-square-2 anim-pulse"/>
-          <Border Width="26" Height="26" Background="{StaticResource InkBrush}" Classes="anim-square-3"/>
-        </StackPanel>
-        <TextBlock Text="CASHERE" FontSize="64" FontWeight="Black" Foreground="{StaticResource InkBrush}" Classes="anim-mark"/>
-        <TextBlock Text="{Binding ShopName, StringFormat='a cashier app for {0}'}"
-                   FontSize="16" FontWeight="Medium" Foreground="{StaticResource InkBrush}" Classes="anim-sub"/>
-      </StackPanel>
-    </Border>
+    <!-- ============================================================
+         LEFT: Bauhaus poster + wordmark
+         ============================================================ -->
+    <Grid Grid.Column="0" Background="{DynamicResource PaperBrush}">
 
-    <!-- Right: login card -->
-    <Border Grid.Column="1" Background="{StaticResource BlueBrush}" Padding="40" VerticalAlignment="Center">
+      <!-- Poster composition (behind the wordmark).
+           IsHitTestVisible=False so it never steals clicks. -->
+      <Canvas HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch"
+              IsHitTestVisible="False">
+
+        <!-- Red circle - intentionally cropped off the left edge -->
+        <Ellipse Canvas.Left="-90" Canvas.Top="230"
+                 Width="340" Height="340"
+                 Fill="{StaticResource RedBrush}"
+                 Classes="bh-circle"/>
+
+        <!-- Yellow square - overlaps the circle's lower-right corner -->
+        <Border Canvas.Left="180" Canvas.Top="380"
+                Width="150" Height="150"
+                Background="{StaticResource YellowBrush}"
+                CornerRadius="{DynamicResource RadiusMedium}"
+                Classes="bh-square"/>
+
+        <!-- Blue bars - staggered widths, Moholy-Nagy telegram motif.
+             Middle bar carries the ambient pulse in addition to the
+             shared bh-bar entrance. -->
+        <Border Canvas.Left="360" Canvas.Top="300"
+                Width="280" Height="18"
+                Background="{StaticResource BlueBrush}"
+                CornerRadius="{DynamicResource RadiusSmall}"
+                Classes="bh-bar"/>
+
+        <Border Canvas.Left="360" Canvas.Top="332"
+                Width="210" Height="18"
+                Background="{StaticResource BlueBrush}"
+                CornerRadius="{DynamicResource RadiusSmall}"
+                Classes="bh-bar bh-bar-pulse"/>
+
+        <Border Canvas.Left="360" Canvas.Top="364"
+                Width="150" Height="18"
+                Background="{StaticResource BlueBrush}"
+                CornerRadius="{DynamicResource RadiusSmall}"
+                Classes="bh-bar"/>
+
+        <!-- Thin ink rule - counterweight, low right -->
+        <Border Canvas.Left="480" Canvas.Top="560"
+                Width="120" Height="6"
+                Background="{StaticResource InkBrush}"
+                Classes="bh-bar"/>
+      </Canvas>
+
+      <!-- Wordmark block, top-left -->
+      <StackPanel HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Margin="30" Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,4">
+          <Border Width="26" Height="26"
+                  Background="{StaticResource RedBrush}"
+                  Classes="anim-square-1"/>
+          <Border Width="26" Height="26"
+                  Background="{StaticResource YellowBrush}"
+                  Classes="anim-square-2 anim-pulse"/>
+          <Border Width="26" Height="26"
+                  Background="{StaticResource BlueBrush}"
+                  Classes="anim-square-3"/>
+        </StackPanel>
+
+        <TextBlock Text="CASHERE"
+                   FontSize="64" FontWeight="Black"
+                   Foreground="{StaticResource InkBrush}"
+                   Classes="anim-mark"/>
+
+        <TextBlock Text="{Binding ShopName, StringFormat='a cashier app for {0}'}"
+                   FontSize="16" FontWeight="Medium"
+                   Foreground="{StaticResource InkBrush}"
+                   Classes="anim-sub"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- ============================================================
+         RIGHT: login card
+         ============================================================ -->
+    <Border Grid.Column="1"
+            Padding="40"
+            VerticalAlignment="Center"
+            Background="{DynamicResource PaperBrush}">
       <Border Classes="card" Padding="26">
         <StackPanel Spacing="12">
-          <TextBlock Text="GET STARTED" Classes="eyebrow"/>
+          <TextBlock Text="GET STARTED" Classes="headline"/>
           <Border Classes="rule-thick"/>
 
           <TextBlock Text="USERNAME" Classes="eyebrow" FontSize="9"/>
-          <TextBox Text="{Binding Username}" Watermark="Username" KeyDown="OnFieldKeyDown">
+          <TextBox Text="{Binding Username}" Watermark="Username"
+                   KeyDown="OnFieldKeyDown">
             <TextBox.InnerLeftContent>
-              <mi:MaterialIcon Kind="AccountOutline" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+              <mi:MaterialIcon Kind="AccountOutline"
+                               Width="16" Height="16"
+                               Foreground="{StaticResource GrayBrush}" Margin="8,0,0,0"/>
             </TextBox.InnerLeftContent>
           </TextBox>
 
           <TextBlock Text="PIN" Classes="eyebrow" FontSize="9"/>
-          <TextBox Text="{Binding Pin}" PasswordChar="•" RevealPassword="{Binding IsPinVisible}"
-                    Watermark="PIN" MaxLength="12" KeyDown="OnFieldKeyDown">
+          <TextBox Text="{Binding Pin}"
+                   PasswordChar="•"
+                   RevealPassword="{Binding IsPinVisible}"
+                   Watermark="PIN" MaxLength="12"
+                   KeyDown="OnFieldKeyDown">
             <TextBox.InnerLeftContent>
-              <mi:MaterialIcon Kind="LockOutline" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+              <mi:MaterialIcon Kind="LockOutline"
+                               Width="16" Height="16"
+                               Foreground="{StaticResource GrayBrush}" Margin="8,0,0,0"/>
             </TextBox.InnerLeftContent>
             <TextBox.InnerRightContent>
-              <Button Classes="ghost" Padding="4" Command="{Binding TogglePinVisibilityCommand}" ToolTip.Tip="Show/hide PIN">
-                <Grid>
-                  <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16" IsVisible="{Binding !IsPinVisible}"/>
-                  <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16" IsVisible="{Binding IsPinVisible}"/>
+              <Button Classes="ghost" Padding="4"
+                      Command="{Binding TogglePinVisibilityCommand}"
+                      ToolTip.Tip="Show/hide PIN" Margin="0,0,8,0">
+                <Grid >
+                  <mi:MaterialIcon Kind="EyeOutline"
+                                   Width="16" Height="16"
+                                   IsVisible="{Binding !IsPinVisible}"/>
+                  <mi:MaterialIcon Kind="EyeOffOutline"
+                                   Width="16" Height="16"
+                                   IsVisible="{Binding IsPinVisible}"/>
                 </Grid>
               </Button>
             </TextBox.InnerRightContent>
           </TextBox>
 
-          <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
-            <Button Grid.Row="0" Grid.Column="0" Classes="keypad accent-yellow" Content="1" Command="{Binding AppendDigitCommand}" CommandParameter="1" Margin="0,0,4,4"/>
-            <Button Grid.Row="0" Grid.Column="1" Classes="keypad accent-yellow" Content="2" Command="{Binding AppendDigitCommand}" CommandParameter="2" Margin="4,0,4,4"/>
-            <Button Grid.Row="0" Grid.Column="2" Classes="keypad accent-yellow" Content="3" Command="{Binding AppendDigitCommand}" CommandParameter="3" Margin="4,0,0,4"/>
+          <UniformGrid Columns="3" Rows="4"
+                       Margin="0,4,0,0"
+                       HorizontalAlignment="Stretch">
+            <Button Classes="keypad accent-yellow"
+                    Content="1"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="1"
+                    Margin="0,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="2"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="2"
+                    Margin="4,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="3"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="3"
+                    Margin="4,0,0,4"/>
 
-            <Button Grid.Row="1" Grid.Column="0" Classes="keypad accent-yellow" Content="4" Command="{Binding AppendDigitCommand}" CommandParameter="4" Margin="0,0,4,4"/>
-            <Button Grid.Row="1" Grid.Column="1" Classes="keypad accent-yellow" Content="5" Command="{Binding AppendDigitCommand}" CommandParameter="5" Margin="4,0,4,4"/>
-            <Button Grid.Row="1" Grid.Column="2" Classes="keypad accent-yellow" Content="6" Command="{Binding AppendDigitCommand}" CommandParameter="6" Margin="4,0,0,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="4"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="4"
+                    Margin="0,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="5"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="5"
+                    Margin="4,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="6"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="6"
+                    Margin="4,0,0,4"/>
 
-            <Button Grid.Row="2" Grid.Column="0" Classes="keypad accent-yellow" Content="7" Command="{Binding AppendDigitCommand}" CommandParameter="7" Margin="0,0,4,4"/>
-            <Button Grid.Row="2" Grid.Column="1" Classes="keypad accent-yellow" Content="8" Command="{Binding AppendDigitCommand}" CommandParameter="8" Margin="4,0,4,4"/>
-            <Button Grid.Row="2" Grid.Column="2" Classes="keypad accent-yellow" Content="9" Command="{Binding AppendDigitCommand}" CommandParameter="9" Margin="4,0,0,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="7"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="7"
+                    Margin="0,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="8"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="8"
+                    Margin="4,0,4,4"/>
+            <Button Classes="keypad accent-yellow"
+                    Content="9"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="9"
+                    Margin="4,0,0,4"/>
 
-            <Button Grid.Row="3" Grid.Column="0" Classes="keypad ghost" Command="{Binding ClearPinCommand}" Margin="0,0,4,0" ToolTip.Tip="Clear">
+            <Button Classes="keypad ghost"
+                    Command="{Binding ClearPinCommand}"
+                    Margin="0,0,4,0"
+                    ToolTip.Tip="Clear">
               <mi:MaterialIcon Kind="CloseCircleOutline" Width="18" Height="18"/>
             </Button>
-            <Button Grid.Row="3" Grid.Column="1" Classes="keypad accent-yellow" Content="0" Command="{Binding AppendDigitCommand}" CommandParameter="0" Margin="4,0,4,0"/>
-            <Button Grid.Row="3" Grid.Column="2" Classes="keypad ghost" Command="{Binding BackspaceCommand}" Margin="4,0,0,0" ToolTip.Tip="Backspace">
+            <Button Classes="keypad accent-yellow"
+                    Content="0"
+                    Command="{Binding AppendDigitCommand}" CommandParameter="0"
+                    Margin="4,0,4,0"/>
+            <Button Classes="keypad ghost"
+                    Command="{Binding BackspaceCommand}"
+                    Margin="4,0,0,0"
+                    ToolTip.Tip="Backspace">
               <mi:MaterialIcon Kind="BackspaceOutline" Width="18" Height="18"/>
             </Button>
-          </Grid>
+          </UniformGrid>
 
-          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold"
-                     TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          <TextBlock Text="{Binding ErrorMessage}"
+                     Foreground="{StaticResource RedBrush}"
+                     FontWeight="Bold"
+                     TextWrapping="Wrap"
+                     IsVisible="{Binding ErrorMessage,
+                                 Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
-          <Button Classes="accent-blue" Command="{Binding LoginCommand}" IsEnabled="{Binding CanSubmit}"
-                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,16" FontSize="16" Margin="0,4,0,0">
+          <Button Classes="accent-blue"
+                  Command="{Binding LoginCommand}"
+                  IsEnabled="{Binding CanSubmit}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Padding="0,16" FontSize="16"
+                  Margin="0,4,0,0">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <mi:MaterialIcon Kind="LoginVariant" Width="18" Height="18"/>
               <TextBlock Text="LOGIN" IsVisible="{Binding !IsBusy}"/>

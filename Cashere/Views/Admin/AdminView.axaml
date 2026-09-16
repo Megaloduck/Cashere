@@ -38,7 +38,7 @@
     <Grid Grid.Row="2" ColumnDefinitions="220,*">
 
       <Border Grid.Column="0" Background="{StaticResource BlueBrush}">
-        <ScrollViewer>
+        <ScrollViewer VerticalScrollBarVisibility="Hidden">
           <StackPanel Margin="0,16">
 
             <TextBlock Text="CATALOG" Classes="nav-group-label"/>

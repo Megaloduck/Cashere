@@ -16,10 +16,11 @@
       <TextBlock Text="System follows your OS's light/dark setting, including if you change it while Cashere is running."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
-      <TextBlock Text="{Binding StatusMessage}"
-                 Foreground="{StaticResource BlueBrush}"
-                 FontWeight="Bold"
-                 TextWrapping="Wrap"/>
+<TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Button Content="SAVE"
               Classes="accent-blue"

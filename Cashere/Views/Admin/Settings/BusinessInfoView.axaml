@@ -47,9 +47,10 @@
       <TextBox Text="{Binding Timezone}" Watermark="e.g. Asia/Jakarta"/>
 
       <TextBlock Text="{Binding StatusMessage}"
-                 Foreground="{StaticResource BlueBrush}"
-                 FontWeight="Bold"
-                 TextWrapping="Wrap"/>
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Button Content="SAVE"
               Classes="accent-blue"

@@ -14,9 +14,9 @@
   </UserControl.Resources>
 
   <Grid ColumnDefinitions="230,*">
-
-    <Border Grid.Column="0" Background="{StaticResource ChromeBrush}" CornerRadius="5">
-      <ScrollViewer>
+      
+    <Border Grid.Column="0" Background="{DynamicResource PaperBrush}" CornerRadius="5" BorderThickness="2" BorderBrush="{DynamicResource InkBrush}">
+      <ScrollViewer VerticalScrollBarVisibility="Hidden">
         <StackPanel Spacing="2">
 
           <TextBlock Text="BUSINESS" Classes="nav-group-label"/>

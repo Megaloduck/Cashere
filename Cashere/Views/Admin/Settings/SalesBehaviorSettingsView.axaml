@@ -30,10 +30,11 @@
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoPrintReceiptAfterPayment}" VerticalAlignment="Center"/>
       </Grid>
 
-      <TextBlock Text="{Binding StatusMessage}"
-                 Foreground="{StaticResource BlueBrush}"
-                 FontWeight="Bold"
-                 TextWrapping="Wrap"/>
+<TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Button Content="SAVE"
               Classes="accent-blue"

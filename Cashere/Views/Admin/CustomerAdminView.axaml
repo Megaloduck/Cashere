@@ -82,7 +82,7 @@
           <TextBlock Text="NOTES" Classes="eyebrow"/>
           <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="60"/>
 
-          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
           <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
             <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>

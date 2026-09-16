@@ -36,10 +36,11 @@
                                TextWrapping="Wrap"
                                FontSize="11"/>
 
-                    <TextBlock Text="{Binding StatusMessage}"
-                               Foreground="{StaticResource BlueBrush}"
-                               FontWeight="Bold"
-                               TextWrapping="Wrap"/>
+<TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
                     <Button Content="SAVE SETTINGS"
                             Classes="accent-blue"

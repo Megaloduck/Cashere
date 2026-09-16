@@ -29,63 +29,65 @@
       </Button>
     </Grid>
 
-    <Grid Grid.Row="1" ColumnDefinitions="48,2*,1*,1*,1*,1*,190" Margin="0,0,0,4">
-      <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
-      <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
-      <TextBlock Grid.Column="3" Text="PRICE" Classes="eyebrow"/>
-      <TextBlock Grid.Column="4" Text="STOCK" Classes="eyebrow"/>
-      <TextBlock Grid.Column="5" Text="STATUS" Classes="eyebrow"/>
-      <TextBlock Grid.Column="6" Text="ACTIONS" Classes="eyebrow"/>
-    </Grid>
-    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+    <Grid Grid.Row="1" ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190" Margin="0,0,0,4">
+  <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
+  <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
+  <TextBlock Grid.Column="3" Text="BARCODE" Classes="eyebrow"/>
+  <TextBlock Grid.Column="4" Text="PRICE" Classes="eyebrow"/>
+  <TextBlock Grid.Column="5" Text="STOCK" Classes="eyebrow"/>
+  <TextBlock Grid.Column="6" Text="STATUS" Classes="eyebrow"/>
+  <TextBlock Grid.Column="7" Text="ACTIONS" Classes="eyebrow"/>
+</Grid>
+<Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
 
-    <ScrollViewer Grid.Row="2">
-      <ItemsControl ItemsSource="{Binding FilteredProducts}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="models:Product">
-            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
-              <Grid ColumnDefinitions="48,2*,1*,1*,1*,1*,190">
-                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="{StaticResource RadiusSmall}"
-                        Background="{StaticResource GrayLightBrush}" ClipToBounds="True" VerticalAlignment="Center">
-                  <Grid>
-                    <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
-                           IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
-                           Stretch="UniformToFill"/>
-                    <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18" Foreground="{StaticResource GrayBrush}"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}"/>
-                  </Grid>
-                </Border>
-                <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="10,0,0,0"/>
-                <TextBlock Grid.Column="2" Text="{Binding Sku}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="3" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="4" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
-                <StackPanel Grid.Column="5" VerticalAlignment="Center">
-                  <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
-                  <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="4">
-                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
-                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
-                  </Button>
-                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
-                    <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
-                  </Button>
-                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
-                    <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
-                  </Button>
-                  <Button Classes="ghost" Click="OnRemovePhotoClick"
-                          IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
-                          ToolTip.Tip="Remove photo">
-                    <mi:MaterialIcon Kind="ImageRemoveOutline" Width="16" Height="16"/>
-                  </Button>
-                </StackPanel>
+<ScrollViewer Grid.Row="2">
+  <ItemsControl ItemsSource="{Binding FilteredProducts}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="models:Product">
+        <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+          <Grid ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190">
+            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="{StaticResource RadiusSmall}"
+                    Background="{StaticResource GrayLightBrush}" ClipToBounds="True" VerticalAlignment="Center">
+              <Grid>
+                <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
+                       IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Stretch="UniformToFill"/>
+                <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18" Foreground="{StaticResource GrayBrush}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}"/>
               </Grid>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
+            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="10,0,0,0"/>
+            <TextBlock Grid.Column="2" Text="{Binding Sku}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Grid.Column="3" Text="{Binding Barcode, TargetNullValue='—'}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Grid.Column="4" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="6" VerticalAlignment="Center">
+              <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+              <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="4">
+              <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+              </Button>
+              <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
+                <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
+              </Button>
+              <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
+                <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+              </Button>
+              <Button Classes="ghost" Click="OnRemovePhotoClick"
+                      IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      ToolTip.Tip="Remove photo">
+                <mi:MaterialIcon Kind="ImageRemoveOutline" Width="16" Height="16"/>
+              </Button>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</ScrollViewer>
 
     <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
       <Border Classes="card" Width="460" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -147,7 +149,7 @@
               </StackPanel>
             </Grid>
 
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
             <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
               <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>

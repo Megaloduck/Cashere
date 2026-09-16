@@ -8,6 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.PurchaseAdminView"
              x:DataType="vm:PurchaseAdminViewModel">
+
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="PURCHASES" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
@@ -88,7 +89,7 @@
                 <TextBlock Text="UNIT COST" Classes="eyebrow"/>
                 <TextBox Text="{Binding LineUnitCost}"/>
               </StackPanel>
-              <Button Grid.Column="2" Classes="accent-yellow" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}">
+              <Button Grid.Column="2" Classes="accent-yellow" VerticalAlignment="Bottom" Command="{Binding AddLineCommand}" >
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
                   <TextBlock Text="ADD"/>
@@ -120,7 +121,7 @@
               </Grid>
             </Border>
 
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
             <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
               <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>

@@ -340,8 +340,8 @@
   <Setter Property="FontWeight" Value="Bold"/>
   <Setter Property="FontSize" Value="10"/>
   <Setter Property="LetterSpacing" Value="2"/>
-  <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
-  <Setter Property="Margin" Value="16,18,16,6"/>
+  <Setter Property="Foreground" Value="White"/>
+  <Setter Property="Margin" Value="12"/>
 </Style>
 
         <!-- Desktop nav item (icon + label, for a desktop sidebar) -->
@@ -376,6 +376,7 @@
 
 <Style Selector="Button.nav-item.selected">
   <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
 </Style>
 
 <Style Selector="Button.nav-item.selected:pointerover">
@@ -383,7 +384,11 @@
 </Style>
 
 <Style Selector="Button.nav-item.selected mi|MaterialIcon">
-  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+  <Setter Property="Foreground" Value="{DynamicResource ChromeBrush}"/>
+</Style>
+
+    <Style Selector="Button.nav-item.selected TextBlock">
+  <Setter Property="Foreground" Value="{DynamicResource ChromeBrush}"/>
 </Style>
 
 <Style Selector="Button.nav-item.selected TextBlock.nav-label">

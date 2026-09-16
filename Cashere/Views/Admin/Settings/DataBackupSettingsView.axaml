@@ -41,7 +41,11 @@
               HorizontalContentAlignment="Center"
               Padding="0,14"/>
 
-      <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Border Classes="rule-thick" Margin="0,4"/>
       <Grid ColumnDefinitions="*,Auto">

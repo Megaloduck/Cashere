@@ -15,7 +15,7 @@
 
       <StackPanel Spacing="10" IsVisible="{Binding !HasOpenShift}">
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <mi:MaterialIcon Kind="CashRegister" Width="16" Height="16" Foreground="{StaticResource GrayBrush}"/>
+          <mi:MaterialIcon Kind="CashRegister" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
           <TextBlock Text="NO SHIFT CURRENTLY OPEN" Classes="eyebrow"/>
         </StackPanel>
 
@@ -64,7 +64,11 @@
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
       </StackPanel>
 
-      <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+     <TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
       <Grid ColumnDefinitions="*,Auto">

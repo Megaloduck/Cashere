@@ -30,10 +30,11 @@
           </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <TextBlock Text="{Binding StatusMessage}"
-                   Foreground="{StaticResource BlueBrush}"
-                   FontWeight="Bold"
-                   TextWrapping="Wrap"/>
+<TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
         <Button Content="SAVE"
                 Classes="accent-blue"
@@ -43,17 +44,14 @@
                 Padding="0,14"/>
 
         <Button Classes="accent-yellow" Command="{Binding TestPrintCommand}" IsEnabled="{Binding !IsTestPrinting}"
-                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <mi:MaterialIcon Kind="PrinterOutline" Width="16" Height="16"/>
             <TextBlock Text="TEST PRINT" IsVisible="{Binding !IsTestPrinting}"/>
             <TextBlock Text="PRINTING..." IsVisible="{Binding IsTestPrinting}"/>
           </StackPanel>
         </Button>
-        <TextBlock Text="{Binding TestPrintStatusMessage}"
-                   Foreground="{StaticResource BlueBrush}"
-                   FontWeight="Bold"
-                   TextWrapping="Wrap"/>
+
       </StackPanel>
 
       <StackPanel Spacing="10" IsVisible="{Binding !IsPrinterServiceAvailable}">

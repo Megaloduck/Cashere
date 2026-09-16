@@ -25,14 +25,6 @@
                           Margin="0,0,12,0">
                 <StackPanel Spacing="10">
 
-    <StackPanel Orientation="Horizontal" Spacing="8">
-      <mi:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
-      <TextBlock Text="Shop name, address, phone, tax ID, currency and tax rate are live under Settings → Business Info."
-                 TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
-    </StackPanel>
-
-    <Border Classes="rule-thick"/>
-             
                 <TextBlock Text="PREVIEW AS PAYMENT METHOD" Classes="eyebrow"/>
                 <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PreviewPaymentMethod}"    HorizontalAlignment="Stretch"/>
               
@@ -40,10 +32,11 @@
     <TextBlock Text="RECEIPT FOOTER TEXT" Classes="eyebrow"/>
     <TextBox Text="{Binding ReceiptFooterText}" AcceptsReturn="True" Height="70"/>
 
-    <TextBlock Text="{Binding StatusMessage}"
-               Foreground="{StaticResource BlueBrush}"
-               FontWeight="Bold"
-               TextWrapping="Wrap"/>
+<TextBlock Text="{Binding StatusMessage}"
+           Foreground="{StaticResource BlueBrush}"
+           FontWeight="Bold"
+           TextWrapping="Wrap"
+           IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
     <Button Content="SAVE SETTINGS"
             Classes="accent-blue"
@@ -52,6 +45,13 @@
             HorizontalContentAlignment="Center"
             Padding="0,14"
             Margin="0,8,0,0"/>
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <mi:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
+      <TextBlock Text="Shop name, address, phone, tax ID, currency and tax rate are live under Settings → Business Info."
+                 TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
+    </StackPanel>
+
 </StackPanel>
             </ScrollViewer>
 
