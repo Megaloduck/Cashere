@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="760"
+             x:Class="Cashere.Views.Admin.Settings.StaffPermissionsView"
+             x:DataType="vm:StaffPermissionsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="12" Spacing="12">
+      <TextBlock Text="STAFF &amp; PERMISSIONS" Classes="headline" FontSize="18"/>
+      <Border Classes="rule-thick"/>
+
+      <TextBlock Text="WHAT EACH ROLE CAN DO TODAY" Classes="eyebrow"/>
+
+      <Border Classes="card" Padding="14">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" Background="{StaticResource BlueBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3" VerticalAlignment="Top">
+              <TextBlock Text="OWNER / MANAGER" FontWeight="Black" FontSize="10" Foreground="White"/>
+            </Border>
+            <TextBlock Grid.Column="1" Text="Full access: everything on this screen, plus every Admin section - create/edit/deactivate products, run purchases, manage suppliers, customers and cashiers, view reports, and change any setting."
+                       TextWrapping="Wrap" Margin="10,0,0,0"/>
+          </Grid>
+          <Border Classes="rule-thick"/>
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3" VerticalAlignment="Top">
+              <TextBlock Text="CASHIER" FontWeight="Black" FontSize="10" Foreground="Black"/>
+            </Border>
+            <TextBlock Grid.Column="1" Text="Full POS access (ring up sales, checkout). In Admin, PRODUCTS is view-only - no add/edit/deactivate/photo controls are shown. Other Admin sections aren't role-gated yet; that's rolling out screen by screen."
+                       TextWrapping="Wrap" Margin="10,0,0,0"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0"  Spacing="8">
+              <TextBlock Text="CASHIERS ON FILE" Classes="eyebrow" VerticalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <mi:MaterialIcon Kind="LockCheckOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
+        <TextBlock Text="Cashiers sign in with a username and PIN, verified against the PBKDF2 hash on their account."
+                   TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
+      </StackPanel>
+          </StackPanel>
+        
+        <Button Grid.Column="1" Classes="chip" Command="{Binding ManageCashiersCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <mi:MaterialIcon Kind="AccountTieOutline" Width="14" Height="14"/>
+            <TextBlock Text="MANAGE CASHIERS"/>
+          </StackPanel>
+        </Button>
+      </Grid>
+      <Border Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+      <ItemsControl ItemsSource="{Binding Cashiers}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Cashier">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+              <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding DisplayName}" FontWeight="Bold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Role}" Margin="8,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+                <TextBlock Grid.Column="2" Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
+                 Text="A real Owner-vs-Manager split (today they're treated identically), per-role toggles for void/refund, discounts and price overrides, cash-drawer authorization, and gating the remaining Admin sections (Suppliers, Purchases, Customers, Sales, Settings) for Cashier logins aren't built yet."/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

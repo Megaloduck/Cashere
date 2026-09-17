@@ -23,8 +23,13 @@ public partial class SettingsShellViewModel : ViewModelBase
     public PreferencesViewModel Preferences { get; }
     public AboutViewModel About { get; }
 
-    public SettingsPlaceholderViewModel Staff { get; }
-    public SettingsPlaceholderViewModel Security { get; }
+    public StaffPermissionsViewModel Staff { get; }
+    public SecuritySettingsViewModel Security { get; }
+
+    // Re-raised from Staff.ManageCashiersRequested - AdminViewModel handles
+    // this by flipping its own SelectedSection to AdminSection.Cashiers,
+    // same bubble-it-up pattern as BackRequested/LogoutRequested elsewhere.
+    public event Action? ManageCashiersRequested;
 
     [ObservableProperty]
     private SettingsSection _selectedSection = SettingsSection.Business;
@@ -54,6 +59,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         IShiftAdminService shiftAdmin,
         IDataBackupService dataBackup,
         IAboutInfoService aboutInfo,
+        ICashierAdminService cashierAdmin,
         int currentCashierId)
     {
         Business = new BusinessInfoViewModel(shopContext);
@@ -68,31 +74,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         Preferences = new PreferencesViewModel(shopContext);
         About = new AboutViewModel(aboutInfo);
 
-        Staff = new SettingsPlaceholderViewModel(
-            "Staff & Permissions",
-            "Cashiers already have a Role (Owner/Manager/Cashier), and passwords are now hashed with PBKDF2 instead of stored as plaintext. There's still no login screen - the app auto-picks the first active cashier the same way it always has - and nothing checks Role yet.",
-            new[]
-            {
-                "Login screen (gate the POS shell on real sign-in)",
-                "Void sale / refund",
-                "Apply discount / change price",
-                "Open cash drawer",
-                "View profit / reports",
-                "Edit inventory, delete products",
-                "Change settings"
-            });
+        Staff = new StaffPermissionsViewModel(cashierAdmin);
+        Staff.ManageCashiersRequested += () => ManageCashiersRequested?.Invoke();
 
-        Security = new SettingsPlaceholderViewModel(
-            "Security",
-            "No PIN, lock screen, or manager-approval gate exists yet - cashier login itself is still a placeholder (see Staff & Permissions), so there's nothing yet for these controls to attach to.",
-            new[]
-            {
-                "PIN requirement",
-                "Auto-lock timeout",
-                "Manager authorization for sensitive actions",
-                "Audit log",
-                "Local database encryption"
-            });
+        Security = new SecuritySettingsViewModel(shopContext);
     }
 
     public async Task InitializeAsync()
@@ -101,10 +86,12 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Receipts.LoadAsync();
         await Payments.LoadAsync();
         await Inventory.LoadAsync();
+        await Staff.LoadAsync();
         await Hardware.LoadAsync();
         await Network.InitializeAsync();
         await CashRegister.LoadAsync();
         await SalesBehavior.LoadAsync();
+        await Security.LoadAsync();
         await DataBackup.LoadAsync();
         await Preferences.LoadAsync();
         await About.LoadAsync();
@@ -134,6 +121,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         {
             _ = Inventory.LoadAsync();
         }
+        else if (value == SettingsSection.Staff)
+        {
+            _ = Staff.LoadAsync();
+        }
         else if (value == SettingsSection.Hardware)
         {
             _ = Hardware.LoadAsync();
@@ -145,6 +136,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         else if (value == SettingsSection.SalesBehavior)
         {
             _ = SalesBehavior.LoadAsync();
+        }
+        else if (value == SettingsSection.Security)
+        {
+            _ = Security.LoadAsync();
         }
         else if (value == SettingsSection.DataBackup)
         {

@@ -15,10 +15,10 @@
     </StackPanel>
     <Border Classes="rule-thick"/>
 
-    <Border Background="{StaticResource BlueBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
+    <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Grid.Column="0" Text="TOTAL DUE" FontWeight="Bold" Foreground="White"/>
-        <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="White"/>
+        <TextBlock Grid.Column="0" Text="TOTAL DUE" FontWeight="Bold" Foreground="Black"/>
+        <TextBlock Grid.Column="1" Text="{Binding TotalDue, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="16" Foreground="Black"/>
       </Grid>
     </Border>
 

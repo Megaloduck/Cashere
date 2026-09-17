@@ -21,7 +21,7 @@
           <mi:MaterialIcon Kind="Magnify" Width="16" Height="16"  Margin="12,0,0,0" Foreground="{StaticResource GrayBrush}"/>
         </TextBox.InnerLeftContent>
       </TextBox>
-      <Button Grid.Column="2" Classes="accent-blue" Command="{Binding AddNewCommand}">
+      <Button Grid.Column="2" Classes="accent-blue" Command="{Binding AddNewCommand}" IsVisible="{Binding CanManage}" >
         <StackPanel Orientation="Horizontal" Spacing="6">
           <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
           <TextBlock Text="NEW PRODUCT"/>
@@ -66,7 +66,8 @@
               <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
               <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
             </StackPanel>
-            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="4">
+            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="4"
+                        IsVisible="{Binding $parent[UserControl].((vm:ProductAdminViewModel)DataContext).CanManage}">
               <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
                 <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
               </Button>

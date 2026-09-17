@@ -33,6 +33,12 @@ public class ReceiptAdmin
     public bool RequireCustomerBeforeCheckout { get; set; }
     public bool AutoPrintReceiptAfterPayment { get; set; }
 
+    // Settings -> Security. Enforced by AutoLockService, configured from
+    // RootViewModel right after login and re-applied live on Save - same
+    // "takes effect immediately" feel as ThemeMode below.
+    public bool AutoLockEnabled { get; set; }
+    public int AutoLockTimeoutMinutes { get; set; } = 15;
+
     // Read by ThemeApplier at startup (desktop only - Android doesn't wire
     // IShopContextService, so the mobile app always renders Light,
     // unchanged from before this setting existed).

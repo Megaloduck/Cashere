@@ -335,16 +335,18 @@
     <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
-   <!-- Admin sidebar navigation -->
+
+ <!-- Admin nav item (icon + label, for a admin sidebar) -->
+ <!-- Group label -->
 <Style Selector="TextBlock.nav-group-label">
   <Setter Property="FontWeight" Value="Bold"/>
   <Setter Property="FontSize" Value="10"/>
   <Setter Property="LetterSpacing" Value="2"/>
   <Setter Property="Foreground" Value="White"/>
   <Setter Property="Margin" Value="12"/>
-</Style>
+</Style>       
 
-        <!-- Desktop nav item (icon + label, for a desktop sidebar) -->
+<!-- Nav item (icon + label) -->
 <Style Selector="Button.nav-item">
   <Setter Property="Background" Value="Transparent"/>
   <Setter Property="BorderThickness" Value="0"/>
@@ -352,46 +354,138 @@
   <Setter Property="HorizontalAlignment" Value="Stretch"/>
   <Setter Property="HorizontalContentAlignment" Value="Left"/>
   <Setter Property="Padding" Value="16,12"/>
+  <Setter Property="Foreground" Value="White"/>
 </Style>
 
+<!-- Default state: icon + text use InkBrush -->
 <Style Selector="Button.nav-item mi|MaterialIcon">
   <Setter Property="Foreground" Value="White"/>
-  <Setter Property="Margin" Value="0,0,12,0"/>
 </Style>
-    
+
 <Style Selector="Button.nav-item TextBlock">
   <Setter Property="Foreground" Value="White"/>
-  <Setter Property="Margin" Value="0,0,12,0"/>
 </Style>
 
-<Style Selector="Button.nav-item TextBlock.nav-label">
+<!-- Label typography -->
+<Style Selector="Button.nav-item TextBlock.setnav-label">
   <Setter Property="FontWeight" Value="Bold"/>
   <Setter Property="FontSize" Value="12"/>
-  <Setter Property="Foreground" Value="White"/>
 </Style>
 
+<!-- Hover state -->
 <Style Selector="Button.nav-item:pointerover">
   <Setter Property="Background" Value="#242424"/>
 </Style>
 
-<Style Selector="Button.nav-item.selected">
-  <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+<Style Selector="Button.nav-item:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="White"/>
 </Style>
 
-<Style Selector="Button.nav-item.selected:pointerover">
+<Style Selector="Button.nav-item:pointerover TextBlock">
+  <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<!-- Selected state -->
+<Style Selector="Button.nav-item.selected">
   <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
 </Style>
 
 <Style Selector="Button.nav-item.selected mi|MaterialIcon">
-  <Setter Property="Foreground" Value="{DynamicResource ChromeBrush}"/>
+  <Setter Property="Foreground" Value="Black"/>
 </Style>
 
-    <Style Selector="Button.nav-item.selected TextBlock">
-  <Setter Property="Foreground" Value="{DynamicResource ChromeBrush}"/>
+<Style Selector="Button.nav-item.selected TextBlock">
+  <Setter Property="Foreground" Value="Black"/>
 </Style>
 
-<Style Selector="Button.nav-item.selected TextBlock.nav-label">
+<!-- Selected + hover -->
+<Style Selector="Button.nav-item.selected:pointerover">
+  <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+</Style>
+
+<Style Selector="Button.nav-item.selected:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<Style Selector="Button.nav-item.selected:pointerover TextBlock">
+  <Setter Property="Foreground" Value="White"/>
+</Style>
+    
+    
+    
+    
+    <!-- Settings nav item (icon + label, for a admin settings sidebar) -->
+       <!-- Group label -->
+<Style Selector="TextBlock.setnav-group-label">
+  <Setter Property="FontWeight" Value="Bold"/>
+  <Setter Property="FontSize" Value="10"/>
+  <Setter Property="LetterSpacing" Value="2"/>
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+  <Setter Property="Margin" Value="12"/>
+</Style>
+
+<!-- Nav item (icon + label) -->
+<Style Selector="Button.setnav-item">
+  <Setter Property="Background" Value="Transparent"/>
+  <Setter Property="BorderThickness" Value="0"/>
+  <Setter Property="CornerRadius" Value="0"/>
+  <Setter Property="HorizontalAlignment" Value="Stretch"/>
+  <Setter Property="HorizontalContentAlignment" Value="Left"/>
+  <Setter Property="Padding" Value="16,12"/>
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<!-- Default state: icon + text use InkBrush -->
+<Style Selector="Button.setnav-item mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.setnav-item TextBlock">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<!-- Label typography -->
+<Style Selector="Button.setnav-item TextBlock.setnav-label">
+  <Setter Property="FontWeight" Value="Bold"/>
+  <Setter Property="FontSize" Value="12"/>
+</Style>
+
+<!-- Hover state -->
+<Style Selector="Button.setnav-item:pointerover">
+  <Setter Property="Background" Value="#242424"/>
+</Style>
+
+<Style Selector="Button.setnav-item:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.setnav-item:pointerover TextBlock">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<!-- Selected state -->
+<Style Selector="Button.setnav-item.selected">
+  <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
+</Style>
+
+<Style Selector="Button.setnav-item.selected mi|MaterialIcon">
+  <Setter Property="Foreground" Value="Black"/>
+</Style>
+
+<Style Selector="Button.setnav-item.selected TextBlock">
+  <Setter Property="Foreground" Value="Black"/>
+</Style>
+
+<!-- Selected + hover -->
+<Style Selector="Button.setnav-item.selected:pointerover">
+  <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+</Style>
+
+<Style Selector="Button.setnav-item.selected:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.setnav-item.selected:pointerover TextBlock">
   <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
 </Style>
 
@@ -454,9 +548,11 @@
     <Setter Property="Opacity" Value="0.4"/>
   </Style>
 
+    <!-- Button accent-blue children -->
+
   <Style Selector="Button.accent-blue">
     <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="White"/>
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-blue:pointerover">
@@ -465,9 +561,29 @@
       <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
   </Style>
 
+<!-- Force children to inherit foreground -->
+<Style Selector="Button.accent-blue TextBlock">
+  <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<Style Selector="Button.accent-blue mi|MaterialIcon">
+  <Setter Property="Foreground" Value="White"/>
+</Style>
+
+<!-- Hover state for children -->
+<Style Selector="Button.accent-blue:pointerover TextBlock">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.accent-blue:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+        <!-- Button accent-red children -->
+
   <Style Selector="Button.accent-red">
     <Setter Property="Background" Value="{DynamicResource RedBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource PaperBrush}"/>
+    <Setter Property="Foreground" Value="White"/>
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-red:pointerover">
@@ -476,9 +592,11 @@
       <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}"/>
   </Style>
 
+            <!-- Button accent-yellow children -->
+
   <Style Selector="Button.accent-yellow">
     <Setter Property="Background" Value="{DynamicResource YellowBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Foreground" Value="Black"/>
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
   </Style>
   <Style Selector="Button.accent-yellow:pointerover">
@@ -558,6 +676,12 @@
   <Style Selector="Border.rule-thick">
     <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
     <Setter Property="Height" Value="3"/>
+  </Style>
+
+    <Style Selector="Border.rule-thick-vertical">
+    <Setter Property="Background" Value="{DynamicResource InkBrush}"/>
+    <Setter Property="Width" Value="3"/>
+
   </Style>
 
 </Styles>

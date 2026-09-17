@@ -84,4 +84,15 @@ public class ShopContextService : IShopContextService
             settings?.RequireCustomerBeforeCheckout ?? false,
             settings?.AutoPrintReceiptAfterPayment ?? false);
     }
-}   
+
+    public async Task<SecuritySettings> GetSecuritySettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        var timeoutMinutes = settings?.AutoLockTimeoutMinutes ?? 15;
+        if (timeoutMinutes <= 0) timeoutMinutes = 15;
+
+        return new SecuritySettings(settings?.AutoLockEnabled ?? false, timeoutMinutes);
+    }
+}

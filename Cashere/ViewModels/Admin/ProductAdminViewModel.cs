@@ -16,6 +16,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     private readonly IProductAdminService _productAdmin;
     private readonly ICategoryAdminService _categoryAdmin;
     private readonly IShopContextService? _shopContext;
+    private readonly UserRole _currentRole;
 
     private List<Product> _allProducts = new();
     private int? _editingProductId;
@@ -23,6 +24,13 @@ public partial class ProductAdminViewModel : ViewModelBase
 
     public ObservableCollection<Product> FilteredProducts { get; } = new();
     public ObservableCollection<Category> Categories { get; } = new();
+
+    // Drives visibility of every mutating control on this screen (NEW
+    // PRODUCT, Edit, Activate/Deactivate, Remove photo) - Cashier logins see
+    // the same product list but none of these. Guarded again inside each
+    // command below as defense-in-depth, same philosophy as SaleService
+    // re-checking settings CheckoutViewModel already gates on.
+    public bool CanManage => RolePermissions.CanManage(_currentRole);
 
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -56,10 +64,12 @@ public partial class ProductAdminViewModel : ViewModelBase
     public ProductAdminViewModel(
         IProductAdminService productAdmin,
         ICategoryAdminService categoryAdmin,
+        UserRole currentRole,
         IShopContextService? shopContext = null)
     {
         _productAdmin = productAdmin;
         _categoryAdmin = categoryAdmin;
+        _currentRole = currentRole;
         _shopContext = shopContext;
     }
 
@@ -102,6 +112,8 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private void AddNew()
     {
+        if (!CanManage) return;
+
         _editingProductId = null;
         EditorTitle = "NEW PRODUCT";
         FormSku = string.Empty;
@@ -120,7 +132,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private void EditProduct(Product? product)
     {
-        if (product is null) return;
+        if (!CanManage || product is null) return;
 
         _editingProductId = product.Id;
         EditorTitle = "EDIT PRODUCT";
@@ -140,7 +152,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task ToggleActive(Product? product)
     {
-        if (product is null) return;
+        if (!CanManage || product is null) return;
         await _productAdmin.SetActiveAsync(product.Id, !product.IsActive);
         await LoadAsync();
     }
@@ -148,7 +160,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task RemovePhoto(Product? product)
     {
-        if (product is null) return;
+        if (!CanManage || product is null) return;
         await _productAdmin.SetPhotoPathAsync(product.Id, null);
         await LoadAsync();
     }
@@ -156,7 +168,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task AddCategory()
     {
-        if (string.IsNullOrWhiteSpace(NewCategoryName)) return;
+        if (!CanManage || string.IsNullOrWhiteSpace(NewCategoryName)) return;
 
         try
         {
@@ -174,6 +186,8 @@ public partial class ProductAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task Save()
     {
+        if (!CanManage) return;
+
         ErrorMessage = null;
 
         var isNewProduct = _editingProductId is null;

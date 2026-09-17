@@ -73,13 +73,13 @@
                   <StackPanel Margin="20,22,20,10" Spacing="3">
                     <TextBlock Text="{Binding ShopName}" FontFamily="Consolas,Courier New,monospace"
                                FontWeight="Black" FontSize="15" HorizontalAlignment="Center"
-                               TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource InkBrush}"/>
+                               TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource ChromaBrush}"/>
                     <TextBlock Text="{Binding Address}" FontFamily="Consolas,Courier New,monospace"
                                FontSize="10.5" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
-                               IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource InkBrush}"/>
+                               IsVisible="{Binding Address, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource ChromaBrush}"/>
                     <TextBlock Text="{Binding Phone}" FontFamily="Consolas,Courier New,monospace"
                                FontSize="10.5" HorizontalAlignment="Center"
-                               IsVisible="{Binding Phone, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource InkBrush}"/>
+                               IsVisible="{Binding Phone, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Foreground="{DynamicResource ChromaBrush}"/>
                   </StackPanel>
 
                   <TextBlock Text="------------------------------------"

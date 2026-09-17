@@ -5,13 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Cashere.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Cashere.Services
 {
     public record PaymentSettings(
@@ -45,6 +38,11 @@ namespace Cashere.Services
         bool RequireCustomerBeforeCheckout,
         bool AutoPrintReceiptAfterPayment);
 
+    // Read by RootViewModel right after login (to arm AutoLockService) and
+    // by SecuritySettingsViewModel (to populate the toggle/picker) - see
+    // Settings -> Security.
+    public record SecuritySettings(bool AutoLockEnabled, int AutoLockTimeoutMinutes);
+
     public interface IShopContextService
     {
         Task<Cashier?> GetDefaultCashierAsync();
@@ -54,5 +52,6 @@ namespace Cashere.Services
         Task UpdateSettingsAsync(ReceiptAdmin settings);
         Task<PaymentSettings> GetPaymentSettingsAsync();
         Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync();
+        Task<SecuritySettings> GetSecuritySettingsAsync();
     }
 }

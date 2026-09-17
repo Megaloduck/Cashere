@@ -3,16 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cashere.Services;
-using Cashere.ViewModels.Admin.Settings;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Cashere.Models;
 using Cashere.Services;
 using Cashere.ViewModels.Admin.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -82,17 +73,21 @@ public partial class AdminViewModel : ViewModelBase
         IDataBackupService dataBackup,
         IAboutInfoService aboutInfo,
         int currentCashierId,
+        UserRole currentRole,
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null)
     {
-        Products = new ProductAdminViewModel(productAdmin, categoryAdmin, shopContext);
+        Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
         Purchases = new PurchaseAdminViewModel(purchaseAdmin, supplierAdmin, productCatalog, currentCashierId);
         Cashiers = new CashierAdminViewModel(cashierAdmin);
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport);
         SalesReport = new SalesReportViewModel(salesReport);
-        Settings = new SettingsShellViewModel(shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, currentCashierId);
+        Settings = new SettingsShellViewModel(
+            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, cashierAdmin, currentCashierId);
+
+        Settings.ManageCashiersRequested += () => SelectedSection = AdminSection.Cashiers;
     }
 
     public async Task InitializeAsync()
