@@ -17,7 +17,13 @@ namespace Cashere.Services
         decimal TaxRatePercent,
         PaymentMethod PaymentMethod,
         decimal AmountTendered,
-        string? PaymentReferenceNumber);
+        string? PaymentReferenceNumber,
+        // Optional - when set, SaleService re-validates and computes the
+        // authoritative discount server-side, overriding whatever
+        // DiscountAmount the UI cached. Null for a plain sale with no
+        // voucher (DiscountAmount above is used as-is, unchanged from before
+        // this field existed).
+        string? VoucherCode = null);
 
     public record CompletedSaleResult(
         int SaleId,
@@ -47,10 +53,23 @@ namespace Cashere.Services
         }
     }
 
+    // Thrown when a voucher code passed to CompleteSaleAsync fails
+    // server-side re-validation (doesn't exist, inactive, expired, or its
+    // usage cap was hit by someone else between the cart preview and
+    // checkout) - CheckoutViewModel catches this the same way it catches
+    // InsufficientStockException.
+    public class InvalidVoucherException : Exception
+    {
+        public string Code { get; }
+
+        public InvalidVoucherException(string code, string reason) : base(reason)
+        {
+            Code = code;
+        }
+    }
+
     public interface ISaleService
     {
         Task<CompletedSaleResult> CompleteSaleAsync(CompleteSaleRequest request);
     }
-
-
 }

@@ -64,6 +64,15 @@
               </StackPanel>
             </Button>
 
+            <TextBlock Text="PROMOTIONS" Classes="nav-group-label"/>
+            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Vouchers}"
+                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Vouchers}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <mi:MaterialIcon Kind="TicketPercentOutline" Width="18" Height="18"/>
+                <TextBlock Text="VOUCHERS"/>
+              </StackPanel>
+            </Button>
+
             <TextBlock Text="PEOPLE" Classes="nav-group-label"/>
             <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Customers}"
                     Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}">

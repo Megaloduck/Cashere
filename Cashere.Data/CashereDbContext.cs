@@ -27,6 +27,8 @@ public class CashereDbContext : DbContext
     public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
     public DbSet<Refund> Refunds => Set<Refund>();
     public DbSet<RefundLineItem> RefundLineItems => Set<RefundLineItem>();
+    public DbSet<Voucher> Vouchers => Set<Voucher>();
+    public DbSet<VoucherRedemption> VoucherRedemptions => Set<VoucherRedemption>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

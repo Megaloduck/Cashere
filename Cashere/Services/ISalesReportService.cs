@@ -39,7 +39,10 @@ public record SaleDetail(
     IReadOnlyList<RefundHistoryEntry> Refunds)
 {
     public decimal TotalCost => Lines.Sum(l => l.UnitCostAtSale * l.Quantity);
-    public decimal GrossProfit => Subtotal - TotalCost;
+    // Discount now subtracted - a Rp 20,000 sale with a Rp 5,000 voucher and
+    // Rp 12,000 of cost previously reported Rp 8,000 profit (ignoring the
+    // discount entirely); it's Rp 3,000 now.
+    public decimal GrossProfit => Subtotal - DiscountAmount - TotalCost;
     public decimal TotalRefunded => Refunds.Sum(r => r.TotalAmount);
 }
 

@@ -9,16 +9,6 @@ using Cashere.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Cashere.Models;
-using Cashere.Services;
-using Cashere.ViewModels;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
 namespace Cashere.ViewModels.Pos;
 
 public partial class CheckoutViewModel : ViewModelBase
@@ -70,9 +60,6 @@ public partial class CheckoutViewModel : ViewModelBase
 
     public bool IsConfirmationRequired => _paymentSettings.RequireConfirmationForNonCash && IsNonCashPayment;
 
-    // Settings -> Sales Behavior. When on, Complete Sale stays disabled
-    // until a customer is picked - SaleService independently re-checks this
-    // at completion as a backstop, same pattern as payment methods.
     public bool IsCustomerRequired => _salesBehaviorSettings.RequireCustomerBeforeCheckout;
 
     public bool CanComplete =>
@@ -152,12 +139,17 @@ public partial class CheckoutViewModel : ViewModelBase
                 TaxRatePercent: _cart.TaxRatePercent,
                 PaymentMethod: this.PaymentMethod,
                 AmountTendered: IsCashPayment ? AmountTendered : TotalDue,
-                PaymentReferenceNumber: IsCashPayment ? null : ReferenceNumber);
+                PaymentReferenceNumber: IsCashPayment ? null : ReferenceNumber,
+                VoucherCode: _cart.AppliedVoucherCode);
 
             var result = await _saleService.CompleteSaleAsync(request);
             SaleCompleted?.Invoke(result);
         }
         catch (InsufficientStockException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (InvalidVoucherException ex)
         {
             ErrorMessage = ex.Message;
         }

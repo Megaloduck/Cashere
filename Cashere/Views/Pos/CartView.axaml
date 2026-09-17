@@ -48,9 +48,39 @@
       <Border Grid.Row="3" Classes="rule-thick" Margin="0,8,0,12"/>
 
       <StackPanel Grid.Row="4" Spacing="8">
+
+        <StackPanel Spacing="6" IsVisible="{Binding AppliedVoucherCode, Converter={x:Static ObjectConverters.IsNull}}">
+        
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox Grid.Column="0" Text="{Binding VoucherCodeInput}" Watermark="Enter a Voucher code"/>
+            <Button Grid.Column="1" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding ApplyVoucherCommand}" IsEnabled="{Binding !IsApplyingVoucher}">
+              <mi:MaterialIcon Kind="TicketPercentOutline" Width="16" Height="16"/>
+            </Button>
+          </Grid>
+        </StackPanel>
+
+        <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="10,6"
+                IsVisible="{Binding AppliedVoucherCode, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0" Text="{Binding AppliedVoucherCode, StringFormat='VOUCHER: {0}'}" FontWeight="Black" Foreground="Black" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Classes="ghost" Command="{Binding RemoveVoucherCommand}" ToolTip.Tip="Remove voucher">
+              <mi:MaterialIcon Kind="CloseCircleOutline" Width="16" Height="16"/>
+            </Button>
+          </Grid>
+        </Border>
+
+        <TextBlock Text="{Binding VoucherErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                   IsVisible="{Binding VoucherErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+        <Border Classes="rule-thick" Margin="0,4"/>
+
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Grid.Column="0" Text="SUBTOTAL" Classes="eyebrow"/>
           <TextBlock Grid.Column="1" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="DISCOUNT" Classes="eyebrow"/>
+          <TextBlock Grid.Column="1" Text="{Binding DiscountAmount, StringFormat='-Rp {0:N0}'}" FontWeight="Bold" Foreground="{StaticResource RedBrush}"/>
         </Grid>
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Grid.Column="0" Text="TAX" Classes="eyebrow"/>
@@ -65,4 +95,4 @@
       </StackPanel>
     </Grid>
   </Border>
-</UserControl>  
+</UserControl>

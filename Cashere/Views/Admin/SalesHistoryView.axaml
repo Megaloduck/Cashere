@@ -54,6 +54,7 @@
       <TextBlock Grid.Column="4" Text="ITEMS" Classes="eyebrow"/>
       <TextBlock Grid.Column="5" Text="STATUS" Classes="eyebrow"/>
       <TextBlock Grid.Column="6" Text="TOTAL" Classes="eyebrow"/>
+      <TextBlock Grid.Column="7" Text="ACTIONS" Classes="eyebrow"/>
     </Grid>
     <Border Grid.Row="2" Classes="rule-thick" VerticalAlignment="Bottom"/>
 
@@ -204,7 +205,7 @@
             </Button>
           </Grid>
 
-          <Button Classes="accent-blue" Command="{Binding CloseDetailCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+          <Button Classes="accent-blue  " Command="{Binding CloseDetailCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <mi:MaterialIcon Kind="Close" Width="16" Height="16"/>
               <TextBlock Text="CLOSE"/>

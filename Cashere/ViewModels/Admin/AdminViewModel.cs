@@ -20,6 +20,7 @@ public partial class AdminViewModel : ViewModelBase
     public CustomerAdminViewModel Customers { get; }
     public SalesHistoryViewModel SalesHistory { get; }
     public SalesReportViewModel SalesReport { get; }
+    public VoucherAdminViewModel Vouchers { get; }
 
     public SettingsShellViewModel Settings { get; }
 
@@ -38,6 +39,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.Cashiers => Cashiers,
         AdminSection.SalesHistory => SalesHistory,
         AdminSection.SalesReport => SalesReport,
+        AdminSection.Vouchers => Vouchers,
         AdminSection.Settings => Settings,
         _ => Products
     };
@@ -51,6 +53,7 @@ public partial class AdminViewModel : ViewModelBase
         AdminSection.Cashiers => "CASHIERS",
         AdminSection.SalesHistory => "SALES HISTORY",
         AdminSection.SalesReport => "REPORTS",
+        AdminSection.Vouchers => "VOUCHERS",
         AdminSection.Settings => "SETTINGS",
         _ => "ADMIN"
     };
@@ -72,7 +75,8 @@ public partial class AdminViewModel : ViewModelBase
         UserRole currentRole,
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null,
-        IRefundService? refundService = null)
+        IRefundService? refundService = null,
+        IVoucherAdminService? voucherAdmin = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
@@ -81,6 +85,7 @@ public partial class AdminViewModel : ViewModelBase
         Customers = new CustomerAdminViewModel(customerAdmin);
         SalesHistory = new SalesHistoryViewModel(salesReport, currentRole, currentCashierId, refundService);
         SalesReport = new SalesReportViewModel(salesReport);
+        Vouchers = new VoucherAdminViewModel(voucherAdmin, currentRole);
         Settings = new SettingsShellViewModel(
             shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, cashierAdmin, currentCashierId);
 
@@ -96,6 +101,7 @@ public partial class AdminViewModel : ViewModelBase
         await Customers.LoadAsync();
         await SalesHistory.LoadAsync();
         await SalesReport.LoadAsync();
+        await Vouchers.LoadAsync();
         await Settings.InitializeAsync();
     }
 

@@ -28,5 +28,6 @@ namespace Cashere.Services
         public static IDataBackupService? DataBackup { get; set; }
         public static IAboutInfoService? AboutInfo { get; set; }
         public static IRefundService? RefundService { get; set; }
+        public static IVoucherAdminService? VoucherAdmin { get; set; }
     }
 }

@@ -81,12 +81,6 @@ public class SalesReportService : ISalesReportService
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         var (from, toExclusive) = NormalizeRange(fromDate, toDate);
 
-        // Voided sales never counted as real income, same as before. A
-        // partially-refunded sale still generated real revenue for whatever
-        // wasn't given back, so it stays in - NetRevenue/NetCost below
-        // subtract out exactly the quantity that was returned per line, so
-        // a fully-Refunded sale nets to zero on its own without needing a
-        // separate exclusion for it.
         var sales = await db.Sales
             .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive &&
                         (s.Status == SaleStatus.Completed || s.Status == SaleStatus.PartiallyRefunded))
@@ -100,12 +94,17 @@ public class SalesReportService : ISalesReportService
             .Select(g =>
             {
                 var revenue = g.Sum(NetRevenue);
+                var discount = g.Sum(s => s.DiscountAmount);
                 var cost = g.Sum(NetCost);
-                return new DailySalesRow(g.Key, g.Count(), revenue, cost, revenue - cost);
+                // Discount subtracted here now too, so the daily PROFIT
+                // column matches the summary card above it instead of
+                // silently running higher.
+                return new DailySalesRow(g.Key, g.Count(), revenue, cost, revenue - discount - cost);
             })
             .ToList();
 
         var totalRevenue = sales.Sum(NetRevenue);
+        var totalDiscount = sales.Sum(s => s.DiscountAmount);
         var totalCost = sales.Sum(NetCost);
 
         return new SalesReportSummary(
@@ -113,10 +112,10 @@ public class SalesReportService : ISalesReportService
             toExclusive.AddDays(-1),
             sales.Count,
             totalRevenue,
-            sales.Sum(s => s.DiscountAmount),
+            totalDiscount,
             sales.Sum(s => s.TaxAmount),
             totalCost,
-            totalRevenue - totalCost,
+            totalRevenue - totalDiscount - totalCost,
             dailyBreakdown);
     }
 

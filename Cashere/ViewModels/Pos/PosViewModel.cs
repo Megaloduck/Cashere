@@ -19,9 +19,6 @@ public partial class PosViewModel : ViewModelBase
     private readonly ICustomerAdminService? _customerAdmin;
     private readonly IReceiptPrinterService? _receiptPrinter;
 
-    // Refreshed on InitializeAsync and whenever the cashier returns from
-    // Admin (see ShellViewModel.ShowPos), so any of these three take effect
-    // on the very next checkout without an app restart.
     private PaymentSettings _paymentSettings = new(true, true, true, null, null, false);
     private SalesBehaviorSettings _salesBehaviorSettings = new(false, false);
     private List<Customer> _customers = new();
@@ -51,7 +48,8 @@ public partial class PosViewModel : ViewModelBase
         int cashierId,
         string cashierName,
         ICustomerAdminService? customerAdmin = null,
-        IReceiptPrinterService? receiptPrinter = null)
+        IReceiptPrinterService? receiptPrinter = null,
+        IVoucherAdminService? voucherAdmin = null)
     {
         _catalog = catalog;
         _saleService = saleService;
@@ -64,7 +62,7 @@ public partial class PosViewModel : ViewModelBase
         ProductPicker = new ProductPickerViewModel(catalog);
         ProductPicker.ProductSelected += OnProductSelected;
 
-        Cart = new CartViewModel { TaxRatePercent = taxRatePercent };
+        Cart = new CartViewModel(voucherAdmin) { TaxRatePercent = taxRatePercent };
     }
 
     public async Task InitializeAsync()
@@ -116,13 +114,6 @@ public partial class PosViewModel : ViewModelBase
         LastReceiptSummary =
             $"Sale {result.SaleNumber} complete - total Rp {result.TotalAmount:N0}, change Rp {result.ChangeDue:N0}";
 
-        // Materialize everything the receipt needs before CloseCheckout()/
-        // Cart.Clear() below run. Checkout's own properties stay valid on
-        // this captured reference regardless of CloseCheckout() nulling
-        // PosViewModel.Checkout (that only clears the field, not the
-        // object) - but Cart.Lines has to be copied out synchronously, now,
-        // before Clear() empties it and before the fire-and-forget task
-        // below gets a chance to run past its first await.
         if (_salesBehaviorSettings.AutoPrintReceiptAfterPayment && _receiptPrinter is not null && Checkout is not null)
         {
             var lines = Cart.Lines.Select(l => new SaleReceiptLine(l.Name, l.Quantity, l.Subtotal)).ToList();
@@ -172,8 +163,6 @@ public partial class PosViewModel : ViewModelBase
         }
         catch
         {
-            // Best-effort - a failed auto-print shouldn't affect a checkout
-            // that already succeeded and was already recorded.
         }
     }
 

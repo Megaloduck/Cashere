@@ -29,6 +29,7 @@ public partial class RootViewModel : ViewModelBase
     private readonly IConnectedDeviceService? _connectedDevices;
     private readonly IReceiptPrinterService? _receiptPrinter;
     private readonly IRefundService? _refundService;
+    private readonly IVoucherAdminService? _voucherAdmin;
 
     [ObservableProperty]
     private ViewModelBase _currentView = null!;
@@ -49,7 +50,8 @@ public partial class RootViewModel : ViewModelBase
         IAboutInfoService aboutInfo,
         IConnectedDeviceService? connectedDevices,
         IReceiptPrinterService? receiptPrinter,
-        IRefundService? refundService)
+        IRefundService? refundService,
+        IVoucherAdminService? voucherAdmin)
     {
         _productCatalog = productCatalog;
         _saleService = saleService;
@@ -67,6 +69,7 @@ public partial class RootViewModel : ViewModelBase
         _connectedDevices = connectedDevices;
         _receiptPrinter = receiptPrinter;
         _refundService = refundService;
+        _voucherAdmin = voucherAdmin;
 
         AutoLockService.LockTriggered += OnAutoLockTriggered;
     }
@@ -115,7 +118,8 @@ public partial class RootViewModel : ViewModelBase
             cashier.Id,
             cashier.DisplayName,
             _customerAdmin,
-            _receiptPrinter);
+            _receiptPrinter,
+            _voucherAdmin);
 
         var adminViewModel = new AdminViewModel(
             _productAdmin,
@@ -134,7 +138,8 @@ public partial class RootViewModel : ViewModelBase
             cashier.Role,
             _connectedDevices,
             _receiptPrinter,
-            _refundService);
+            _refundService,
+            _voucherAdmin);
 
         var shell = new ShellViewModel(posViewModel, adminViewModel);
         shell.LogoutRequested += OnLogoutRequested;

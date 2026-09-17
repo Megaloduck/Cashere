@@ -45,9 +45,6 @@ public class SaleService : ISaleService
                 $"{request.PaymentMethod} is currently disabled in Settings -> Payments.");
         }
 
-        // Defense-in-depth: CheckoutViewModel already disables Complete Sale
-        // until a customer is picked when this is on, but a stale UI or a
-        // future non-desktop client shouldn't be able to bypass it.
         if ((settings?.RequireCustomerBeforeCheckout ?? false) && request.CustomerId is null)
         {
             throw new InvalidOperationException(
@@ -72,9 +69,43 @@ public class SaleService : ISaleService
         }
 
         var subtotal = request.Lines.Sum(l => l.UnitPrice * l.Quantity);
+
+        // Server-side re-validation, same defense-in-depth spirit as the
+        // stock check above: the cart already previewed this discount, but
+        // the voucher could have expired or been used up by another till in
+        // the gap between preview and this commit, so the authoritative
+        // amount is always computed fresh here, never trusted from the UI.
+        Voucher? voucher = null;
+        var effectiveDiscount = request.DiscountAmount;
+
+        if (!string.IsNullOrWhiteSpace(request.VoucherCode))
+        {
+            var normalizedCode = request.VoucherCode.Trim().ToUpperInvariant();
+            voucher = await db.Vouchers.FirstOrDefaultAsync(v => v.Code == normalizedCode);
+
+            if (voucher is null)
+            {
+                throw new InvalidVoucherException(normalizedCode, "That voucher code doesn't exist.");
+            }
+            if (!voucher.IsActive)
+            {
+                throw new InvalidVoucherException(normalizedCode, "This voucher is no longer active.");
+            }
+            if (voucher.ExpiresAt is not null && voucher.ExpiresAt < DateTime.UtcNow)
+            {
+                throw new InvalidVoucherException(normalizedCode, "This voucher has expired.");
+            }
+            if (voucher.MaxUsageCount is int max && voucher.UsageCount >= max)
+            {
+                throw new InvalidVoucherException(normalizedCode, "This voucher has already been fully redeemed.");
+            }
+
+            effectiveDiscount = VoucherAdminService.ComputeDiscount(voucher.DiscountType, voucher.DiscountValue, subtotal);
+        }
+
         var taxAmount = Math.Round(
-            (subtotal - request.DiscountAmount) * (request.TaxRatePercent / 100m), 2, MidpointRounding.AwayFromZero);
-        var totalAmount = subtotal - request.DiscountAmount + taxAmount;
+            (subtotal - effectiveDiscount) * (request.TaxRatePercent / 100m), 2, MidpointRounding.AwayFromZero);
+        var totalAmount = subtotal - effectiveDiscount + taxAmount;
 
         var todayUtc = DateTime.UtcNow.Date;
         var tomorrowUtc = todayUtc.AddDays(1);
@@ -88,7 +119,7 @@ public class SaleService : ISaleService
             CustomerId = request.CustomerId,
             SaleDate = DateTime.UtcNow,
             Subtotal = subtotal,
-            DiscountAmount = request.DiscountAmount,
+            DiscountAmount = effectiveDiscount,
             TaxAmount = taxAmount,
             TotalAmount = totalAmount,
             Status = SaleStatus.Completed
@@ -135,6 +166,18 @@ public class SaleService : ISaleService
             });
         }
 
+        if (voucher is not null)
+        {
+            voucher.UsageCount += 1;
+            db.VoucherRedemptions.Add(new VoucherRedemption
+            {
+                VoucherId = voucher.Id,
+                SaleId = sale.Id,
+                DiscountAmount = effectiveDiscount,
+                RedeemedAt = DateTime.UtcNow
+            });
+        }
+
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
 
@@ -143,6 +186,6 @@ public class SaleService : ISaleService
             : 0;
 
         return new CompletedSaleResult(
-            sale.Id, sale.SaleNumber, subtotal, request.DiscountAmount, taxAmount, totalAmount, changeDue, sale.SaleDate);
+            sale.Id, sale.SaleNumber, subtotal, effectiveDiscount, taxAmount, totalAmount, changeDue, sale.SaleDate);
     }
 }

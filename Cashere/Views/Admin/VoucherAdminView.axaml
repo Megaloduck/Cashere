@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
+             xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:converters="clr-namespace:Cashere.Converters"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+             x:Class="Cashere.Views.Admin.VoucherAdminView"
+             x:DataType="vm:VoucherAdminViewModel">
+  <UserControl.Resources>
+    <converters:EnumMatchConverter x:Key="EnumMatch"/>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,Auto,*" Margin="12" IsVisible="{Binding IsServiceAvailable}">
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+      <TextBlock Grid.Column="0" Text="VOUCHERS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
+      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding AddNewCommand}" IsVisible="{Binding CanManage}">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          <TextBlock Text="NEW VOUCHER"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="1.2*,1.2*,1*,1*,Auto,150" Margin="0,0,0,4">
+      <TextBlock Grid.Column="0" Text="CODE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="1" Text="DISCOUNT" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="USAGE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="EXPIRES" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="STATUS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="5" Text="ACTIONS" Classes="eyebrow"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl ItemsSource="{Binding Vouchers}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Voucher">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="1.2*,1.2*,1*,1*,Auto,150">
+                <TextBlock Grid.Column="0" Text="{Binding Code}" FontWeight="Black" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding DiscountValue, StringFormat='{}{0}% OFF'}"
+                             IsVisible="{Binding DiscountType, Converter={StaticResource EnumMatch}, ConverterParameter=Percentage}"/>
+                  <TextBlock Text="{Binding DiscountValue, StringFormat='Rp {0:N0} OFF'}"
+                             IsVisible="{Binding DiscountType, Converter={StaticResource EnumMatch}, ConverterParameter=FixedAmount}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding UsageCount, StringFormat='USED: {0}'}" FontSize="11"/>
+                  <TextBlock Text="{Binding MaxUsageCount, StringFormat='LIMIT: {0}'}" FontSize="11" Foreground="{StaticResource GrayBrush}"
+                             IsVisible="{Binding MaxUsageCount, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                  <TextBlock Text="UNLIMITED" FontSize="11" Foreground="{StaticResource GrayBrush}"
+                             IsVisible="{Binding MaxUsageCount, Converter={x:Static ObjectConverters.IsNull}}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="3" Text="{Binding ExpiresAt, StringFormat='{}{0:dd MMM yyyy}', TargetNullValue='NEVER'}" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                  <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+                  <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4"
+                            IsVisible="{Binding $parent[UserControl].((vm:VoucherAdminViewModel)DataContext).CanManage}">
+                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
+                    <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
+                    <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnDeleteClick" ToolTip.Tip="Delete">
+                    <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                  </Button>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
+      <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
+          <Border Classes="rule-thick"/>
+
+          <TextBlock Text="CODE" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormCode}" IsEnabled="{Binding !IsEditingExistingVoucher}"/>
+          <TextBlock Text="Leave blank to auto-generate a code" FontSize="10" Foreground="{StaticResource GrayBrush}"
+                     IsVisible="{Binding !IsEditingExistingVoucher}"/>
+
+          <TextBlock Text="DISCOUNT TYPE" Classes="eyebrow"/>
+          <ComboBox ItemsSource="{Binding DiscountTypes}" SelectedItem="{Binding FormDiscountType}" HorizontalAlignment="Stretch"/>
+
+          <TextBlock Text="DISCOUNT VALUE" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormDiscountValue}"/>
+
+          <TextBlock Text="USAGE LIMIT (BLANK = UNLIMITED)" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormMaxUsageCount}" Watermark="e.g. 1 for single-use"/>
+
+          <TextBlock Text="EXPIRES (OPTIONAL)" Classes="eyebrow"/>
+          <DatePicker SelectedDate="{Binding FormExpiresAt}"/>
+
+          <TextBlock Text="NOTES (OPTIONAL)" Classes="eyebrow"/>
+          <TextBox Text="{Binding FormNotes}" AcceptsReturn="True" Height="50"/>
+
+          <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+          <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+            <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+            <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+  </Grid>
+</UserControl>
