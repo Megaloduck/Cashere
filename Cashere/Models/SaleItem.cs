@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Cashere.Models;
 
 public class SaleItem
@@ -9,7 +11,8 @@ public class SaleItem
     public Product Product { get; set; } = null!;
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
-    // Captured at sale time so profit reports stay accurate even if the product's cost changes later.
     public decimal UnitCostAtSale { get; set; }
     public decimal Subtotal { get; set; }
+
+    public ICollection<RefundLineItem> RefundLineItems { get; set; } = new List<RefundLineItem>();
 }

@@ -605,6 +605,24 @@
       <Setter Property="BorderBrush" Value="{DynamicResource YellowBrush}"/>
   </Style>
 
+    <!-- Force children to use Black in default state -->
+<Style Selector="Button.accent-yellow TextBlock">
+  <Setter Property="Foreground" Value="Black"/>
+</Style>
+
+<Style Selector="Button.accent-yellow mi|MaterialIcon">
+  <Setter Property="Foreground" Value="Black"/>
+</Style>
+
+<!-- Hover: children follow accent-yellow -->
+<Style Selector="Button.accent-yellow:pointerover TextBlock">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
+<Style Selector="Button.accent-yellow:pointerover mi|MaterialIcon">
+  <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
+</Style>
+
   <Style Selector="Button.ghost">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>

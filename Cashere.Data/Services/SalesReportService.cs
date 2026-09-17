@@ -23,10 +23,6 @@ public class SalesReportService : ISalesReportService
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         var (from, toExclusive) = NormalizeRange(fromDate, toDate);
 
-        // No .Include() needed here - the final Select projects only specific
-        // scalar fields, so EF Core translates Cashier/Customer access and
-        // Items.Count straight into SQL joins/subqueries instead of loading
-        // full entity graphs.
         return await db.Sales
             .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive)
             .OrderByDescending(s => s.SaleDate)
@@ -51,6 +47,7 @@ public class SalesReportService : ISalesReportService
             .Include(s => s.Customer)
             .Include(s => s.Items).ThenInclude(i => i.Product)
             .Include(s => s.Payments)
+            .Include(s => s.Refunds).ThenInclude(r => r.ProcessedByCashier)
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == saleId);
 
@@ -72,6 +69,10 @@ public class SalesReportService : ISalesReportService
                 .ToList(),
             sale.Payments
                 .Select(p => new SalePaymentDetail(p.Method, p.Amount, p.ReferenceNumber))
+                .ToList(),
+            sale.Refunds
+                .OrderByDescending(r => r.RefundDate)
+                .Select(r => new RefundHistoryEntry(r.RefundDate, r.ProcessedByCashier.DisplayName, r.TotalAmount, r.IsVoid, r.Reason))
                 .ToList());
     }
 
@@ -80,11 +81,16 @@ public class SalesReportService : ISalesReportService
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         var (from, toExclusive) = NormalizeRange(fromDate, toDate);
 
-        // Voided/refunded sales stay visible in Sales History for audit
-        // purposes but are excluded here - they never counted as real income.
+        // Voided sales never counted as real income, same as before. A
+        // partially-refunded sale still generated real revenue for whatever
+        // wasn't given back, so it stays in - NetRevenue/NetCost below
+        // subtract out exactly the quantity that was returned per line, so
+        // a fully-Refunded sale nets to zero on its own without needing a
+        // separate exclusion for it.
         var sales = await db.Sales
-            .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive && s.Status == SaleStatus.Completed)
-            .Include(s => s.Items)
+            .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive &&
+                        (s.Status == SaleStatus.Completed || s.Status == SaleStatus.PartiallyRefunded))
+            .Include(s => s.Items).ThenInclude(i => i.RefundLineItems)
             .AsNoTracking()
             .ToListAsync();
 
@@ -93,14 +99,14 @@ public class SalesReportService : ISalesReportService
             .OrderBy(g => g.Key)
             .Select(g =>
             {
-                var revenue = g.Sum(s => s.Subtotal);
-                var cost = g.Sum(s => s.Items.Sum(i => i.UnitCostAtSale * i.Quantity));
+                var revenue = g.Sum(NetRevenue);
+                var cost = g.Sum(NetCost);
                 return new DailySalesRow(g.Key, g.Count(), revenue, cost, revenue - cost);
             })
             .ToList();
 
-        var totalRevenue = sales.Sum(s => s.Subtotal);
-        var totalCost = sales.Sum(s => s.Items.Sum(i => i.UnitCostAtSale * i.Quantity));
+        var totalRevenue = sales.Sum(NetRevenue);
+        var totalCost = sales.Sum(NetCost);
 
         return new SalesReportSummary(
             from,
@@ -113,6 +119,12 @@ public class SalesReportService : ISalesReportService
             totalRevenue - totalCost,
             dailyBreakdown);
     }
+
+    private static decimal NetRevenue(Sale sale) => sale.Items.Sum(i =>
+        i.UnitPrice * (i.Quantity - i.RefundLineItems.Sum(l => l.Quantity)));
+
+    private static decimal NetCost(Sale sale) => sale.Items.Sum(i =>
+        i.UnitCostAtSale * (i.Quantity - i.RefundLineItems.Sum(l => l.Quantity)));
 
     private static (DateTime from, DateTime toExclusive) NormalizeRange(DateTime fromDate, DateTime toDate)
     {

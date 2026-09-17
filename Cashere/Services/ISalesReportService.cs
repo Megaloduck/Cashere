@@ -21,6 +21,8 @@ public record SaleLineDetail(string ProductName, int Quantity, decimal UnitPrice
 
 public record SalePaymentDetail(PaymentMethod Method, decimal Amount, string? ReferenceNumber);
 
+public record RefundHistoryEntry(DateTime RefundDate, string ProcessedByName, decimal TotalAmount, bool IsVoid, string? Reason);
+
 public record SaleDetail(
     int Id,
     string SaleNumber,
@@ -33,13 +35,12 @@ public record SaleDetail(
     decimal TotalAmount,
     SaleStatus Status,
     IReadOnlyList<SaleLineDetail> Lines,
-    IReadOnlyList<SalePaymentDetail> Payments)
+    IReadOnlyList<SalePaymentDetail> Payments,
+    IReadOnlyList<RefundHistoryEntry> Refunds)
 {
-    // UnitCostAtSale is exactly what SaleService froze at transaction time -
-    // this is the whole reason that column exists, so profit here stays
-    // accurate even if a product's current cost has since changed.
     public decimal TotalCost => Lines.Sum(l => l.UnitCostAtSale * l.Quantity);
     public decimal GrossProfit => Subtotal - TotalCost;
+    public decimal TotalRefunded => Refunds.Sum(r => r.TotalAmount);
 }
 
 public record DailySalesRow(DateTime Date, int TransactionCount, decimal Revenue, decimal Cost, decimal Profit);
@@ -55,10 +56,6 @@ public record SalesReportSummary(
     decimal GrossProfit,
     IReadOnlyList<DailySalesRow> DailyBreakdown);
 
-// Read-only reporting surface over completed sales - deliberately separate
-// from ISaleService (which only ever writes new sales) and from
-// IProductCatalogService (which is POS-facing product data), same split
-// philosophy as every other service pair in this project.
 public interface ISalesReportService
 {
     Task<List<SaleListItem>> GetSalesHistoryAsync(DateTime fromDate, DateTime toDate);

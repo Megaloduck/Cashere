@@ -20,4 +20,5 @@ public class Sale
 
     public ICollection<SaleItem> Items { get; set; } = new List<SaleItem>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public ICollection<Refund> Refunds { get; set; } = new List<Refund>();
 }

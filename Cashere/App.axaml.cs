@@ -11,7 +11,7 @@ using Cashere.Services;
 using Cashere.ViewModels.Pos;
 using Cashere.ViewModels.Mobile;
 using Cashere.Views.Mobile;
-using Cashere.ViewModels.Admin;     
+using Cashere.ViewModels.Admin;
 
 namespace Cashere;
 
@@ -60,7 +60,8 @@ public partial class App : Application
                     AppServices.DataBackup,
                     AppServices.AboutInfo,
                     AppServices.ConnectedDevices,
-                    AppServices.ReceiptPrinter);
+                    AppServices.ReceiptPrinter,
+                    AppServices.RefundService);
 
                 desktop.MainWindow = new MainWindow
                 {

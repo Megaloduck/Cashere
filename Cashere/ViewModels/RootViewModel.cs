@@ -11,15 +11,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Cashere.ViewModels;
 
-// Top-level state machine for the desktop app: shows LoginView until a
-// cashier authenticates, then builds and shows the Pos/Admin shell for
-// that cashier - torn back down to LoginView on logout, or automatically by
-// AutoLockService after Settings -> Security's inactivity timeout fires.
-// Mirrors the same "own a CurrentView property, swap it on an event"
-// shape ShellViewModel already uses for Pos<->Admin, just one level higher
-// up the tree. MainWindow.axaml binds to CurrentView with
-// x:CompileBindings="False", so it keeps working unchanged whether its
-// DataContext is this class or (as before) ShellViewModel directly.
 public partial class RootViewModel : ViewModelBase
 {
     private readonly IProductCatalogService _productCatalog;
@@ -37,6 +28,7 @@ public partial class RootViewModel : ViewModelBase
     private readonly IAboutInfoService _aboutInfo;
     private readonly IConnectedDeviceService? _connectedDevices;
     private readonly IReceiptPrinterService? _receiptPrinter;
+    private readonly IRefundService? _refundService;
 
     [ObservableProperty]
     private ViewModelBase _currentView = null!;
@@ -56,7 +48,8 @@ public partial class RootViewModel : ViewModelBase
         IDataBackupService dataBackup,
         IAboutInfoService aboutInfo,
         IConnectedDeviceService? connectedDevices,
-        IReceiptPrinterService? receiptPrinter)
+        IReceiptPrinterService? receiptPrinter,
+        IRefundService? refundService)
     {
         _productCatalog = productCatalog;
         _saleService = saleService;
@@ -73,6 +66,7 @@ public partial class RootViewModel : ViewModelBase
         _aboutInfo = aboutInfo;
         _connectedDevices = connectedDevices;
         _receiptPrinter = receiptPrinter;
+        _refundService = refundService;
 
         AutoLockService.LockTriggered += OnAutoLockTriggered;
     }
@@ -81,15 +75,8 @@ public partial class RootViewModel : ViewModelBase
 
     private Task ShowLoginAsync()
     {
-        // Disarm on the way to the login screen, whether that's a normal
-        // logout or the lock itself firing - otherwise a still-armed timer
-        // would try to "lock" a screen that's already showing Login.
         AutoLockService.Stop();
 
-        // Shown with a placeholder shop name immediately (no async gap
-        // before MainWindow has content), then patched in once the real
-        // name loads - LoginViewModel.ShopName is observable, so the
-        // subtitle just updates in place a moment later.
         var login = new LoginViewModel(_cashierAdmin, "Cashere");
         login.LoginSucceeded += OnLoginSucceeded;
         CurrentView = login;
@@ -110,7 +97,6 @@ public partial class RootViewModel : ViewModelBase
         }
         catch
         {
-            // Cosmetic subtitle only - not worth surfacing a startup error over it.
         }
     }
 
@@ -147,7 +133,8 @@ public partial class RootViewModel : ViewModelBase
             cashier.Id,
             cashier.Role,
             _connectedDevices,
-            _receiptPrinter);
+            _receiptPrinter,
+            _refundService);
 
         var shell = new ShellViewModel(posViewModel, adminViewModel);
         shell.LogoutRequested += OnLogoutRequested;
@@ -159,9 +146,5 @@ public partial class RootViewModel : ViewModelBase
 
     private async void OnLogoutRequested() => await ShowLoginAsync();
 
-    // DispatcherTimer.Tick already runs on the UI thread, so this can touch
-    // CurrentView directly - no Dispatcher.UIThread.Post needed here, unlike
-    // the SignalR-thread handlers elsewhere in the app (e.g.
-    // DevicesAdminViewModel) that genuinely fire off-thread.
     private async void OnAutoLockTriggered() => await ShowLoginAsync();
 }

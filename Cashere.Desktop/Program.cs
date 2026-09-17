@@ -43,6 +43,7 @@ sealed class Program
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
         AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
+        AppServices.RefundService = new RefundService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory, passwordHasher);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);

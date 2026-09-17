@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-
 namespace Cashere.Data;
 
 public class CashereDbContext : DbContext
@@ -26,6 +25,8 @@ public class CashereDbContext : DbContext
     public DbSet<SaleItem> SaleItems => Set<SaleItem>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
+    public DbSet<Refund> Refunds => Set<Refund>();
+    public DbSet<RefundLineItem> RefundLineItems => Set<RefundLineItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,7 +34,6 @@ public class CashereDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    // Windows: %LocalAppData%\Cashere\cashere.db (works the same way once Mac/Linux desktop targets are added).
     public static string GetDefaultDbPath()
     {
         var folder = Path.Combine(

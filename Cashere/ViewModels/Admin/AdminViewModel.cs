@@ -24,10 +24,6 @@ public partial class AdminViewModel : ViewModelBase
     public SettingsShellViewModel Settings { get; }
 
     public event Action? BackRequested;
-
-    // Raised by the sidebar's LOGOUT item - ShellViewModel re-raises this as
-    // its own LogoutRequested event for RootViewModel to handle, same
-    // relay-upward pattern as BackRequested.
     public event Action? LogoutRequested;
 
     [ObservableProperty]
@@ -75,14 +71,15 @@ public partial class AdminViewModel : ViewModelBase
         int currentCashierId,
         UserRole currentRole,
         IConnectedDeviceService? connectedDeviceService = null,
-        IReceiptPrinterService? receiptPrinter = null)
+        IReceiptPrinterService? receiptPrinter = null,
+        IRefundService? refundService = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
         Purchases = new PurchaseAdminViewModel(purchaseAdmin, supplierAdmin, productCatalog, currentCashierId);
         Cashiers = new CashierAdminViewModel(cashierAdmin);
         Customers = new CustomerAdminViewModel(customerAdmin);
-        SalesHistory = new SalesHistoryViewModel(salesReport);
+        SalesHistory = new SalesHistoryViewModel(salesReport, currentRole, currentCashierId, refundService);
         SalesReport = new SalesReportViewModel(salesReport);
         Settings = new SettingsShellViewModel(
             shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, cashierAdmin, currentCashierId);

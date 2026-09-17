@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace Cashere.Services
 {
-    // Minimal static service locator, wired up once before the Avalonia
-    // lifetime starts - in Cashere.Desktop/Program.cs for desktop, in
-    // Cashere.Android/MainActivity.cs for Android.
     public static class AppServices
     {
         public static IProductCatalogService? ProductCatalog { get; set; }
@@ -30,5 +27,6 @@ namespace Cashere.Services
         public static IShiftAdminService? ShiftAdmin { get; set; }
         public static IDataBackupService? DataBackup { get; set; }
         public static IAboutInfoService? AboutInfo { get; set; }
+        public static IRefundService? RefundService { get; set; }
     }
 }

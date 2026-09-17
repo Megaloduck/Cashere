@@ -18,7 +18,12 @@ public enum SaleStatus
 {
     Completed,
     Voided,
-    Refunded
+    Refunded,
+    // A refund covering some but not all lines/quantities - Completed and
+    // PartiallyRefunded sales both still generated real net revenue, unlike
+    // Voided/fully Refunded ones, so SalesReportService treats them as
+    // "still counts" and nets out exactly what was returned.
+    PartiallyRefunded
 }
 
 public enum InventoryMovementType
@@ -41,13 +46,9 @@ public enum ShiftStatus
     Closed
 }
 
-// Read by ThemeApplier at app startup and whenever Settings -> Preferences
-// saves. System maps to Avalonia's ThemeVariant.Default, which follows the
-// OS theme automatically (including live OS theme changes) with no extra
-// wiring needed here.
 public enum AppThemeMode
 {
     Light,
     Dark,
     System
-}
+}   

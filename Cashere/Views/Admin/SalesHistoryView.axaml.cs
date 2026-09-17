@@ -21,4 +21,20 @@ public partial class SalesHistoryView : UserControl
             vm.ViewSaleCommand.Execute(item);
         }
     }
+
+    private void OnRefundClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: SaleListItem item } && DataContext is SalesHistoryViewModel vm)
+        {
+            vm.OpenRefundDialogCommand.Execute(item);
+        }
+    }
+
+    private void OnVoidClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: SaleListItem item } && DataContext is SalesHistoryViewModel vm)
+        {
+            vm.OpenVoidPromptCommand.Execute(item);
+        }
+    }
 }
