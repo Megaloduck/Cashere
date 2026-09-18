@@ -25,7 +25,10 @@ public partial class AdminViewModel : ViewModelBase
     public SettingsShellViewModel Settings { get; }
 
     public event Action? BackRequested;
+
     public event Action? LogoutRequested;
+
+    public HeaderClockViewModel HeaderClock => HeaderClockService.Current;
 
     [ObservableProperty]
     private AdminSection _selectedSection = AdminSection.Products;

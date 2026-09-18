@@ -28,6 +28,7 @@ public partial class PosViewModel : ViewModelBase
 
     public int CurrentCashierId { get; }
     public string CurrentCashierName { get; }
+    public HeaderClockViewModel HeaderClock => HeaderClockService.Current;
 
     public event Action? AdminRequested;
 

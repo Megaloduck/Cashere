@@ -14,6 +14,16 @@ public class ReceiptAdmin
     public string? ReceiptFooterText { get; set; }
     public string? Timezone { get; set; }
 
+    // Settings -> Preferences. Drives the live day/date/month/year/hours
+    // display in the Pos/Admin shell headers - see HeaderClockService,
+    // which is configured from these on login and re-applied live on Save.
+    public bool ShowHeaderClock { get; set; } = true;
+    public bool ShowHeaderDay { get; set; } = true;
+    public bool ShowHeaderDate { get; set; } = true;
+    public bool ShowHeaderMonth { get; set; } = true;
+    public bool ShowHeaderYear { get; set; } = true;
+    public bool ShowHeaderHours { get; set; } = true;
+
     public bool TrackInventory { get; set; } = true;
     public OutOfStockBehavior OutOfStockBehavior { get; set; } = OutOfStockBehavior.Block;
     public int DefaultLowStockThreshold { get; set; } = 5;

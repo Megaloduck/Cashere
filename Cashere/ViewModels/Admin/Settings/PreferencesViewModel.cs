@@ -25,6 +25,12 @@ public partial class PreferencesViewModel : ViewModelBase
 
     [ObservableProperty] private AppThemeMode _selectedTheme = AppThemeMode.System;
     [ObservableProperty] private string? _statusMessage;
+    [ObservableProperty] private bool _showHeaderClock = true;
+    [ObservableProperty] private bool _showHeaderDay = true;
+    [ObservableProperty] private bool _showHeaderDate = true;
+    [ObservableProperty] private bool _showHeaderMonth = true;
+    [ObservableProperty] private bool _showHeaderYear = true;
+    [ObservableProperty] private bool _showHeaderHours = true;
 
     public PreferencesViewModel(IShopContextService shopContext)
     {
@@ -37,6 +43,13 @@ public partial class PreferencesViewModel : ViewModelBase
         if (settings is null) return;
 
         SelectedTheme = settings.ThemeMode;
+        SelectedTheme = settings.ThemeMode;
+        ShowHeaderClock = settings.ShowHeaderClock;
+        ShowHeaderDay = settings.ShowHeaderDay;
+        ShowHeaderDate = settings.ShowHeaderDate;
+        ShowHeaderMonth = settings.ShowHeaderMonth;
+        ShowHeaderYear = settings.ShowHeaderYear;
+        ShowHeaderHours = settings.ShowHeaderHours; 
     }
 
     [RelayCommand]
@@ -46,12 +59,18 @@ public partial class PreferencesViewModel : ViewModelBase
 
         var settings = await _shopContext.GetSettingsAsync() ?? new ReceiptAdmin();
         settings.ThemeMode = SelectedTheme;
+        settings.ShowHeaderClock = ShowHeaderClock;
+        settings.ShowHeaderDay = ShowHeaderDay;
+        settings.ShowHeaderDate = ShowHeaderDate;
+        settings.ShowHeaderMonth = ShowHeaderMonth;
+        settings.ShowHeaderYear = ShowHeaderYear;
+        settings.ShowHeaderHours = ShowHeaderHours;
 
         await _shopContext.UpdateSettingsAsync(settings);
 
-        // Applied immediately, not just on next launch - same "live" feel
-        // as every other toggle in this app.
         ThemeApplier.Apply(SelectedTheme);
+        HeaderClockService.Current.Configure(
+            ShowHeaderClock, ShowHeaderDay, ShowHeaderDate, ShowHeaderMonth, ShowHeaderYear, ShowHeaderHours);
 
         StatusMessage = "Saved.";
     }

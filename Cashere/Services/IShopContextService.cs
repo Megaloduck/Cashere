@@ -43,6 +43,12 @@ namespace Cashere.Services
     // Settings -> Security.
     public record SecuritySettings(bool AutoLockEnabled, int AutoLockTimeoutMinutes);
 
+    // Read by RootViewModel right after login (to arm HeaderClockService)
+    // and by PreferencesViewModel (to populate the toggles) - see
+    // Settings -> Preferences.
+    public record HeaderClockSettings(
+        bool IsVisible, bool ShowDay, bool ShowDate, bool ShowMonth, bool ShowYear, bool ShowHours);    
+
     public interface IShopContextService
     {
         Task<Cashier?> GetDefaultCashierAsync();
@@ -53,5 +59,6 @@ namespace Cashere.Services
         Task<PaymentSettings> GetPaymentSettingsAsync();
         Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync();
         Task<SecuritySettings> GetSecuritySettingsAsync();
+        Task<HeaderClockSettings> GetHeaderClockSettingsAsync();
     }
 }

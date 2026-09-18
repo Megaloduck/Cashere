@@ -52,8 +52,6 @@
           </Border>
         </Grid>
 
-        <TextBlock Text="CLOSE SHIFT" Classes="eyebrow"/>
-
         <TextBlock Text="ACTUAL CASH COUNTED" Classes="eyebrow" FontSize="9"/>
         <TextBox Text="{Binding FormActualCash}"/>
 

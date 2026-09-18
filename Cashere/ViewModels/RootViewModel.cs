@@ -110,6 +110,11 @@ public partial class RootViewModel : ViewModelBase
         var security = await _shopContext.GetSecuritySettingsAsync();
         AutoLockService.Configure(security.AutoLockEnabled, security.AutoLockTimeoutMinutes);
 
+        var headerClock = await _shopContext.GetHeaderClockSettingsAsync();
+        HeaderClockService.Current.Configure(
+            headerClock.IsVisible, headerClock.ShowDay, headerClock.ShowDate,
+            headerClock.ShowMonth, headerClock.ShowYear, headerClock.ShowHours);
+
         var posViewModel = new PosViewModel(
             _productCatalog,
             _saleService,

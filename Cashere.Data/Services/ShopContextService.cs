@@ -95,4 +95,17 @@ public class ShopContextService : IShopContextService
 
         return new SecuritySettings(settings?.AutoLockEnabled ?? false, timeoutMinutes);
     }
+    public async Task<HeaderClockSettings> GetHeaderClockSettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        return new HeaderClockSettings(
+            settings?.ShowHeaderClock ?? true,
+            settings?.ShowHeaderDay ?? true,
+            settings?.ShowHeaderDate ?? true,
+            settings?.ShowHeaderMonth ?? true,
+            settings?.ShowHeaderYear ?? true,
+            settings?.ShowHeaderHours ?? true);
+    }
 }

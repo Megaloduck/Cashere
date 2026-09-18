@@ -16,6 +16,38 @@
       <TextBlock Text="System follows your OS's light/dark setting, including if you change it while Cashere is running."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="SHOW CLOCK IN HEADER" FontWeight="Bold"/>
+          <TextBlock Text="Shows the current day, date, month, year and time in the POS/Admin header bar."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderClock}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <StackPanel Spacing="8" IsVisible="{Binding ShowHeaderClock}">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="DAY" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderDay}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="DATE" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderDate}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="MONTH" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderMonth}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="YEAR" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderYear}"/>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="HOURS" VerticalAlignment="Center"/>
+          <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowHeaderHours}"/>
+        </Grid>
+      </StackPanel>
+
 <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"
            FontWeight="Bold"
