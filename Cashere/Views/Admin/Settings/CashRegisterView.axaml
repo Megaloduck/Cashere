@@ -50,7 +50,7 @@
               <TextBlock Text="{Binding ExpectedCash, StringFormat='Rp {0:N0}'}" FontWeight="Black" FontSize="18"/>
             </StackPanel>
           </Border>
-        </Grid>
+        </Grid> 
 
         <TextBlock Text="ACTUAL CASH COUNTED" Classes="eyebrow" FontSize="9"/>
         <TextBox Text="{Binding FormActualCash}"/>
@@ -76,32 +76,34 @@
         </Button>
       </Grid>
 
-      <Grid ColumnDefinitions="120,1.2*,90,90,90,90" Margin="0,0,0,4">
-        <TextBlock Grid.Column="0" Text="OPENED" Classes="eyebrow" FontSize="9"/>
-        <TextBlock Grid.Column="1" Text="CASHIER" Classes="eyebrow" FontSize="9"/>
-        <TextBlock Grid.Column="2" Text="START" Classes="eyebrow" FontSize="9"/>
-        <TextBlock Grid.Column="3" Text="EXPECTED" Classes="eyebrow" FontSize="9"/>
-        <TextBlock Grid.Column="4" Text="ACTUAL" Classes="eyebrow" FontSize="9"/>
-        <TextBlock Grid.Column="5" Text="DIFF" Classes="eyebrow" FontSize="9"/>
-      </Grid>
-      <Border Classes="rule-thick"/>
+      <Grid ColumnDefinitions="120,110,1.2*,90,90,90,90" Margin="0,0,0,4">
+  <TextBlock Grid.Column="0" Text="OPENED" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="1" Text="DURATION" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="2" Text="CASHIER" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="3" Text="START" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="4" Text="EXPECTED" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="5" Text="ACTUAL" Classes="eyebrow" FontSize="9"/>
+  <TextBlock Grid.Column="6" Text="DIFF" Classes="eyebrow" FontSize="9"/>
+</Grid>
+<Border Classes="rule-thick"/>
 
-      <ItemsControl ItemsSource="{Binding RecentShifts}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="services:ShiftListItem">
-            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
-              <Grid ColumnDefinitions="120,1.2*,90,90,90,90">
-                <TextBlock Grid.Column="0" Text="{Binding OpenedAt, StringFormat='{}{0:dd MMM HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
-                <TextBlock Grid.Column="1" Text="{Binding CashierName}" VerticalAlignment="Center" FontWeight="Bold" FontSize="11"/>
-                <TextBlock Grid.Column="2" Text="{Binding StartingCash, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
-                <TextBlock Grid.Column="3" Text="{Binding ExpectedCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
-                <TextBlock Grid.Column="4" Text="{Binding ActualCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
-                <TextBlock Grid.Column="5" Text="{Binding DiscrepancyAmount, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11" FontWeight="Bold"/>
-              </Grid>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+<ItemsControl ItemsSource="{Binding RecentShifts}">
+  <ItemsControl.ItemTemplate>
+    <DataTemplate x:DataType="services:ShiftListItem">
+      <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+        <Grid ColumnDefinitions="120,110,1.2*,90,90,90,90">
+          <TextBlock Grid.Column="0" Text="{Binding OpenedAt, StringFormat='{}{0:dd MMM HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
+          <TextBlock Grid.Column="1" Text="{Binding DurationDisplay}" VerticalAlignment="Center" FontSize="11"/>
+          <TextBlock Grid.Column="2" Text="{Binding CashierName}" VerticalAlignment="Center" FontWeight="Bold" FontSize="11"/>
+          <TextBlock Grid.Column="3" Text="{Binding StartingCash, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+          <TextBlock Grid.Column="4" Text="{Binding ExpectedCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+          <TextBlock Grid.Column="5" Text="{Binding ActualCashAtClose, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>
+          <TextBlock Grid.Column="6" Text="{Binding DiscrepancyAmount, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11" FontWeight="Bold"/>
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </ItemsControl.ItemTemplate>
+</ItemsControl>
 
     </StackPanel>
   </ScrollViewer>

@@ -16,12 +16,13 @@ public record ShiftListItem(
     decimal? ExpectedCashAtClose,
     decimal? ActualCashAtClose,
     decimal? DiscrepancyAmount,
-    ShiftStatus Status);
-
-// Cash-drawer reconciliation for a single till - mirrors ActiveCartService's
-// "one till is enough for MVP" assumption: only one shift can be open at a
-// time regardless of which cashier opened it, rather than tracking
-// concurrent shifts per cashier.
+    ShiftStatus Status)
+{
+    // EXAMPLE = "09:00 - 17:30" for a closed shift, "09:00 - ..." while still open.
+    public string DurationDisplay => ClosedAt is { } closedAt
+        ? $"{OpenedAt:HH:mm} - {closedAt:HH:mm}"
+        : $"{OpenedAt:HH:mm} - ...";
+}
 public interface IShiftAdminService
 {
     Task<Shift?> GetOpenShiftAsync();
