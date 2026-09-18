@@ -81,7 +81,7 @@ public partial class RootViewModel : ViewModelBase
         AutoLockService.Stop();
 
         var login = new LoginViewModel(_cashierAdmin, "Cashere");
-        login.LoginSucceeded += OnLoginSucceeded;
+        login.LoginSucceeded += OnLoginSucceeded;   
         CurrentView = login;
 
         _ = LoadShopNameAsync(login);
@@ -110,6 +110,9 @@ public partial class RootViewModel : ViewModelBase
         var security = await _shopContext.GetSecuritySettingsAsync();
         AutoLockService.Configure(security.AutoLockEnabled, security.AutoLockTimeoutMinutes);
 
+        var preferences = await _shopContext.GetSettingsAsync();
+        ClockPreferenceService.Configure(preferences?.ClockSource ?? ClockSource.SystemLocal);
+
         var headerClock = await _shopContext.GetHeaderClockSettingsAsync();
         HeaderClockService.Current.Configure(
             headerClock.IsVisible, headerClock.ShowDay, headerClock.ShowDate,
@@ -127,24 +130,10 @@ public partial class RootViewModel : ViewModelBase
             _voucherAdmin);
 
         var adminViewModel = new AdminViewModel(
-            _productAdmin,
-            _categoryAdmin,
-            _supplierAdmin,
-            _purchaseAdmin,
-            _cashierAdmin,
-            _customerAdmin,
-            _salesReport,
-            _productCatalog,
-            _shopContext,
-            _shiftAdmin,
-            _dataBackup,
-            _aboutInfo,
-            cashier.Id,
-            cashier.Role,
-            _connectedDevices,
-            _receiptPrinter,
-            _refundService,
-            _voucherAdmin);
+    _productAdmin, _categoryAdmin, _supplierAdmin, _purchaseAdmin, _cashierAdmin, _customerAdmin,
+    _salesReport, _productCatalog, _shopContext, _shiftAdmin, _dataBackup, _aboutInfo,
+    cashier.Id, cashier.Role, cashier.Username,
+    _connectedDevices, _receiptPrinter, _refundService, _voucherAdmin);
 
         var shell = new ShellViewModel(posViewModel, adminViewModel);
         shell.LogoutRequested += OnLogoutRequested;

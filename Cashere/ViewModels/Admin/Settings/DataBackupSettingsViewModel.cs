@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
+﻿using Cashere.Models;
 using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Cashere.ViewModels.Admin.Settings;
 
 public partial class DataBackupSettingsViewModel : ViewModelBase
 {
     private readonly IDataBackupService _backupService;
+    private readonly IReportExportService? _reportExport;
+    private readonly ICashierAdminService _cashierAdmin;
+    private readonly UserRole _currentRole;
+    private readonly string _currentUsername;
 
     public ObservableCollection<BackupFileInfo> Backups { get; } = new();
 
@@ -22,11 +24,41 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string? _statusMessage;
 
+    [ObservableProperty] private DateTimeOffset? _exportFromDate = DateTimeOffset.Now.Date.AddDays(-29);
+    [ObservableProperty] private DateTimeOffset? _exportToDate = DateTimeOffset.Now.Date;
+    [ObservableProperty] private bool _isExporting;
+    [ObservableProperty] private string? _exportStatusMessage;
+
+    [ObservableProperty] private bool _isResetPromptOpen;
+    [ObservableProperty] private string _resetPin = string.Empty;
+    [ObservableProperty] private string? _resetErrorMessage;
+    [ObservableProperty] private bool _isResetting;
+
+    public bool CanResetDatabase => _currentRole == UserRole.Owner;
+    public bool IsReportExportAvailable => _reportExport is not null;
     public bool HasNoBackups => Backups.Count == 0;
 
-    public DataBackupSettingsViewModel(IDataBackupService backupService)
+    // Bubbled up the same way Staff.ManageCashiersRequested is, so
+    // AdminViewModel can forward it into the existing LogoutRequested chain -
+    // a reset deletes the signed-in cashier's own row, so the session can't
+    // meaningfully continue.
+    public event Action? DatabaseWasReset;
+
+    public DataBackupSettingsViewModel(
+        IDataBackupService backupService,
+        IReportExportService? reportExport,
+        ICashierAdminService cashierAdmin,
+        UserRole currentRole,
+        string currentUsername)
     {
         _backupService = backupService;
+        _reportExport = reportExport;
+        _cashierAdmin = cashierAdmin;
+        _currentRole = currentRole;
+        _currentUsername = currentUsername;
+
+        // Keep HasNoBackups in sync whenever the collection changes.
+        Backups.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoBackups));
     }
 
     public async Task LoadAsync()
@@ -39,7 +71,6 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
         var backups = await _backupService.GetBackupsAsync();
         Backups.Clear();
         foreach (var backup in backups) Backups.Add(backup);
-        OnPropertyChanged(nameof(HasNoBackups));
     }
 
     [RelayCommand]
@@ -60,6 +91,30 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportSalesReport()
+    {
+        if (_reportExport is null) return;
+
+        ExportStatusMessage = null;
+        IsExporting = true;
+        try
+        {
+            var from = (ExportFromDate ?? DateTimeOffset.Now).Date;
+            var to = (ExportToDate ?? DateTimeOffset.Now).Date;
+            var path = await _reportExport.ExportSalesReportAsync(from, to);
+            ExportStatusMessage = $"Exported to {path}";
+        }
+        catch (Exception ex)
+        {
+            ExportStatusMessage = $"Export failed: {ex.Message}";
+        }
+        finally
+        {
+            IsExporting = false;
         }
     }
 
@@ -96,6 +151,62 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
 
     [RelayCommand]
     private async Task Refresh() => await LoadAsync();
+
+    [RelayCommand]
+    private void OpenResetPrompt()
+    {
+        if (!CanResetDatabase) return;
+        ResetPin = string.Empty;
+        ResetErrorMessage = null;
+        IsResetPromptOpen = true;
+    }
+
+    [RelayCommand]
+    private void CancelReset()
+    {
+        IsResetPromptOpen = false;
+        ResetPin = string.Empty;
+        ResetErrorMessage = null;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmReset()
+    {
+        if (!CanResetDatabase || IsResetting) return;
+
+        ResetErrorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(ResetPin))
+        {
+            ResetErrorMessage = "Enter your PIN to confirm.";
+            return;
+        }
+
+        IsResetting = true;
+        try
+        {
+            var verified = await _cashierAdmin.VerifyCredentialsAsync(_currentUsername, ResetPin);
+            if (verified is null || verified.Role != UserRole.Owner)
+            {
+                ResetErrorMessage = "Incorrect PIN.";
+                return;
+            }
+
+            await _backupService.ResetAllDataAsync();
+
+            IsResetPromptOpen = false;
+            DatabaseWasReset?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            ResetErrorMessage = $"Reset failed: {ex.Message}";
+        }
+        finally
+        {
+            ResetPin = string.Empty;
+            IsResetting = false;
+        }
+    }
 
     private static string FormatBytes(long bytes)
     {

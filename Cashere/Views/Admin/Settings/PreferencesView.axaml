@@ -16,6 +16,11 @@
       <TextBlock Text="System follows your OS's light/dark setting, including if you change it while Cashere is running."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
+        <TextBlock Text="CLOCK" Classes="eyebrow"/>
+<ComboBox ItemsSource="{Binding ClockSources}" SelectedItem="{Binding SelectedClockSource}" HorizontalAlignment="Stretch"/>
+<TextBlock Text="Controls what timezone timestamps (sales, shifts, receipts) are displayed in on this device. System Local uses this machine's clock; UTC shows the same time everywhere regardless of machine settings."
+           Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Grid.Column="0" Spacing="2">
           <TextBlock Text="SHOW CLOCK IN HEADER" FontWeight="Bold"/>

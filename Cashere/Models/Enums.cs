@@ -51,4 +51,9 @@ public enum AppThemeMode
     Light,
     Dark,
     System
-}   
+}
+public enum ClockSource
+{
+    SystemLocal,
+    Utc
+}

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Cashere.Services;
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cashere.Data.Services;
 
@@ -87,5 +88,38 @@ public class DataBackupService : IDataBackupService
             File.Delete(backupFilePath);
         }
         return Task.CompletedTask;
+    }
+    public async Task ResetAllDataAsync()
+    {
+        SqliteConnection.ClearAllPools();
+
+        var options = new DbContextOptionsBuilder<CashereDbContext>()
+            .UseSqlite($"Data Source={_dbPath}")
+            .Options;
+
+        await using var db = new CashereDbContext(options);
+
+        // Children before parents so FK constraints never trip, even though
+        // most relations here are Restrict rather than freely orderable.
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM VoucherRedemptions");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM RefundLineItems");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Refunds");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Payments");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM SaleItems");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Sales");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM PurchaseItems");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Purchases");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM InventoryMovements");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Vouchers");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Products");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Categories");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Suppliers");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Customers");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Shifts");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Cashiers");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM ReceiptAdmin");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sqlite_sequence");
+
+        await SeedData.EnsureSeedDataAsync(db);
     }
 }

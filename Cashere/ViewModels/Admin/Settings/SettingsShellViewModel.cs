@@ -70,7 +70,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
-        DataBackup = new DataBackupSettingsViewModel(dataBackup);
+        DataBackup = new DataBackupSettingsViewModel(dataBackup, AppServices.ReportExport, cashierAdmin, currentRole, currentUsername);
         Preferences = new PreferencesViewModel(shopContext);
         About = new AboutViewModel(aboutInfo);
 
@@ -157,4 +157,7 @@ public partial class SettingsShellViewModel : ViewModelBase
 
     [RelayCommand]
     private void SelectSection(SettingsSection section) => SelectedSection = section;
+
+    DataBackup.DatabaseWasReset += () => DatabaseWasReset?.Invoke();
+    public event Action? DatabaseWasReset;
 }

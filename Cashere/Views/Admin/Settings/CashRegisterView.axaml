@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="Cashere.Views.Admin.Settings.CashRegisterView"
              x:DataType="vm:CashRegisterViewModel">
+
+    <UserControl.Resources>
+  <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+</UserControl.Resources>
+        
   <ScrollViewer>
     <StackPanel Margin="12" Spacing="12" >
       <TextBlock Text="CASH REGISTER" Classes="headline" FontSize="18"/>
@@ -92,7 +98,7 @@
     <DataTemplate x:DataType="services:ShiftListItem">
       <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
         <Grid ColumnDefinitions="120,110,1.2*,90,90,90,90">
-          <TextBlock Grid.Column="0" Text="{Binding OpenedAt, StringFormat='{}{0:dd MMM HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
+         <TextBlock Grid.Column="0" Text="{Binding OpenedAt, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM HH:mm}'}"/>
           <TextBlock Grid.Column="1" Text="{Binding DurationDisplay}" VerticalAlignment="Center" FontSize="11"/>
           <TextBlock Grid.Column="2" Text="{Binding CashierName}" VerticalAlignment="Center" FontWeight="Bold" FontSize="11"/>
           <TextBlock Grid.Column="3" Text="{Binding StartingCash, StringFormat='{}{0:N0}'}" VerticalAlignment="Center" FontSize="11"/>

@@ -24,6 +24,11 @@ public class ReceiptAdmin
     public bool ShowHeaderYear { get; set; } = true;
     public bool ShowHeaderHours { get; set; } = true;
 
+    // Settings -> Preferences. Governs whether timestamps display in this
+    // device's local time or UTC, so multiple tills/phones agree on one clock
+    // instead of each showing its own machine's local time.
+    public ClockSource ClockSource { get; set; } = ClockSource.SystemLocal;
+
     public bool TrackInventory { get; set; } = true;
     public OutOfStockBehavior OutOfStockBehavior { get; set; } = OutOfStockBehavior.Block;
     public int DefaultLowStockThreshold { get; set; } = 5;

@@ -79,6 +79,7 @@ public partial class AdminViewModel : ViewModelBase
         IConnectedDeviceService? connectedDeviceService = null,
         IReceiptPrinterService? receiptPrinter = null,
         IRefundService? refundService = null,
+
         IVoucherAdminService? voucherAdmin = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
@@ -90,9 +91,11 @@ public partial class AdminViewModel : ViewModelBase
         SalesReport = new SalesReportViewModel(salesReport);
         Vouchers = new VoucherAdminViewModel(voucherAdmin, currentRole);
         Settings = new SettingsShellViewModel(
-            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo, cashierAdmin, currentCashierId);
+           shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo,
+           cashierAdmin, currentCashierId, currentRole, currentUsername);
 
         Settings.ManageCashiersRequested += () => SelectedSection = AdminSection.Cashiers;
+        Settings.DatabaseWasReset += () => LogoutRequested?.Invoke();
     }
 
     public async Task InitializeAsync()

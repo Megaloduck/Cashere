@@ -12,6 +12,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" />
+		<PackageReference Include="ClosedXML" />
 	</ItemGroup>
 
 	<ItemGroup>

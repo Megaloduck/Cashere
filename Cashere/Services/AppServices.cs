@@ -29,5 +29,6 @@ namespace Cashere.Services
         public static IAboutInfoService? AboutInfo { get; set; }
         public static IRefundService? RefundService { get; set; }
         public static IVoucherAdminService? VoucherAdmin { get; set; }
+        public static IReportExportService? ReportExport { get; set; }
     }
 }

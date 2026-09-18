@@ -48,6 +48,7 @@ sealed class Program
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory, passwordHasher);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
+        AppServices.ReportExport = new ReportExportService(dbPath, AppServices.SalesReport);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
         AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
         AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);

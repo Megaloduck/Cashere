@@ -51,5 +51,6 @@ public class ReceiptAdminConfiguration : IEntityTypeConfiguration<ReceiptAdmin>
         builder.Property(s => s.ServerBindAddress).IsRequired().HasMaxLength(64);
         builder.Property(s => s.OutOfStockBehavior).HasConversion<string>().HasMaxLength(30);
         builder.Property(s => s.ThemeMode).HasConversion<string>().HasMaxLength(20);
+        builder.Property(s => s.ClockSource).HasConversion<string>().HasMaxLength(20);
     }
 }   

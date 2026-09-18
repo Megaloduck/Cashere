@@ -42,4 +42,10 @@ public interface IDataBackupService
     Task<List<BackupFileInfo>> GetBackupsAsync();
     Task RestoreFromBackupAsync(string backupFilePath);
     Task DeleteBackupAsync(string backupFilePath);
+    // Wipes every table and re-seeds the single ReceiptAdmin row, the
+    // "General" category, and the default admin/admin cashier - identical to
+    // what a brand-new install gets. Deliberately not exposed to anyone but
+    // Owner (see DataBackupSettingsViewModel), and only reachable after a PIN
+    // re-check even for an Owner already signed in.
+    Task ResetAllDataAsync();
 }

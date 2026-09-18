@@ -79,11 +79,83 @@
 
       <TextBlock Text="No backups yet - create one above." Foreground="{StaticResource GrayBrush}" FontSize="12"
                  IsVisible="{Binding HasNoBackups}"/>
+        <Border Classes="rule-thick" Margin="0,8"/>
+<TextBlock Text="EXPORT REPORTS" Classes="eyebrow"/>
+
+<Grid ColumnDefinitions="*,*" IsVisible="{Binding IsReportExportAvailable}">
+  <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+    <TextBlock Text="FROM" Classes="eyebrow" FontSize="9"/>
+    <DatePicker SelectedDate="{Binding ExportFromDate}"/>
+  </StackPanel>
+  <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+    <TextBlock Text="TO" Classes="eyebrow" FontSize="9"/>
+    <DatePicker SelectedDate="{Binding ExportToDate}"/>
+  </StackPanel>
+</Grid>
+
+<Button Content="EXPORT SALES REPORT (XLSX)"
+        Classes="accent-blue"
+        Command="{Binding ExportSalesReportCommand}"
+        IsEnabled="{Binding !IsExporting}"
+        IsVisible="{Binding IsReportExportAvailable}"
+        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+
+<TextBlock Text="{Binding ExportStatusMessage}"
+           Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"
+           IsVisible="{Binding ExportStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
       <TextBlock Text="COMING SOON" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
                  Text="Automatic scheduled backups with retention, and CSV/Excel export/import of catalog and sales data, aren't built yet."/>
+
+        <Border Classes="rule-thick" Margin="0,8"/>
+
+<StackPanel Spacing="8" IsVisible="{Binding CanResetDatabase}">
+  <StackPanel Orientation="Horizontal" Spacing="8">
+    <mi:MaterialIcon Kind="AlertOctagonOutline" Width="16" Height="16" Foreground="{StaticResource RedBrush}"/>
+    <TextBlock Text="DANGER ZONE" Classes="eyebrow" Foreground="{StaticResource RedBrush}"/>
+  </StackPanel>
+  <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"
+             Text="Permanently deletes every product, sale, customer, cashier and setting, then re-seeds a fresh install (shop name 'My Shop', admin/admin login). This cannot be undone."/>
+
+  <Button Content="RESET TO DEFAULT"
+          Classes="accent-red"
+          Command="{Binding OpenResetPromptCommand}"
+          HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+</StackPanel>
+
+<Border Grid.RowSpan="99" Background="#CC141414" IsVisible="{Binding IsResetPromptOpen}">
+  <Border Classes="card" Width="420" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Spacing="12">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <mi:MaterialIcon Kind="AlertOctagonOutline" Width="20" Height="20" Foreground="{StaticResource RedBrush}"/>
+        <TextBlock Text="CONFIRM HARD RESET" Classes="headline" FontSize="18"/>
+      </StackPanel>
+      <Border Classes="rule-thick"/>
+      <TextBlock Text="This wipes the entire database. Enter your PIN to confirm you're the Owner."
+                 TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"/>
+
+      <TextBlock Text="PIN" Classes="eyebrow"/>
+      <TextBox Text="{Binding ResetPin}" PasswordChar="•"/>
+
+      <TextBlock Text="{Binding ResetErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                 IsVisible="{Binding ResetErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+      <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+        <Button Grid.Column="0" Content="CANCEL" Classes="ghost" Command="{Binding CancelResetCommand}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        <Button Grid.Column="1" Classes="accent-red" Command="{Binding ConfirmResetCommand}" IsEnabled="{Binding !IsResetting}"
+                Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="CONFIRM RESET" IsVisible="{Binding !IsResetting}"/>
+            <TextBlock Text="RESETTING..." IsVisible="{Binding IsResetting}"/>
+          </StackPanel>
+        </Button>
+      </Grid>
+    </StackPanel>
+  </Border>
+</Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

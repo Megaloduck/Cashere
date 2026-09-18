@@ -22,6 +22,9 @@ public partial class PreferencesViewModel : ViewModelBase
     private readonly IShopContextService _shopContext;
 
     public IReadOnlyList<AppThemeMode> ThemeModes { get; } = Enum.GetValues<AppThemeMode>();
+    public IReadOnlyList<ClockSource> ClockSources { get; } = Enum.GetValues<ClockSource>();
+
+    [ObservableProperty] private ClockSource _selectedClockSource = ClockSource.SystemLocal;
 
     [ObservableProperty] private AppThemeMode _selectedTheme = AppThemeMode.System;
     [ObservableProperty] private string? _statusMessage;
@@ -49,7 +52,8 @@ public partial class PreferencesViewModel : ViewModelBase
         ShowHeaderDate = settings.ShowHeaderDate;
         ShowHeaderMonth = settings.ShowHeaderMonth;
         ShowHeaderYear = settings.ShowHeaderYear;
-        ShowHeaderHours = settings.ShowHeaderHours; 
+        ShowHeaderHours = settings.ShowHeaderHours;
+        SelectedClockSource = settings.ClockSource;
     }
 
     [RelayCommand]
@@ -65,10 +69,12 @@ public partial class PreferencesViewModel : ViewModelBase
         settings.ShowHeaderMonth = ShowHeaderMonth;
         settings.ShowHeaderYear = ShowHeaderYear;
         settings.ShowHeaderHours = ShowHeaderHours;
+        settings.ClockSource = SelectedClockSource;
 
         await _shopContext.UpdateSettingsAsync(settings);
 
         ThemeApplier.Apply(SelectedTheme);
+        ClockPreferenceService.Configure(SelectedClockSource);
         HeaderClockService.Current.Configure(
             ShowHeaderClock, ShowHeaderDay, ShowHeaderDate, ShowHeaderMonth, ShowHeaderYear, ShowHeaderHours);
 
