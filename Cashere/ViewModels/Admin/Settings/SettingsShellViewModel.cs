@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cashere.Models;
 using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -30,6 +31,11 @@ public partial class SettingsShellViewModel : ViewModelBase
     // this by flipping its own SelectedSection to AdminSection.Cashiers,
     // same bubble-it-up pattern as BackRequested/LogoutRequested elsewhere.
     public event Action? ManageCashiersRequested;
+
+    // Re-raised from DataBackup.DatabaseWasReset - AdminViewModel forwards
+    // this into its own LogoutRequested chain, since a reset deletes the
+    // signed-in cashier's own row.
+    public event Action? DatabaseWasReset;
 
     [ObservableProperty]
     private SettingsSection _selectedSection = SettingsSection.Business;
@@ -60,7 +66,9 @@ public partial class SettingsShellViewModel : ViewModelBase
         IDataBackupService dataBackup,
         IAboutInfoService aboutInfo,
         ICashierAdminService cashierAdmin,
-        int currentCashierId)
+        int currentCashierId,
+        UserRole currentRole,
+        string currentUsername)
     {
         Business = new BusinessInfoViewModel(shopContext);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
@@ -70,7 +78,8 @@ public partial class SettingsShellViewModel : ViewModelBase
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
-        DataBackup = new DataBackupSettingsViewModel(dataBackup, AppServices.ReportExport, cashierAdmin, currentRole, currentUsername);
+        DataBackup = new DataBackupSettingsViewModel(
+            dataBackup, AppServices.ReportExport, cashierAdmin, currentRole, currentUsername);
         Preferences = new PreferencesViewModel(shopContext);
         About = new AboutViewModel(aboutInfo);
 
@@ -78,6 +87,8 @@ public partial class SettingsShellViewModel : ViewModelBase
         Staff.ManageCashiersRequested += () => ManageCashiersRequested?.Invoke();
 
         Security = new SecuritySettingsViewModel(shopContext);
+
+        DataBackup.DatabaseWasReset += () => DatabaseWasReset?.Invoke();
     }
 
     public async Task InitializeAsync()
@@ -157,7 +168,4 @@ public partial class SettingsShellViewModel : ViewModelBase
 
     [RelayCommand]
     private void SelectSection(SettingsSection section) => SelectedSection = section;
-
-    DataBackup.DatabaseWasReset += () => DatabaseWasReset?.Invoke();
-    public event Action? DatabaseWasReset;
 }

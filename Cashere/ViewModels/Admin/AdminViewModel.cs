@@ -62,25 +62,25 @@ public partial class AdminViewModel : ViewModelBase
     };
 
     public AdminViewModel(
-        IProductAdminService productAdmin,
-        ICategoryAdminService categoryAdmin,
-        ISupplierAdminService supplierAdmin,
-        IPurchaseAdminService purchaseAdmin,
-        ICashierAdminService cashierAdmin,
-        ICustomerAdminService customerAdmin,
-        ISalesReportService salesReport,
-        IProductCatalogService productCatalog,
-        IShopContextService shopContext,
-        IShiftAdminService shiftAdmin,
-        IDataBackupService dataBackup,
-        IAboutInfoService aboutInfo,
-        int currentCashierId,
-        UserRole currentRole,
-        IConnectedDeviceService? connectedDeviceService = null,
-        IReceiptPrinterService? receiptPrinter = null,
-        IRefundService? refundService = null,
-
-        IVoucherAdminService? voucherAdmin = null)
+    IProductAdminService productAdmin,
+    ICategoryAdminService categoryAdmin,
+    ISupplierAdminService supplierAdmin,
+    IPurchaseAdminService purchaseAdmin,
+    ICashierAdminService cashierAdmin,
+    ICustomerAdminService customerAdmin,
+    ISalesReportService salesReport,
+    IProductCatalogService productCatalog,
+    IShopContextService shopContext,
+    IShiftAdminService shiftAdmin,
+    IDataBackupService dataBackup,
+    IAboutInfoService aboutInfo,
+    int currentCashierId,
+    UserRole currentRole,
+    string currentUsername,
+    IConnectedDeviceService? connectedDeviceService = null,
+    IReceiptPrinterService? receiptPrinter = null,
+    IRefundService? refundService = null,
+    IVoucherAdminService? voucherAdmin = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
