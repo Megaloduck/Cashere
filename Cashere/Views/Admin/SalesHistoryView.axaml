@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1050" d:DesignHeight="640"
              x:Class="Cashere.Views.Admin.SalesHistoryView"
              x:DataType="vm:SalesHistoryViewModel">
+
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
+
   <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="12">
     <TextBlock Grid.Row="0" Text="SALES HISTORY" Classes="headline" FontSize="18" Margin="0,0,0,12"/>
 
@@ -64,7 +70,7 @@
           <DataTemplate x:DataType="services:SaleListItem">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
               <Grid ColumnDefinitions="150,1.3*,0.8*,0.8*,60,90,110,160">
-                <TextBlock Grid.Column="0" Text="{Binding SaleDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="{Binding SaleDate, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Text="{Binding SaleNumber}" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="{Binding CashierName}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="3" Text="{Binding CustomerName}" VerticalAlignment="Center"/>
@@ -97,7 +103,7 @@
           <ScrollViewer MaxHeight="500">
             <StackPanel Spacing="12" DataContext="{Binding SelectedSaleDetail}" x:DataType="services:SaleDetail">
               <TextBlock Text="{Binding SaleNumber, StringFormat='SALE {0}'}" Classes="headline" FontSize="18"/>
-              <TextBlock Text="{Binding SaleDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Classes="eyebrow"/>
+              <TextBlock Text="{Binding SaleDate, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Classes="eyebrow"/>
               <Border Classes="rule-thick"/>
 
               <Grid ColumnDefinitions="*,Auto">
@@ -178,7 +184,7 @@
                         <TextBlock Text="{Binding ProcessedByName}" FontWeight="Bold" FontSize="11"/>
                         <TextBlock Text="{Binding Reason}" FontSize="10" Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"
                                    IsVisible="{Binding Reason, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                        <TextBlock Text="{Binding RefundDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" FontSize="9" Foreground="{StaticResource GrayBrush}"/>
+                        <TextBlock Text="{Binding RefundDate, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" FontSize="9" Foreground="{StaticResource GrayBrush}"/>
                       </StackPanel>
                       <TextBlock Grid.Column="2" Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold" VerticalAlignment="Top"/>
                     </Grid>

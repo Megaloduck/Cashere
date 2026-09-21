@@ -39,7 +39,7 @@
         <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
           <StackPanel Spacing="4">
             <TextBlock Text="SHIFT OPEN" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
-            <TextBlock Text="{Binding OpenedAt, StringFormat='Opened {0:dd MMM yyyy HH:mm}'}" Foreground="{StaticResource InkBrush}"/>
+            <TextBlock Text="{Binding OpenedAt, Converter={StaticResource UtcToDisplay}, StringFormat='Opened {0:dd MMM yyyy HH:mm}'}" Foreground="{StaticResource InkBrush}"/>
           </StackPanel>
         </Border>
 

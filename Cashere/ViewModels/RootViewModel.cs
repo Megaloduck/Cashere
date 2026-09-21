@@ -81,7 +81,7 @@ public partial class RootViewModel : ViewModelBase
         AutoLockService.Stop();
 
         var login = new LoginViewModel(_cashierAdmin, "Cashere");
-        login.LoginSucceeded += OnLoginSucceeded;   
+        login.LoginSucceeded += OnLoginSucceeded;
         CurrentView = login;
 
         _ = LoadShopNameAsync(login);
@@ -110,8 +110,9 @@ public partial class RootViewModel : ViewModelBase
         var security = await _shopContext.GetSecuritySettingsAsync();
         AutoLockService.Configure(security.AutoLockEnabled, security.AutoLockTimeoutMinutes);
 
-        var preferences = await _shopContext.GetSettingsAsync();
-        ClockPreferenceService.Configure(preferences?.ClockSource ?? ClockSource.SystemLocal);
+        // No clock/timezone configuration needed here anymore - Cashere runs
+        // as a single local install, so every timestamp always displays in
+        // this device's own local time. See ClockPreferenceService.
 
         var headerClock = await _shopContext.GetHeaderClockSettingsAsync();
         HeaderClockService.Current.Configure(

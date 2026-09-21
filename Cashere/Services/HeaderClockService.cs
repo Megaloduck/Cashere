@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -14,8 +12,12 @@ namespace Cashere.Services;
 // headers - each component's visibility is configured under Settings ->
 // Preferences and applied immediately, same "live" feel as
 // ThemeApplier/AutoLockService. A DispatcherTimer ticking every second
-// keeps HoursText current without PosViewModel/AdminViewModel needing to
-// know anything about clocks - they just expose this same instance.
+// keeps HoursText current. "Now" is always derived from DateTime.UtcNow
+// through ClockPreferenceService.ToDisplay - the same conversion every
+// other stored timestamp in the app goes through (see
+// UtcToDisplayTimeConverter) - which is what keeps the header clock, the
+// Cash Register "Shift Open" line, and Recent Shifts all agreeing with
+// each other.
 public partial class HeaderClockViewModel : ObservableObject
 {
     private readonly DispatcherTimer _timer;
@@ -58,7 +60,7 @@ public partial class HeaderClockViewModel : ObservableObject
 
     private void UpdateNow()
     {
-        var now = DateTime.Now;
+        var now = ClockPreferenceService.ToDisplay(DateTime.UtcNow);
         DayText = now.ToString("dddd");
         DateText = now.ToString("dd");
         MonthText = now.ToString("MMMM");

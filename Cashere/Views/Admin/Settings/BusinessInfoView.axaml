@@ -44,7 +44,9 @@
       </Grid>
 
       <TextBlock Text="TIMEZONE" Classes="eyebrow"/>
-      <TextBox Text="{Binding Timezone}" Watermark="e.g. Asia/Jakarta"/>
+      <ComboBox ItemsSource="{Binding TimezoneOptions}" SelectedItem="{Binding Timezone}" HorizontalAlignment="Stretch"/>
+      <TextBlock Text="Reference only (e.g. for printed info) - doesn't change how times are displayed. Times always follow this device's own local clock."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
       <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"

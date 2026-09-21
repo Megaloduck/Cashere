@@ -12,6 +12,13 @@ public class ReceiptAdmin
     public string Currency { get; set; } = "IDR";
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
+
+    // Business Info's Timezone picker. Purely informational/reference (what
+    // timezone the shop is physically in, e.g. for printed info) - it does
+    // NOT affect how any timestamp is displayed. Stored as a TimezoneOption
+    // label (e.g. "Jakarta (GMT+7)") from TimezonePresets.FixedOffsets.
+    // Actual display always follows this device's own local clock; see
+    // ClockPreferenceService.
     public string? Timezone { get; set; }
 
     // Settings -> Preferences. Drives the live day/date/month/year/hours
@@ -23,11 +30,6 @@ public class ReceiptAdmin
     public bool ShowHeaderMonth { get; set; } = true;
     public bool ShowHeaderYear { get; set; } = true;
     public bool ShowHeaderHours { get; set; } = true;
-
-    // Settings -> Preferences. Governs whether timestamps display in this
-    // device's local time or UTC, so multiple tills/phones agree on one clock
-    // instead of each showing its own machine's local time.
-    public ClockSource ClockSource { get; set; } = ClockSource.SystemLocal;
 
     public bool TrackInventory { get; set; } = true;
     public OutOfStockBehavior OutOfStockBehavior { get; set; } = OutOfStockBehavior.Block;

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Cashere.Models;
 using Cashere.Services;
@@ -17,14 +15,18 @@ namespace Cashere.ViewModels.Admin.Settings;
 // already built on DynamicResource Color bindings - see that file's
 // ThemeDictionaries for the Light/Dark palettes, and ThemeApplier for how a
 // saved choice gets applied both at startup and live when Save runs here.
+//
+// There is deliberately no configurable clock/timezone setting here -
+// Cashere runs as a single local install, so every timestamp in the app
+// always displays in this device's own local time (see
+// ClockPreferenceService). Business Info's Timezone field is a separate,
+// purely informational value (what timezone the shop is physically in)
+// and doesn't affect this.
 public partial class PreferencesViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
 
     public IReadOnlyList<AppThemeMode> ThemeModes { get; } = Enum.GetValues<AppThemeMode>();
-    public IReadOnlyList<ClockSource> ClockSources { get; } = Enum.GetValues<ClockSource>();
-
-    [ObservableProperty] private ClockSource _selectedClockSource = ClockSource.SystemLocal;
 
     [ObservableProperty] private AppThemeMode _selectedTheme = AppThemeMode.System;
     [ObservableProperty] private string? _statusMessage;
@@ -46,14 +48,12 @@ public partial class PreferencesViewModel : ViewModelBase
         if (settings is null) return;
 
         SelectedTheme = settings.ThemeMode;
-        SelectedTheme = settings.ThemeMode;
         ShowHeaderClock = settings.ShowHeaderClock;
         ShowHeaderDay = settings.ShowHeaderDay;
         ShowHeaderDate = settings.ShowHeaderDate;
         ShowHeaderMonth = settings.ShowHeaderMonth;
         ShowHeaderYear = settings.ShowHeaderYear;
         ShowHeaderHours = settings.ShowHeaderHours;
-        SelectedClockSource = settings.ClockSource;
     }
 
     [RelayCommand]
@@ -69,12 +69,10 @@ public partial class PreferencesViewModel : ViewModelBase
         settings.ShowHeaderMonth = ShowHeaderMonth;
         settings.ShowHeaderYear = ShowHeaderYear;
         settings.ShowHeaderHours = ShowHeaderHours;
-        settings.ClockSource = SelectedClockSource;
 
         await _shopContext.UpdateSettingsAsync(settings);
 
         ThemeApplier.Apply(SelectedTheme);
-        ClockPreferenceService.Configure(SelectedClockSource);
         HeaderClockService.Current.Configure(
             ShowHeaderClock, ShowHeaderDay, ShowHeaderDate, ShowHeaderMonth, ShowHeaderYear, ShowHeaderHours);
 

@@ -18,10 +18,19 @@ public record ShiftListItem(
     decimal? DiscrepancyAmount,
     ShiftStatus Status)
 {
-    // EXAMPLE = "09:00 - 17:30" for a closed shift, "09:00 - ..." while still open.
-    public string DurationDisplay => ClosedAt is { } closedAt
-        ? $"{OpenedAt:HH:mm} - {closedAt:HH:mm}"
-        : $"{OpenedAt:HH:mm} - ...";
+    // Routed through ClockPreferenceService so this agrees with the header
+    // clock and every other timestamp on screen, instead of showing the
+    // raw stored UTC hours directly.
+    public string DurationDisplay
+    {
+        get
+        {
+            var opened = ClockPreferenceService.ToDisplay(OpenedAt);
+            return ClosedAt is { } closedAt
+                ? $"{opened:HH:mm} - {ClockPreferenceService.ToDisplay(closedAt):HH:mm}"
+                : $"{opened:HH:mm} - ...";
+        }
+    }
 }
 public interface IShiftAdminService
 {

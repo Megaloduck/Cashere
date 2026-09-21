@@ -52,8 +52,8 @@ public enum AppThemeMode
     Dark,
     System
 }
-public enum ClockSource
-{
-    SystemLocal,
-    Utc
-}
+
+// ClockSource (SystemLocal/Utc) was removed: Cashere runs as a single
+// local install, so every displayed timestamp now always follows this
+// device's own local time zone with no configuration needed - see
+// ClockPreferenceService.

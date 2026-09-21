@@ -24,7 +24,7 @@
       </Button>
     </Grid>
 
-    <Grid Grid.Row="1" ColumnDefinitions="1.2*,1.2*,1*,1*,Auto,150" Margin="0,0,0,4">
+    <Grid Grid.Row="1" ColumnDefinitions="1.2*,1.2*,1*,1*,1*,150" Margin="0,0,0,4">
       <TextBlock Grid.Column="0" Text="CODE" Classes="eyebrow"/>
       <TextBlock Grid.Column="1" Text="DISCOUNT" Classes="eyebrow"/>
       <TextBlock Grid.Column="2" Text="USAGE" Classes="eyebrow"/>
@@ -39,7 +39,7 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Voucher">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
-              <Grid ColumnDefinitions="1.2*,1.2*,1*,1*,Auto,150">
+              <Grid ColumnDefinitions="1.2*,1.2*,1*,1*,1*,150">
                 <TextBlock Grid.Column="0" Text="{Binding Code}" FontWeight="Black" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">

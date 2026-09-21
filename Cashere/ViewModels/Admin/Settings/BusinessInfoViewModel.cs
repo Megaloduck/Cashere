@@ -2,26 +2,29 @@
 using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Cashere.ViewModels.Admin.Settings;
 
 // Owns the store-identity fields that used to be editable on
 // ReceiptAdminViewModel (ShopName, Address, Phone, Currency, TaxRatePercent),
-// plus the new Email/TaxId/Timezone fields - all still backed by the same
+// plus the Email/TaxId/Timezone fields - all still backed by the same
 // single-row ReceiptAdmin table Receipts and Synchronization already write
 // to. Save() re-fetches the row fresh rather than trusting a possibly-stale
 // _loadedSettings snapshot, since three different screens can now write to
 // this same row in one admin session; that avoids clobbering whatever
 // Receipts or Synchronization saved most recently.
+//
+// Timezone here is purely informational (what timezone the shop is
+// physically in, e.g. for reference/printed info) - it does not affect how
+// any timestamp is displayed. Display always follows this device's own
+// local time; see ClockPreferenceService and PreferencesView's note.
 public partial class BusinessInfoViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
+
+    public IReadOnlyList<TimezoneOption> TimezoneOptions { get; } = TimezonePresets.FixedOffsets;
 
     [ObservableProperty] private string _shopName = string.Empty;
     [ObservableProperty] private string _address = string.Empty;
@@ -29,7 +32,7 @@ public partial class BusinessInfoViewModel : ViewModelBase
     [ObservableProperty] private string _email = string.Empty;
     [ObservableProperty] private string _taxId = string.Empty;
     [ObservableProperty] private string _currency = "IDR";
-    [ObservableProperty] private string _timezone = string.Empty;
+    [ObservableProperty] private TimezoneOption? _timezone;
     [ObservableProperty] private string _taxRatePercent = "0";
     [ObservableProperty] private string? _statusMessage;
 
@@ -49,8 +52,8 @@ public partial class BusinessInfoViewModel : ViewModelBase
         Email = settings.Email ?? string.Empty;
         TaxId = settings.TaxId ?? string.Empty;
         Currency = settings.Currency;
-        Timezone = settings.Timezone ?? string.Empty;
         TaxRatePercent = settings.TaxRatePercent.ToString();
+        Timezone = TimezonePresets.FindByLabel(settings.Timezone);
     }
 
     [RelayCommand]
@@ -78,7 +81,7 @@ public partial class BusinessInfoViewModel : ViewModelBase
         settings.Email = string.IsNullOrWhiteSpace(Email) ? null : Email.Trim();
         settings.TaxId = string.IsNullOrWhiteSpace(TaxId) ? null : TaxId.Trim();
         settings.Currency = Currency.Trim();
-        settings.Timezone = string.IsNullOrWhiteSpace(Timezone) ? null : Timezone.Trim();
+        settings.Timezone = Timezone?.Label;
         settings.TaxRatePercent = taxRate;
 
         await _shopContext.UpdateSettingsAsync(settings);
