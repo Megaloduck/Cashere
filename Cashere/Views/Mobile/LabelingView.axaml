@@ -13,7 +13,7 @@
     <!-- Not connected -->
     <StackPanel Margin="24" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center"
                 IsVisible="{Binding !IsConnected}">
-      <mi:MaterialIcon Kind="LanDisconnect" Width="32" Height="32" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center"/>
+      <mi:MaterialIcon Kind="LanDisconnect" Width="32" Height="32" Foreground="{StaticResource GrayBrush}" HorizontalAlignment="Center" Margin="8,0,0,0"/>
       <TextBlock Text="NOT CONNECTED" Classes="eyebrow" HorizontalAlignment="Center"/>
       <TextBlock Text="Go to the PAIR tab and connect to a till first." TextWrapping="Wrap" TextAlignment="Center" Foreground="{StaticResource GrayBrush}"/>
     </StackPanel>

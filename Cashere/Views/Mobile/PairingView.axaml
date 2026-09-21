@@ -42,7 +42,7 @@
         <TextBlock Text="You're connected. Switch to SCAN to start ringing up items, or LABEL to photograph a product."
                    TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"/>
 
-        <Button Classes="ghost" Command="{Binding DisconnectCommand}">
+        <Button Classes="accent-red" Command="{Binding DisconnectCommand}">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <mi:MaterialIcon Kind="LanDisconnect" Width="16" Height="16"/>
             <TextBlock Text="DISCONNECT"/>
