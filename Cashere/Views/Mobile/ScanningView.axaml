@@ -72,7 +72,7 @@
           </Button>
         </Grid>
         <TextBlock Text="{Binding LastScanMessage}" FontWeight="Bold" TextWrapping="Wrap" 
-                   IsVisible="{Binding LastScanMessage}, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    IsVisible="{Binding LastScanMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
         <Border Classes="rule-thick"/>
 
