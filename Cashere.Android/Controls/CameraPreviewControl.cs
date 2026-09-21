@@ -40,6 +40,15 @@ public class CameraPreviewControl : NativeControlHost
                 ViewGroup.LayoutParams.MatchParent)
         };
 
+        // Default ("Performance") mode backs this with a SurfaceView, which
+        // composites as its own layer outside Avalonia's view hierarchy - it
+        // ignores ClipToBounds and, inside a ScrollViewer, can drift out of
+        // sync with the card's actual position/scroll offset (the overflow
+        // seen in ScanningView). "Compatible" mode backs it with a TextureView
+        // instead, which renders as a normal View and stays clipped/positioned
+        // correctly like everything else on screen.
+        PreviewView.SetImplementationMode(PreviewView.ImplementationMode.Compatible);
+
         var radiusPx = TypedValue.ApplyDimension(ComplexUnitType.Dip, CornerRadiusDip, context.Resources?.DisplayMetrics);
         PreviewView.OutlineProvider = new RoundedOutlineProvider(radiusPx);
         PreviewView.ClipToOutline = true;

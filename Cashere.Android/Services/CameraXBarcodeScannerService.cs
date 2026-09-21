@@ -8,6 +8,7 @@ using AndroidX.Camera.Lifecycle;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using AndroidX.Lifecycle;
+using Android.Util;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Cashere.Android.Controls;
@@ -95,10 +96,28 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService
 
     public async Task StartAsync()
     {
-        if (_previewControl?.PreviewView is null)
+        if (_previewControl is null)
         {
             throw new InvalidOperationException(
                 "CreatePreviewControl() must be attached to the visual tree before StartAsync().");
+        }
+
+        // Native PreviewView attaches asynchronously after Content is assigned -
+        // poll briefly instead of failing on the very first check (same fix as
+        // CameraXPhotoCaptureService.StartAsync).
+        var waited = TimeSpan.Zero;
+        var pollInterval = TimeSpan.FromMilliseconds(25);
+        var timeout = TimeSpan.FromSeconds(3);
+        while (_previewControl.PreviewView is null && waited < timeout)
+        {
+            await Task.Delay(pollInterval);
+            waited += pollInterval;
+        }
+
+        if (_previewControl.PreviewView is null)
+        {
+            throw new InvalidOperationException(
+                "Camera preview surface never became ready - try again.");
         }
 
         _cameraProvider ??= await GetCameraProviderAsync();
@@ -200,5 +219,15 @@ public class CameraXBarcodeScannerService : IBarcodeScannerService
         }
 
         public void Analyze(IImageProxy image) => _analyze(image);
+
+        // ImageAnalysis.Analyzer declares these as Java default methods, but
+        // this binding surfaces them as members that must be implemented
+        // explicitly - without them, CameraX's internal call into either one
+        // throws AbstractMethodError at runtime. null / 0 reproduce CameraX's
+        // own built-in defaults (no preferred resolution; original coordinate
+        // system), so behavior is unchanged from what Java would do implicitly.
+        public Size? DefaultTargetResolution => null;
+
+        public int TargetCoordinateSystem => 0; // ImageAnalysis.CoordinateSystemOriginal
     }
 }

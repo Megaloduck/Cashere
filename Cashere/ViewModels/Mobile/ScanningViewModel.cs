@@ -45,6 +45,27 @@ public partial class ScanningViewModel : ViewModelBase
     private decimal _cartSubtotal;
 
     [ObservableProperty]
+    private int _scanQuantity = 1;
+
+    [RelayCommand]
+    private void IncrementQuantity() => ScanQuantity++;
+
+    [RelayCommand]
+    private void DecrementQuantity()
+    {
+        if (ScanQuantity > 1) ScanQuantity--;
+    }
+
+    [RelayCommand]
+    private void QuickQuantity1() => ScanQuantity = 1;
+
+    [RelayCommand]
+    private void QuickQuantity5() => ScanQuantity = 5;
+
+    [RelayCommand]
+    private void QuickQuantity10() => ScanQuantity = 10;
+
+    [ObservableProperty]
     private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
 
     public bool IsConnected => State == SyncConnectionState.Connected;
@@ -145,16 +166,22 @@ public partial class ScanningViewModel : ViewModelBase
     // ScanBarcode round trip to the till is identical either way.
     private async Task ProcessScanAsync(string barcode)
     {
+        var quantity = ScanQuantity;
         try
         {
-            var outcome = await _syncClient.ScanBarcodeAsync(barcode);
+            var outcome = await _syncClient.ScanBarcodeAsync(barcode, quantity);
             LastScanMessage = outcome.Found
-                ? $"Added: {outcome.ProductName}"
+                ? $"Added: {outcome.ProductName} x{quantity}"
                 : outcome.Message ?? "No product matches that barcode.";
 
             if (outcome.Cart is not null)
             {
                 HandleCartUpdated(outcome.Cart);
+            }
+
+            if (outcome.Found)
+            {
+                ScanQuantity = 1;
             }
         }
         catch (Exception ex)

@@ -26,7 +26,8 @@
         <TextBlock Text="PORT" Classes="eyebrow"/>
         <TextBox Text="{Binding PortInput}" Watermark="5177"/>
 
-        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" 
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
         <Button Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 Padding="0,14" FontSize="16" Command="{Binding ConnectCommand}" IsEnabled="{Binding CanConnect}">

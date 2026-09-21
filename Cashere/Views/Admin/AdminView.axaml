@@ -15,43 +15,43 @@
 
   <Grid RowDefinitions="Auto,Auto,*">
     <Border Grid.Row="0" Background="{StaticResource ChromeBrush}" Padding="20,14">
-  <Grid ColumnDefinitions="Auto,*,Auto">
-    <!-- Left: Brand -->
-    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-      <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
-      <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
-      <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
-      <StackPanel Margin="10,0,0,0">
-        <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
-        <TextBlock Text="{Binding CurrentSectionTitle}" Classes="eyebrow" Foreground="#B8B8B8"/>
-      </StackPanel>
-    </StackPanel>
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <!-- Left: Brand -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Border Width="14" Height="14" Background="{StaticResource RedBrush}"/>
+          <Border Width="14" Height="14" Background="{StaticResource YellowBrush}"/>
+          <Border Width="14" Height="14" Background="{StaticResource BlueBrush}"/>
+          <StackPanel Margin="10,0,0,0">
+            <TextBlock Text="CASHERE" Classes="headline" Foreground="White"/>
+            <TextBlock Text="{Binding CurrentSectionTitle}" Classes="eyebrow" Foreground="#B8B8B8"/>
+          </StackPanel>
+        </StackPanel>
 
-    <!-- Center: Header Clock -->
-    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                IsVisible="{Binding HeaderClock.IsVisible}">
-      <TextBlock Text="{Binding HeaderClock.DayText}" IsVisible="{Binding HeaderClock.ShowDay}"
-                 Foreground="#B8B8B8" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
-      <TextBlock Text="{Binding HeaderClock.DateText}" IsVisible="{Binding HeaderClock.ShowDate}"
-                 Foreground="White" FontSize="14" FontWeight="Black" VerticalAlignment="Center"/>
-      <TextBlock Text="{Binding HeaderClock.MonthText}" IsVisible="{Binding HeaderClock.ShowMonth}"
-                 Foreground="White" FontSize="14" FontWeight="Black" VerticalAlignment="Center"/>
-      <TextBlock Text="{Binding HeaderClock.YearText}" IsVisible="{Binding HeaderClock.ShowYear}"
-                 Foreground="#B8B8B8" FontSize="13" VerticalAlignment="Center"/>
-      <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3"
-              IsVisible="{Binding HeaderClock.ShowHours}">
-        <TextBlock Text="{Binding HeaderClock.HoursText}" Foreground="Black" FontWeight="Black" FontSize="14"/>
-      </Border>
-    </StackPanel>
+        <!-- Center: Header Clock -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding HeaderClock.IsVisible}">
+          <TextBlock Text="{Binding HeaderClock.DayText}" IsVisible="{Binding HeaderClock.ShowDay}"
+                     Foreground="#B8B8B8" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding HeaderClock.DateText}" IsVisible="{Binding HeaderClock.ShowDate}"
+                     Foreground="White" FontSize="14" FontWeight="Black" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding HeaderClock.MonthText}" IsVisible="{Binding HeaderClock.ShowMonth}"
+                     Foreground="White" FontSize="14" FontWeight="Black" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding HeaderClock.YearText}" IsVisible="{Binding HeaderClock.ShowYear}"
+                     Foreground="#B8B8B8" FontSize="13" VerticalAlignment="Center"/>
+          <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3"
+                  IsVisible="{Binding HeaderClock.ShowHours}">
+            <TextBlock Text="{Binding HeaderClock.HoursText}" Foreground="Black" FontWeight="Black" FontSize="14"/>
+          </Border>
+        </StackPanel>
 
-    <!-- Right: Back to POS button -->
-    <Button Grid.Column="2" Content="BACK TO POS" Classes="accent-yellow"
-            Command="{Binding BackCommand}"
-            VerticalAlignment="Center" HorizontalAlignment="Right"/>
-  </Grid>
-</Border>
+        <!-- Right: Back to POS button -->
+        <Button Grid.Column="2" Content="BACK TO POS" Classes="accent-yellow"
+                Command="{Binding BackCommand}"
+                VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      </Grid>
+    </Border>
 
     <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Height="6">
       <Border Grid.Column="0" Background="{StaticResource RedBrush}"/>
@@ -62,92 +62,97 @@
     <Grid Grid.Row="2" ColumnDefinitions="220,*">
 
       <Border Grid.Column="0" Background="{StaticResource BlueBrush}">
-        <ScrollViewer VerticalScrollBarVisibility="Hidden">
-          <StackPanel Margin="0,16">
+        <Grid RowDefinitions="*,Auto">
+          <!-- Scrollable nav content -->
+          <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Hidden">
+            <StackPanel Margin="0,16,0,0">
 
-            <TextBlock Text="CATALOG" Classes="nav-group-label"/>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Products}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Products}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18"/>
-                <TextBlock Text="PRODUCTS"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Purchases}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Purchases}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="TruckDeliveryOutline" Width="18" Height="18"/>
-                <TextBlock Text="PURCHASES"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Suppliers}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Suppliers}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="OfficeBuildingOutline" Width="18" Height="18"/>
-                <TextBlock Text="SUPPLIERS"/>
-              </StackPanel>
-            </Button>
+              <TextBlock Text="CATALOG" Classes="nav-group-label"/>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Products}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Products}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18"/>
+                  <TextBlock Text="PRODUCTS"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Purchases}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Purchases}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="TruckDeliveryOutline" Width="18" Height="18"/>
+                  <TextBlock Text="PURCHASES"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Suppliers}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Suppliers}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="OfficeBuildingOutline" Width="18" Height="18"/>
+                  <TextBlock Text="SUPPLIERS"/>
+                </StackPanel>
+              </Button>
 
-            <TextBlock Text="PROMOTIONS" Classes="nav-group-label"/>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Vouchers}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Vouchers}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="TicketPercentOutline" Width="18" Height="18"/>
-                <TextBlock Text="VOUCHERS"/>
-              </StackPanel>
-            </Button>
+              <TextBlock Text="PROMOTIONS" Classes="nav-group-label"/>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Vouchers}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Vouchers}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="TicketPercentOutline" Width="18" Height="18"/>
+                  <TextBlock Text="VOUCHERS"/>
+                </StackPanel>
+              </Button>
 
-            <TextBlock Text="PEOPLE" Classes="nav-group-label"/>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Customers}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="AccountGroupOutline" Width="18" Height="18"/>
-                <TextBlock Text="CUSTOMERS"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Cashiers}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Cashiers}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
-                <TextBlock Text="CASHIERS"/>
-              </StackPanel>
-            </Button>
+              <TextBlock Text="PEOPLE" Classes="nav-group-label"/>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Customers}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="AccountGroupOutline" Width="18" Height="18"/>
+                  <TextBlock Text="CUSTOMERS"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Cashiers}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Cashiers}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
+                  <TextBlock Text="CASHIERS"/>
+                </StackPanel>
+              </Button>
 
-            <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="History" Width="18" Height="18"/>
-                <TextBlock Text="SALES HISTORY"/>
-              </StackPanel>
-            </Button>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesReport}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="ChartBar" Width="18" Height="18"/>
-                <TextBlock Text="SALES REPORTS"/>
-              </StackPanel>
-            </Button>
+              <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="History" Width="18" Height="18"/>
+                  <TextBlock Text="SALES HISTORY"/>
+                </StackPanel>
+              </Button>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesReport}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="ChartBar" Width="18" Height="18"/>
+                  <TextBlock Text="SALES REPORTS"/>
+                </StackPanel>
+              </Button>
 
-            <TextBlock Text="SYSTEM" Classes="nav-group-label"/>
-            <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
-                    Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
+              <TextBlock Text="SYSTEM" Classes="nav-group-label"/>
+              <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
+                  <TextBlock Text="SETTINGS"/>
+                </StackPanel>
+              </Button>
+
+            </StackPanel>
+          </ScrollViewer>
+
+          <!-- Docked logout button at the bottom -->
+          <Border Grid.Row="1" Padding="16,12" BorderThickness="0,1,0,0" BorderBrush="#33FFFFFF">
+            <Button Classes="accent-red" Command="{Binding LogoutCommand}" HorizontalAlignment="Stretch">
               <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
-                <TextBlock Text="SETTINGS"/>
+                <mi:MaterialIcon Kind="LogoutVariant" Width="18" Height="18"/>
+                <TextBlock Text="LOGOUT"/>
               </StackPanel>
             </Button>
-
-            <Border Height="2" Background="#2A2A2A" Margin="16,16,16,8"/>
-            <Button Classes="nav-item" Command="{Binding LogoutCommand}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <mi:MaterialIcon Kind="LogoutVariant" Width="18" Height="18" Foreground="{StaticResource RedBrush}"/>
-                <TextBlock Text="LOGOUT" Foreground="{StaticResource RedBrush}"/>
-              </StackPanel>
-            </Button>
-
-          </StackPanel>
-        </ScrollViewer>
+          </Border>
+        </Grid>
       </Border>
 
       <Border Grid.Column="1" Padding="16">

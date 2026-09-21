@@ -41,7 +41,7 @@ public partial class ScanningView : UserControl
         }
     }
 
-    private void OnCameraReadyChanged(bool ready)
+    private async void OnCameraReadyChanged(bool ready)
     {
         if (DataContext is not ScanningViewModel vm || vm.Scanner is null) return;
 
@@ -49,7 +49,15 @@ public partial class ScanningView : UserControl
         {
             _cameraPreviewControl ??= vm.Scanner.CreatePreviewControl();
             CameraPreviewHost.Content = _cameraPreviewControl;
-            _ = vm.Scanner.StartAsync();
+
+            try
+            {
+                await vm.Scanner.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                vm.LastScanMessage = $"Could not start camera: {ex.Message}";
+            }
         }
         else
         {
