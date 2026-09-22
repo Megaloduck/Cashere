@@ -11,7 +11,7 @@
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
       <TextBlock Grid.Column="0" Text="CONNECTED DEVICES" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
-      <Button Grid.Column="1" Classes="accent-blue" Command="{Binding RefreshCommand}">
+      <Button Grid.Column="1" Classes="accent-yellow" Command="{Binding RefreshCommand}">
         <StackPanel Orientation="Horizontal" Spacing="6">
           <mi:MaterialIcon Kind="Refresh" Width="16" Height="16"/>
           <TextBlock Text="REFRESH"/>

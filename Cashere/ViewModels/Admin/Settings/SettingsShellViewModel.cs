@@ -16,7 +16,8 @@ public partial class SettingsShellViewModel : ViewModelBase
     public ReceiptAdminViewModel Receipts { get; }
     public PaymentSettingsViewModel Payments { get; }
     public InventorySettingsViewModel Inventory { get; }
-    public HardwareSettingsViewModel Hardware { get; }
+    public HardwareSettingsViewModel Hardware { get; }  
+    public SyncronizationAdminViewModel Synchronization { get; }
     public NetworkSettingsViewModel Network { get; }
     public CashRegisterViewModel CashRegister { get; }
     public SalesBehaviorSettingsViewModel SalesBehavior { get; }
@@ -74,6 +75,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
         Payments = new PaymentSettingsViewModel(shopContext);
         Inventory = new InventorySettingsViewModel(shopContext);
+                Synchronization = new SyncronizationAdminViewModel(shopContext, AppServices.PairingQrCode);
         Hardware = new HardwareSettingsViewModel(shopContext, receiptPrinter);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices);
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);

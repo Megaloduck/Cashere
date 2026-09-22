@@ -30,5 +30,6 @@ namespace Cashere.Services
         public static IRefundService? RefundService { get; set; }
         public static IVoucherAdminService? VoucherAdmin { get; set; }
         public static IReportExportService? ReportExport { get; set; }
+        public static IPairingQrCodeService? PairingQrCode { get; set; }
     }
 }

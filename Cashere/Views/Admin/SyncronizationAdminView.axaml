@@ -19,6 +19,14 @@
 
     <ScrollViewer Grid.Row="1">
         <StackPanel Spacing="10">
+            <StackPanel Spacing="8" IsVisible="{Binding IsPairingQrCodeAvailable}" HorizontalAlignment="Center" Margin="0,0,0,8">
+  <TextBlock Text="SCAN TO PAIR A PHONE" Classes="eyebrow" HorizontalAlignment="Center"/>
+  <Border Classes="card" Padding="12" Width="180" Height="180">
+    <Image Source="{Binding PairingQrCodeImage}" Stretch="Uniform"/>
+  </Border>
+</StackPanel>
+
+<Border Classes="rule-thick" Margin="0,4" IsVisible="{Binding IsPairingQrCodeAvailable}"/>
                     <TextBlock Text="BIND ADDRESS" Classes="eyebrow"/>
                     <ComboBox ItemsSource="{Binding AvailableBindAddresses}"
                               SelectedItem="{Binding ServerBindAddress}"

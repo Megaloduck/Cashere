@@ -54,6 +54,7 @@ sealed class Program
         AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);
         AppServices.DataBackup = new DataBackupService(dbPath);
         AppServices.AboutInfo = new AboutInfoService(dbContextFactory, dbPath);
+        AppServices.PairingQrCode = new QrCoderPairingQrCodeService();
 
         try
         {

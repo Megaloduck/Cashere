@@ -3,10 +3,12 @@ using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
 
 namespace Cashere.ViewModels.Admin;
 
@@ -34,6 +36,17 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         _shopContext = shopContext;
     }
 
+    private readonly IPairingQrCodeService? _pairingQrCode;
+
+    [ObservableProperty] private Bitmap? _pairingQrCodeImage;
+    public bool IsPairingQrCodeAvailable => _pairingQrCode is not null;
+
+    public SyncronizationAdminViewModel(IShopContextService shopContext, IPairingQrCodeService? pairingQrCode = null)
+    {
+        _shopContext = shopContext;
+        _pairingQrCode = pairingQrCode;
+    }
+
     public async Task LoadAsync()
     {
         var settings = await _shopContext.GetSettingsAsync();
@@ -43,11 +56,53 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         _loadedServerBindAddress = settings.ServerBindAddress;
         _loadedServerPort = settings.ServerPort;
 
+        RegeneratePairingQrCode();
         ServerBindAddress = settings.ServerBindAddress;
         ServerPort = settings.ServerPort.ToString();
 
         PopulateAvailableBindAddresses(settings.ServerBindAddress);
     }
+
+    // Generated from the currently ACTIVE settings, not the live-edited
+    // ServerBindAddress/ServerPort fields - a bind address/port change only
+    // takes effect after restart, so the QR must reflect what's actually
+    // listening right now, never an unsaved edit that wouldn't work yet.
+    private void RegeneratePairingQrCode()
+    {
+        if (_pairingQrCode is null) return;
+
+        var host = ResolveConnectableAddress(_loadedServerBindAddress);
+        var png = _pairingQrCode.GeneratePairingQrCodePng(host, _loadedServerPort);
+        if (png is null) return;
+
+        using var stream = new MemoryStream(png);
+        PairingQrCodeImage = new Bitmap(stream);
+    }
+
+    // "0.0.0.0" (bind all adapters) isn't itself reachable - resolve to an
+    // actual LAN IPv4 address a phone on the same network can connect to.
+    private static string ResolveConnectableAddress(string bindAddress)
+    {
+        if (!string.IsNullOrWhiteSpace(bindAddress) && bindAddress != "0.0.0.0")
+        {
+            return bindAddress;
+        }
+
+        try
+        {
+            return NetworkInterface.GetAllNetworkInterfaces()
+                .Where(nic => nic.OperationalStatus == OperationalStatus.Up
+                              && nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .SelectMany(nic => nic.GetIPProperties().UnicastAddresses)
+                .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
+                .Select(addr => addr.Address.ToString())
+                .FirstOrDefault() ?? "0.0.0.0";
+        }
+        catch
+        {
+            return "0.0.0.0";
+        }
+    }   
 
     // Same best-effort LAN-adapter discovery ReceiptAdminViewModel used to
     // do - moved here since bind address is now this screen's concern.

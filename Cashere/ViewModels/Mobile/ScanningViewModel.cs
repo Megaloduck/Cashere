@@ -42,10 +42,32 @@ public partial class ScanningViewModel : ViewModelBase
     private string _lastScanMessage = string.Empty;
 
     [ObservableProperty]
+    private bool _isCameraActive;
+
+    [ObservableProperty]
+    private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
+
+    [ObservableProperty]
     private decimal _cartSubtotal;
 
     [ObservableProperty]
     private int _scanQuantity = 1;
+
+    // ---- Derived state -----------------------------------------------------
+
+    public bool IsConnected => State == SyncConnectionState.Connected;
+
+    // Single source of truth: preview is only shown when we're connected,
+    // permission is granted, and the scanner session is actually running.
+    public bool ShowCameraPreview =>
+        IsConnected &&
+        CameraPermission == CameraPermissionStatus.Granted &&
+        IsCameraActive;
+
+    public bool CameraPermissionDenied =>
+        CameraPermission == CameraPermissionStatus.Denied;
+
+    // ---- Commands ----------------------------------------------------------
 
     [RelayCommand]
     private void IncrementQuantity() => ScanQuantity++;
@@ -65,12 +87,29 @@ public partial class ScanningViewModel : ViewModelBase
     [RelayCommand]
     private void QuickQuantity10() => ScanQuantity = 10;
 
-    [ObservableProperty]
-    private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
+    [RelayCommand]
+    private async Task EnableCamera()
+    {
+        if (_scanner is null) return;
 
-    public bool IsConnected => State == SyncConnectionState.Connected;
-    public bool ShowCameraPreview => IsConnected && CameraPermission == CameraPermissionStatus.Granted;
-    public bool CameraPermissionDenied => CameraPermission == CameraPermissionStatus.Denied;
+        CameraPermission = await _scanner.RequestCameraPermissionAsync();
+        if (CameraPermission == CameraPermissionStatus.Granted)
+        {
+            IsCameraActive = true;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SendManualScan()
+    {
+        if (string.IsNullOrWhiteSpace(ManualBarcode)) return;
+
+        var barcode = ManualBarcode.Trim();
+        ManualBarcode = string.Empty;
+        await ProcessScanAsync(barcode);
+    }
+
+    // ---- Construction ------------------------------------------------------
 
     public ScanningViewModel(IPosSyncClientService syncClient, IBarcodeScannerService? scanner = null)
     {
@@ -88,6 +127,8 @@ public partial class ScanningViewModel : ViewModelBase
         State = _syncClient.State;
     }
 
+    // ---- Lifecycle ---------------------------------------------------------
+
     // Called by MobileShellViewModel whenever this section becomes visible.
     public async Task RefreshAsync()
     {
@@ -104,6 +145,26 @@ public partial class ScanningViewModel : ViewModelBase
         }
     }
 
+    // Called by MobileShellViewModel whenever this tab is navigated away from.
+    // Tears the camera down right now and flips IsCameraActive false, so the
+    // next visit requires (and correctly triggers) a fresh StartAsync() against
+    // whatever new View instance is showing - instead of silently believing the
+    // camera is "already on" while the session backing that belief was actually
+    // torn down along with the old View.
+    public async Task DeactivateCameraAsync()
+    {
+        if (!IsCameraActive) return;
+
+        IsCameraActive = false;
+
+        if (_scanner is not null)
+        {
+            await _scanner.StopAsync();
+        }
+    }
+
+    // ---- Event handlers ----------------------------------------------------
+
     private async void HandleSyncStateChanged(SyncConnectionState state)
     {
         State = state;
@@ -113,6 +174,7 @@ public partial class ScanningViewModel : ViewModelBase
         if (state != SyncConnectionState.Connected && _scanner is not null)
         {
             await _scanner.StopAsync();
+            IsCameraActive = false;
         }
     }
 
@@ -130,37 +192,29 @@ public partial class ScanningViewModel : ViewModelBase
     // the till has no way to tell the two apart, by design.
     private void HandleBarcodeScanned(string barcode) => _ = ProcessScanAsync(barcode);
 
+    // ---- Property change hooks --------------------------------------------
+
     partial void OnStateChanged(SyncConnectionState value)
     {
         OnPropertyChanged(nameof(IsConnected));
-        OnPropertyChanged(nameof(ShowCameraPreview));
-        CameraReadyChanged?.Invoke(ShowCameraPreview);
+        NotifyCameraPreviewChanged();
     }
 
     partial void OnCameraPermissionChanged(CameraPermissionStatus value)
     {
-        OnPropertyChanged(nameof(ShowCameraPreview));
         OnPropertyChanged(nameof(CameraPermissionDenied));
+        NotifyCameraPreviewChanged();
+    }
+
+    partial void OnIsCameraActiveChanged(bool value) => NotifyCameraPreviewChanged();
+
+    private void NotifyCameraPreviewChanged()
+    {
+        OnPropertyChanged(nameof(ShowCameraPreview));
         CameraReadyChanged?.Invoke(ShowCameraPreview);
     }
 
-    [RelayCommand]
-    private async Task EnableCamera()
-    {
-        if (_scanner is null) return;
-
-        CameraPermission = await _scanner.RequestCameraPermissionAsync();
-    }
-
-    [RelayCommand]
-    private async Task SendManualScan()
-    {
-        if (string.IsNullOrWhiteSpace(ManualBarcode)) return;
-
-        var barcode = ManualBarcode.Trim();
-        ManualBarcode = string.Empty;
-        await ProcessScanAsync(barcode);
-    }
+    // ---- Scan processing ---------------------------------------------------
 
     // Shared by both the manual TextBox path and the camera path above - the
     // ScanBarcode round trip to the till is identical either way.

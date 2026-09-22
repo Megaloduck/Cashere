@@ -41,7 +41,7 @@ public partial class MobileShellViewModel : ViewModelBase
         IPhotoCaptureService? photoCapture,
         IProductPhotoService? productPhoto)
     {
-        Pairing = new PairingViewModel(syncClient);
+        Pairing = new PairingViewModel(syncClient, scanner);
         Scanning = new ScanningViewModel(syncClient, scanner);
         Labeling = new LabelingViewModel(syncClient, photoCapture, productPhoto);
     }
@@ -55,8 +55,10 @@ public partial class MobileShellViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(CurrentView));
 
-        // Picks up latest state in case a connection or catalog change
-        // happened on another tab while this one wasn't visible.
+        if (value != MobileSection.Pairing) _ = Pairing.DeactivateCameraAsync();
+        if (value != MobileSection.Scanning) _ = Scanning.DeactivateCameraAsync();
+        if (value != MobileSection.Labeling) _ = Labeling.DeactivateCameraAsync();
+
         if (value == MobileSection.Scanning)
         {
             _ = Scanning.RefreshAsync();

@@ -51,6 +51,9 @@ public partial class LabelingViewModel : ViewModelBase
     private bool _isCameraStarted;
 
     [ObservableProperty]
+    private bool _isCameraActive;
+
+    [ObservableProperty]
     private byte[]? _capturedPhoto;
 
     [ObservableProperty]
@@ -76,7 +79,7 @@ public partial class LabelingViewModel : ViewModelBase
     public void ReportCameraError(string message) => StatusMessage = message;
     public bool ShowCapturePanel => IsConnected && SelectedProduct is not null && CapturedPhoto is null;
     public bool ShowReviewPanel => IsConnected && SelectedProduct is not null && CapturedPhoto is not null;
-    public bool ShowCameraPreview => ShowCapturePanel && CameraPermission == CameraPermissionStatus.Granted;
+    public bool ShowCameraPreview => ShowCapturePanel && CameraPermission == CameraPermissionStatus.Granted && IsCameraActive;
     public bool CameraPermissionDenied => CameraPermission == CameraPermissionStatus.Denied;
 
     public LabelingViewModel(
@@ -243,6 +246,28 @@ public partial class LabelingViewModel : ViewModelBase
     {
         if (_photoCapture is null) return;
         CameraPermission = await _photoCapture.RequestCameraPermissionAsync();
+        if (CameraPermission == CameraPermissionStatus.Granted)
+        {
+            IsCameraActive = true;
+        }
+    }
+
+    partial void OnIsCameraActiveChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowCameraPreview));
+        CameraReadyChanged?.Invoke(ShowCameraPreview);
+    }
+
+    public async Task DeactivateCameraAsync()
+    {
+        if (!IsCameraActive) return;
+
+        IsCameraActive = false;
+
+        if (_photoCapture is not null)
+        {
+            await _photoCapture.StopAsync();
+        }
     }
 
     // Clearing CapturedPhoto flips ShowCameraPreview back to true (permission

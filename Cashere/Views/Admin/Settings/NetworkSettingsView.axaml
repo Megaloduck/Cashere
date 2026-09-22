@@ -16,8 +16,9 @@
   -->
   <ScrollViewer>
     <StackPanel Spacing="4">
+        <!-- Synchronization Devices -->
       <adminViews:SyncronizationAdminView DataContext="{Binding Synchronization}"/>
-      <Border Classes="rule-thick" Margin="12,8"/>
+        <!-- Connection Devices -->
       <adminViews:DevicesAdminView DataContext="{Binding ConnectedDevices}" Height="420"/>
     </StackPanel>
   </ScrollViewer>

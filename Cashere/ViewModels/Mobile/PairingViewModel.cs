@@ -28,6 +28,9 @@ public partial class PairingViewModel : ViewModelBase
     private string? _errorMessage;
 
     [ObservableProperty]
+    private CameraPermissionStatus _cameraPermission = CameraPermissionStatus.Unknown;
+
+    [ObservableProperty]
     private SyncConnectionState _state = SyncConnectionState.Disconnected;
 
     [ObservableProperty]
@@ -121,4 +124,92 @@ public partial class PairingViewModel : ViewModelBase
         await _syncClient.DisconnectAsync();
         ShopName = null;
     }
+
+    private readonly IBarcodeScannerService? _scanner;
+
+    public IBarcodeScannerService? Scanner => _scanner;
+    public bool CanScanQr => _scanner is not null;
+
+    public event Action<bool>? CameraReadyChanged;
+
+    [ObservableProperty]
+    private bool _isScanningQr;
+
+    public PairingViewModel(IPosSyncClientService syncClient, IBarcodeScannerService? scanner = null)
+    {
+        _syncClient = syncClient;
+        _scanner = scanner;
+        _syncClient.StateChanged += HandleSyncStateChanged;
+        _syncClient.Kicked += HandleKicked;
+
+        if (_scanner is not null)
+        {
+            _scanner.BarcodeScanned += HandlePairingScan;
+        }
+    }
+
+    [RelayCommand]
+    private async Task StartQrScan()
+    {
+        if (_scanner is null) return;
+
+        ErrorMessage = null;
+        CameraPermission = await _scanner.RequestCameraPermissionAsync();
+
+        if (CameraPermission != CameraPermissionStatus.Granted)
+        {
+            ErrorMessage = "Camera permission is required to scan a pairing QR code.";
+            return;
+        }
+
+        IsScanningQr = true;
+        CameraReadyChanged?.Invoke(true);
+    }
+
+    [RelayCommand]
+    private async Task CancelQrScan() => await StopQrScanInternalAsync();
+
+    private async Task StopQrScanInternalAsync()
+    {
+        if (!IsScanningQr) return;
+
+        IsScanningQr = false;
+        CameraReadyChanged?.Invoke(false);
+
+        if (_scanner is not null)
+        {
+            await _scanner.StopAsync();
+        }
+    }
+
+    // Payload is plain "host:port", matching what the desktop QR encodes.
+    private void HandlePairingScan(string payload)
+    {
+        if (!IsScanningQr) return;
+
+        // Split on the LAST colon so nothing breaks if a future payload ever
+        // used a host containing one (defensive, not expected today).
+        var separatorIndex = payload.LastIndexOf(':');
+        if (separatorIndex <= 0 || separatorIndex == payload.Length - 1 ||
+            !int.TryParse(payload[(separatorIndex + 1)..], out var port))
+        {
+            ErrorMessage = "That QR code isn't a valid pairing code.";
+            return;
+        }
+
+        HostInput = payload[..separatorIndex];
+        PortInput = port.ToString();
+
+        _ = StopQrScanInternalAsync();
+
+        if (ConnectCommand.CanExecute(null))
+        {
+            ConnectCommand.Execute(null);
+        }
+    }
+
+    public void ReportQrScanError(string message) => ErrorMessage = message;
+
+    // Called by MobileShellViewModel when navigating away from this tab.
+    public Task DeactivateCameraAsync() => StopQrScanInternalAsync();
 }
