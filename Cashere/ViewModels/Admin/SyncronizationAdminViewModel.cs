@@ -20,6 +20,7 @@ namespace Cashere.ViewModels.Admin;
 public partial class SyncronizationAdminViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
+    private readonly IPairingQrCodeService? _pairingQrCode;
 
     private ReceiptAdmin? _loadedSettings;
     private string _loadedServerBindAddress = "0.0.0.0";
@@ -29,19 +30,18 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
     [ObservableProperty] private string _serverPort = "5177";
     [ObservableProperty] private string? _statusMessage;
 
+    [ObservableProperty] private Bitmap? _pairingQrCodeImage;
+
     public ObservableCollection<string> AvailableBindAddresses { get; } = new();
 
-    public SyncronizationAdminViewModel(IShopContextService shopContext)
-    {
-        _shopContext = shopContext;
-    }
+    // Driven by the image, not the service: an injected service that fails
+    // to produce a PNG (bad host, exception) must not leave an empty card
+    // on screen. If the bitmap is there, we have something to show.
+    public bool IsPairingQrCodeAvailable => PairingQrCodeImage is not null;
 
-    private readonly IPairingQrCodeService? _pairingQrCode;
-
-    [ObservableProperty] private Bitmap? _pairingQrCodeImage;
-    public bool IsPairingQrCodeAvailable => _pairingQrCode is not null;
-
-    public SyncronizationAdminViewModel(IShopContextService shopContext, IPairingQrCodeService? pairingQrCode = null)
+    public SyncronizationAdminViewModel(
+        IShopContextService shopContext,
+        IPairingQrCodeService? pairingQrCode = null)
     {
         _shopContext = shopContext;
         _pairingQrCode = pairingQrCode;
@@ -57,6 +57,7 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         _loadedServerPort = settings.ServerPort;
 
         RegeneratePairingQrCode();
+
         ServerBindAddress = settings.ServerBindAddress;
         ServerPort = settings.ServerPort.ToString();
 
@@ -69,14 +70,32 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
     // listening right now, never an unsaved edit that wouldn't work yet.
     private void RegeneratePairingQrCode()
     {
-        if (_pairingQrCode is null) return;
+        if (_pairingQrCode is null)
+        {
+            PairingQrCodeImage = null;
+            return;
+        }
 
-        var host = ResolveConnectableAddress(_loadedServerBindAddress);
-        var png = _pairingQrCode.GeneratePairingQrCodePng(host, _loadedServerPort);
-        if (png is null) return;
+        try
+        {
+            var host = ResolveConnectableAddress(_loadedServerBindAddress);
+            var png = _pairingQrCode.GeneratePairingQrCodePng(host, _loadedServerPort);
 
-        using var stream = new MemoryStream(png);
-        PairingQrCodeImage = new Bitmap(stream);
+            if (png is null || png.Length == 0)
+            {
+                PairingQrCodeImage = null;
+                return;
+            }
+
+            using var stream = new MemoryStream(png);
+            PairingQrCodeImage = new Bitmap(stream);
+        }
+        catch
+        {
+            // A QR code is a convenience for pairing, not a hard requirement -
+            // an unreachable/failing generator must not take down the screen.
+            PairingQrCodeImage = null;
+        }
     }
 
     // "0.0.0.0" (bind all adapters) isn't itself reachable - resolve to an
@@ -102,7 +121,7 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         {
             return "0.0.0.0";
         }
-    }   
+    }
 
     // Same best-effort LAN-adapter discovery ReceiptAdminViewModel used to
     // do - moved here since bind address is now this screen's concern.
@@ -137,6 +156,13 @@ public partial class SyncronizationAdminViewModel : ViewModelBase
         {
             AvailableBindAddresses.Add(currentlySaved);
         }
+    }
+
+    // CommunityToolkit.Mvvm calls this whenever PairingQrCodeImage changes,
+    // which is how the XAML's IsVisible binding on the QR panel stays in sync.
+    partial void OnPairingQrCodeImageChanged(Bitmap? value)
+    {
+        OnPropertyChanged(nameof(IsPairingQrCodeAvailable));
     }
 
     [RelayCommand]
