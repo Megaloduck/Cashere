@@ -4,10 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              x:Class="Cashere.Views.Admin.Settings.DataBackupSettingsView"
              x:DataType="vm:DataBackupSettingsViewModel">
+
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
+
   <ScrollViewer>
     <StackPanel Margin="12" Spacing="12">
       <TextBlock Text="DATA &amp; BACKUP" Classes="headline" FontSize="18"/>
@@ -80,7 +86,7 @@
               <Grid ColumnDefinitions="*,80,140,Auto">
                 <TextBlock Grid.Column="0" Text="{Binding FileName}" FontWeight="Bold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                 <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" FontSize="11"/>
-                <TextBlock Grid.Column="2" Text="{Binding CreatedUtc, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock Grid.Column="2" Text="{Binding CreatedUtc, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center" FontSize="11"/>
                 <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
                   <Button Classes="ghost" Click="OnRestoreClick" ToolTip.Tip="Restore this backup">
                     <mi:MaterialIcon Kind="BackupRestore" Width="16" Height="16"/>

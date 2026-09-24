@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="680"
              x:Class="Cashere.Views.Admin.SalesReportView"
-             x:DataType="vm:SalesReportViewModel">    
+             x:DataType="vm:SalesReportViewModel">
+
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,*" Margin="12"> 
       <TextBlock Text="SALES REPORTS" Classes="headline" FontSize="18" Margin="0,0,0,12"/>
@@ -123,7 +128,7 @@
           <DataTemplate x:DataType="services:DailySalesRow">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
               <Grid ColumnDefinitions="140,120,*,*,*">
-                <TextBlock Grid.Column="0" Text="{Binding Date, StringFormat='{}{0:dd MMM yyyy}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="{Binding Date, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy}'}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Text="{Binding TransactionCount}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="{Binding Revenue, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="3" Text="{Binding Cost, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
@@ -136,4 +141,4 @@
     </StackPanel>
   </ScrollViewer>
       </Grid>
-</UserControl>  
+</UserControl>

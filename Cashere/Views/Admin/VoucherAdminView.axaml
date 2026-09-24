@@ -11,6 +11,7 @@
              x:DataType="vm:VoucherAdminViewModel">
   <UserControl.Resources>
     <converters:EnumMatchConverter x:Key="EnumMatch"/>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
   </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,Auto,*" Margin="12" IsVisible="{Binding IsServiceAvailable}">
@@ -57,7 +58,7 @@
                              IsVisible="{Binding MaxUsageCount, Converter={x:Static ObjectConverters.IsNull}}"/>
                 </StackPanel>
 
-                <TextBlock Grid.Column="3" Text="{Binding ExpiresAt, StringFormat='{}{0:dd MMM yyyy}', TargetNullValue='NEVER'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="{Binding ExpiresAt, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy}', TargetNullValue='NEVER'}" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="4" VerticalAlignment="Center">
                   <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>

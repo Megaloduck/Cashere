@@ -72,7 +72,7 @@
         <TextBlock Text="{Binding VoucherErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
                    IsVisible="{Binding VoucherErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
-        <Border Classes="rule-thick" Margin="0,4"/>
+
 
         <Grid ColumnDefinitions="*,Auto">
           <TextBlock Grid.Column="0" Text="SUBTOTAL" Classes="eyebrow"/>

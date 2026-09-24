@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cashere.Services;
 
 namespace Cashere.Formatting;
 
@@ -50,7 +51,11 @@ public static class SaleReceiptFormatter
         if (!string.IsNullOrWhiteSpace(ctx.Phone)) sb.AppendLine(Center(ctx.Phone));
         sb.AppendLine(Divider);
 
-        var dateText = ctx.SaleDate.ToString("dd MMM yyyy HH:mm");
+        // ctx.SaleDate is the raw UTC value stored on the Sale entity - route
+        // it through ClockPreferenceService the same way every other
+        // timestamp in the app does, or the printed receipt shows the wrong
+        // (UTC) time on the till's own paper.
+        var dateText = ClockPreferenceService.ToDisplay(ctx.SaleDate).ToString("dd MMM yyyy HH:mm");
         sb.AppendLine($"{dateText,-20}{ctx.SaleNumber,20}");
         sb.AppendLine($"Cashier: {ctx.CashierName}");
         sb.AppendLine(Divider);

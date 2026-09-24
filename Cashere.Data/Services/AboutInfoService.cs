@@ -37,7 +37,12 @@ public class AboutInfoService : IAboutInfoService
             AppVersion,
             _dbPath,
             FormatBytes(info.Exists ? info.Length : 0),
-            info.Exists ? info.LastWriteTimeUtc.ToLocalTime().ToString("dd MMM yyyy HH:mm") : "Unknown",
+            // FileInfo.LastWriteTimeUtc already carries Kind=Utc correctly
+            // (unlike values round-tripped through SQLite), but this still
+            // goes through the shared ClockPreferenceService rather than its
+            // own .ToLocalTime() call, so every displayed timestamp in the
+            // app stays derived from the exact same conversion.
+            info.Exists ? ClockPreferenceService.ToDisplay(info.LastWriteTimeUtc).ToString("dd MMM yyyy HH:mm") : "Unknown",
             appliedMigrations.Count());
     }
 

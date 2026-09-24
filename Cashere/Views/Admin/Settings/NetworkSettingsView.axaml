@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
              xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="900"
              x:Class="Cashere.Views.Admin.Settings.NetworkSettingsView"
              x:DataType="vm:NetworkSettingsViewModel">
+
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
 
   <ScrollViewer>
     <StackPanel Margin="12" Spacing="12">
@@ -96,7 +101,7 @@
                   <TextBlock Text="{Binding DeviceName}" FontWeight="Bold" TextWrapping="Wrap"/>
                 </StackPanel>
                 <TextBlock Grid.Column="1" Text="{Binding IpAddress}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding ConnectedAt, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding ConnectedAt, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center">
                   <Button Classes="ghost" Click="OnKickClick" ToolTip.Tip="Disconnect this device">
                     <mi:MaterialIcon Kind="CellphoneRemove" Width="18" Height="18"/>

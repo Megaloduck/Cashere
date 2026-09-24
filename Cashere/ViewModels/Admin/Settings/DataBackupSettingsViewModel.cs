@@ -66,7 +66,16 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
         var status = await _backupService.GetStatusAsync();
         DatabasePath = status.DatabasePath;
         DatabaseSizeDisplay = FormatBytes(status.FileSizeBytes);
-        LastModifiedDisplay = status.LastModifiedUtc?.ToLocalTime().ToString("dd MMM yyyy HH:mm") ?? "Unknown";
+
+        // FileInfo.LastWriteTimeUtc already carries Kind=Utc correctly (unlike
+        // values round-tripped through SQLite), but this still goes through
+        // the shared ClockPreferenceService rather than its own .ToLocalTime()
+        // call, so every displayed timestamp in the app is guaranteed to stay
+        // derived from the exact same conversion - no separate code path that
+        // could quietly drift from the rest of the UI.
+        LastModifiedDisplay = status.LastModifiedUtc is { } lastModified
+            ? ClockPreferenceService.ToDisplay(lastModified).ToString("dd MMM yyyy HH:mm")
+            : "Unknown";
 
         var backups = await _backupService.GetBackupsAsync();
         Backups.Clear();

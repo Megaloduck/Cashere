@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin"
              xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="Cashere.Views.Admin.PurchaseAdminView"
              x:DataType="vm:PurchaseAdminViewModel">
+
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
@@ -35,7 +40,7 @@
           <DataTemplate x:DataType="models:Purchase">
             <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
               <Grid ColumnDefinitions="Auto,2*,1*,Auto,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding PurchaseDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="110" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="{Binding PurchaseDate, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM yyyy}'}" Width="110" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Text="{Binding Supplier.Name}" FontWeight="Bold" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="{Binding ReferenceNumber}" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="3" Text="{Binding Items.Count}" Width="60" VerticalAlignment="Center"/>
