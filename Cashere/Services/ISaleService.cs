@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 
 namespace Cashere.Services
 {
-    public record SaleLineRequest(int ProductId, int Quantity, decimal UnitPrice);
+    // TaxRatePercent moved here from CompleteSaleRequest: each line now
+    // carries whatever rate CartViewModel resolved for it (its product's
+    // Category.TaxRate, or the shop-wide default) via TaxCalculator, so a
+    // sale can mix rates instead of applying one flat percentage to
+    // everything. See SaleService.CompleteSaleAsync.
+    public record SaleLineRequest(int ProductId, int Quantity, decimal UnitPrice, decimal TaxRatePercent);
 
     public record CompleteSaleRequest(
         int CashierId,
         int? CustomerId,
         IReadOnlyList<SaleLineRequest> Lines,
         decimal DiscountAmount,
-        decimal TaxRatePercent,
         PaymentMethod PaymentMethod,
         decimal AmountTendered,
         string? PaymentReferenceNumber,
@@ -31,6 +35,9 @@ namespace Cashere.Services
         decimal Subtotal,
         decimal DiscountAmount,
         decimal TaxAmount,
+        // How much Settings -> Business Info -> Rounding changed the total
+        // by - zero whenever rounding is off. See TaxCalculator.ApplyRounding.
+        decimal RoundingAdjustment,
         decimal TotalAmount,
         decimal ChangeDue,
         DateTime SaleDate);

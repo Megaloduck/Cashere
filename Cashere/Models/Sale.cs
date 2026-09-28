@@ -15,6 +15,13 @@ public class Sale
     public decimal Subtotal { get; set; }
     public decimal DiscountAmount { get; set; }
     public decimal TaxAmount { get; set; }
+
+    // TotalAmount minus what discount/tax math alone would have produced -
+    // positive when Settings -> Business Info rounds a sale up, negative
+    // when it rounds down, always zero when RoundingMode is None. See
+    // TaxCalculator.ApplyRounding.
+    public decimal RoundingAdjustment { get; set; }
+
     public decimal TotalAmount { get; set; }
     public SaleStatus Status { get; set; } = SaleStatus.Completed;
 

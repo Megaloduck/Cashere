@@ -45,7 +45,7 @@ public partial class PosViewModel : ViewModelBase
         IProductCatalogService catalog,
         ISaleService saleService,
         IShopContextService shopContext,
-        decimal taxRatePercent,
+        TaxAndRoundingSettings taxSettings,
         int cashierId,
         string cashierName,
         ICustomerAdminService? customerAdmin = null,
@@ -63,7 +63,13 @@ public partial class PosViewModel : ViewModelBase
         ProductPicker = new ProductPickerViewModel(catalog);
         ProductPicker.ProductSelected += OnProductSelected;
 
-        Cart = new CartViewModel(voucherAdmin) { TaxRatePercent = taxRatePercent };
+        Cart = new CartViewModel(voucherAdmin)
+        {
+            TaxRatePercent = taxSettings.DefaultTaxRatePercent,
+            PricesIncludeTax = taxSettings.PricesIncludeTax,
+            RoundingMode = taxSettings.RoundingMode,
+            RoundingIncrement = taxSettings.RoundingIncrement
+        };
     }
 
     public async Task InitializeAsync()
@@ -88,6 +94,21 @@ public partial class PosViewModel : ViewModelBase
     {
         if (_customerAdmin is null) return;
         _customers = await _customerAdmin.GetAllCustomersAsync();
+    }
+
+    // Picks up any Settings -> Business Info change (default rate, rounding,
+    // tax-inclusive toggle) the moment the cashier returns to the till - same
+    // "refresh on ShowPos" pattern as RefreshPaymentSettingsAsync above.
+    // Lines already sitting in an open cart keep whatever rate they resolved
+    // to at add-time (see CartLineViewModel.TaxRatePercent); only the
+    // shop-wide default and the rounding/inclusive settings change here.
+    public async Task RefreshTaxSettingsAsync()
+    {
+        var taxSettings = await _shopContext.GetTaxAndRoundingSettingsAsync();
+        Cart.TaxRatePercent = taxSettings.DefaultTaxRatePercent;
+        Cart.PricesIncludeTax = taxSettings.PricesIncludeTax;
+        Cart.RoundingMode = taxSettings.RoundingMode;
+        Cart.RoundingIncrement = taxSettings.RoundingIncrement;
     }
 
     private void OnProductSelected(Product product)
@@ -118,9 +139,24 @@ public partial class PosViewModel : ViewModelBase
         if (_salesBehaviorSettings.AutoPrintReceiptAfterPayment && _receiptPrinter is not null && Checkout is not null)
         {
             var lines = Cart.Lines.Select(l => new SaleReceiptLine(l.Name, l.Quantity, l.Subtotal)).ToList();
+
+            // Recomputed here (before Cart.Clear() below) via the same
+            // TaxCalculator SaleService just used, grouped by rate, so the
+            // printed receipt can show a per-rate breakdown when a sale
+            // mixed more than one tax rate, or a single "TAX (X%)" line
+            // when it didn't - see SaleReceiptFormatter.Format.
+            var taxCalculation = TaxCalculator.Calculate(
+                Cart.Lines.Select(l => new TaxCalculator.LineInput(l.Subtotal, l.TaxRatePercent)).ToList(),
+                Cart.DiscountAmount, Cart.PricesIncludeTax);
+
+            var taxBreakdown = taxCalculation.Lines
+                .GroupBy(l => l.RatePercent)
+                .Select(g => (RatePercent: g.Key, Amount: g.Sum(l => l.TaxAmount)))
+                .OrderByDescending(g => g.RatePercent)
+                .ToList();
+
             var checkoutSnapshot = Checkout;
-            var taxRatePercent = Cart.TaxRatePercent;
-            _ = TryAutoPrintReceiptAsync(result, checkoutSnapshot, lines, taxRatePercent);
+            _ = TryAutoPrintReceiptAsync(result, checkoutSnapshot, lines, taxBreakdown);
         }
 
         CloseCheckout();
@@ -132,7 +168,7 @@ public partial class PosViewModel : ViewModelBase
         CompletedSaleResult result,
         CheckoutViewModel checkout,
         IReadOnlyList<SaleReceiptLine> lines,
-        decimal taxRatePercent)
+        IReadOnlyList<(decimal RatePercent, decimal Amount)> taxBreakdown)
     {
         try
         {
@@ -150,8 +186,8 @@ public partial class PosViewModel : ViewModelBase
                 lines,
                 result.Subtotal,
                 result.DiscountAmount,
-                taxRatePercent,
-                result.TaxAmount,
+                taxBreakdown,
+                result.RoundingAdjustment,
                 result.TotalAmount,
                 checkout.IsCashPayment,
                 checkout.PaymentMethod.ToString(),

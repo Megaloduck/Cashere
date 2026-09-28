@@ -16,6 +16,7 @@ public class CashereDbContext : DbContext
     public DbSet<Cashier> Cashiers => Set<Cashier>();
     public DbSet<Shift> Shifts => Set<Shift>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<TaxRate> TaxRates => Set<TaxRate>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Purchase> Purchases => Set<Purchase>();

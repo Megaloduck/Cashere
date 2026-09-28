@@ -86,6 +86,10 @@
           <TextBlock Grid.Column="0" Text="TAX" Classes="eyebrow"/>
           <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
         </Grid>
+        <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasRoundingAdjustment}">
+          <TextBlock Grid.Column="0" Text="ROUNDING" Classes="eyebrow"/>
+          <TextBlock Grid.Column="1" Text="{Binding RoundingAdjustment, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+        </Grid>
         <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,8" Margin="0,4,0,0">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" FontSize="16" Foreground="Black"/>

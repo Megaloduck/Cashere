@@ -108,4 +108,16 @@ public class ShopContextService : IShopContextService
             settings?.ShowHeaderYear ?? true,
             settings?.ShowHeaderHours ?? true);
     }
+
+    public async Task<TaxAndRoundingSettings> GetTaxAndRoundingSettingsAsync()
+    {
+        await using var db = await _dbContextFactory.CreateDbContextAsync();
+        var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+
+        return new TaxAndRoundingSettings(
+            settings?.TaxRatePercent ?? 0,
+            settings?.PricesIncludeTax ?? false,
+            settings?.RoundingMode ?? RoundingMode.None,
+            settings?.RoundingIncrement ?? 0);
+    }
 }

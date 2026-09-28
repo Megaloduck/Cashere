@@ -45,6 +45,7 @@ sealed class Program
         AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.RefundService = new RefundService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.VoucherAdmin = new VoucherAdminService(dbContextFactory);
+        AppServices.TaxRateAdmin = new TaxRateAdminService(dbContextFactory);
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory, passwordHasher);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);

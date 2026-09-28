@@ -8,16 +8,6 @@ using Cashere.ViewModels.Pos;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cashere.ViewModels.Admin;
-using Cashere.ViewModels.Pos;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
 namespace Cashere.ViewModels;
 
 public partial class ShellViewModel : ViewModelBase
@@ -49,11 +39,13 @@ public partial class ShellViewModel : ViewModelBase
     {
         CurrentView = Pos;
         // Catches any product/price/stock changes, any payment-method
-        // enable/disable, any sales-behavior change, and any new/edited
-        // customer made while in admin.
+        // enable/disable, any sales-behavior change, any Business Info
+        // change to the default tax rate/rounding/inclusive-pricing toggle,
+        // and any new/edited customer made while in admin.
         await Pos.ProductPicker.RefreshProductsAsync();
         await Pos.RefreshPaymentSettingsAsync();
         await Pos.RefreshSalesBehaviorSettingsAsync();
+        await Pos.RefreshTaxSettingsAsync();
         await Pos.RefreshCustomersAsync();
     }
 

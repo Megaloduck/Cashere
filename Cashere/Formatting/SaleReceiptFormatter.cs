@@ -20,8 +20,13 @@ public record SaleReceiptContext(
     IReadOnlyList<SaleReceiptLine> Lines,
     decimal Subtotal,
     decimal DiscountAmount,
-    decimal TaxRatePercent,
-    decimal TaxAmount,
+    // One entry per distinct tax rate actually charged on this sale - a
+    // single-rate sale (the common case) still gets exactly one entry, so
+    // Format() below only special-cases the printed layout, not the data
+    // shape. See PosViewModel.OnSaleCompleted, which builds this from the
+    // same TaxCalculator SaleService used to charge the sale.
+    IReadOnlyList<(decimal RatePercent, decimal Amount)> TaxBreakdown,
+    decimal RoundingAdjustment,
     decimal TotalAmount,
     bool IsCashPayment,
     string PaymentMethodLabel,
@@ -72,7 +77,17 @@ public static class SaleReceiptFormatter
         {
             sb.AppendLine($"{"DISCOUNT",-20}{$"{currency} {ctx.DiscountAmount:N0}",20}");
         }
-        sb.AppendLine($"{$"TAX ({ctx.TaxRatePercent:0.##}%)",-20}{$"{currency} {ctx.TaxAmount:N0}",20}");
+
+        foreach (var (ratePercent, amount) in ctx.TaxBreakdown)
+        {
+            sb.AppendLine($"{$"TAX ({ratePercent:0.##}%)",-20}{$"{currency} {amount:N0}",20}");
+        }
+
+        if (ctx.RoundingAdjustment != 0)
+        {
+            sb.AppendLine($"{"ROUNDING",-20}{$"{currency} {ctx.RoundingAdjustment:N0}",20}");
+        }
+
         sb.AppendLine($"{"TOTAL",-20}{$"{currency} {ctx.TotalAmount:N0}",20}");
         sb.AppendLine(Divider);
 
@@ -106,3 +121,4 @@ public static class SaleReceiptFormatter
         return new string(' ', pad) + text;
     }
 }
+    

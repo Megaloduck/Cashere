@@ -62,7 +62,8 @@ public partial class App : Application
                     AppServices.ConnectedDevices,
                     AppServices.ReceiptPrinter,
                     AppServices.RefundService,
-                    AppServices.VoucherAdmin);
+                    AppServices.VoucherAdmin,
+                    AppServices.TaxRateAdmin);
 
                 desktop.MainWindow = new MainWindow
                 {

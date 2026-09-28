@@ -19,6 +19,13 @@ public partial class CartLineViewModel : ViewModelBase
     public decimal UnitCost { get; }
     public int StockAvailable { get; }
 
+    // Resolved once, at the moment this line was added to the cart (see
+    // CartViewModel.AddProduct / TaxCalculator.ResolveRatePercent) - a later
+    // change to the product's category rate never rewrites a line already
+    // sitting in an open cart, same "snapshot at add-time" spirit as
+    // UnitPrice/UnitCost above.
+    public decimal TaxRatePercent { get; }
+
     [ObservableProperty]
     private int _quantity;
 
@@ -29,6 +36,7 @@ public partial class CartLineViewModel : ViewModelBase
         string name,
         decimal unitPrice,
         decimal unitCost,
+        decimal taxRatePercent,
         int stockAvailable,
         int quantity,
         Action onChanged)
@@ -37,6 +45,7 @@ public partial class CartLineViewModel : ViewModelBase
         Name = name;
         UnitPrice = unitPrice;
         UnitCost = unitCost;
+        TaxRatePercent = taxRatePercent;
         StockAvailable = stockAvailable;
         _quantity = quantity;
         _onChanged = onChanged;

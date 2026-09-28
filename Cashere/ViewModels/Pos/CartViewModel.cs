@@ -23,8 +23,24 @@ public partial class CartViewModel : ViewModelBase
 
     public ObservableCollection<CartLineViewModel> Lines { get; } = new();
 
+    // The shop-wide default rate (Settings -> Business Info -> Tax Rates) -
+    // used to resolve a new line's rate in AddProduct when its product has
+    // no category, or its category has no TaxRate assigned. Already-added
+    // lines keep whatever rate they resolved to at add-time; see
+    // CartLineViewModel.TaxRatePercent.
     [ObservableProperty]
     private decimal _taxRatePercent;
+
+    // Settings -> Business Info -> "Prices include tax". See TaxCalculator.
+    [ObservableProperty]
+    private bool _pricesIncludeTax;
+
+    // Settings -> Business Info -> Rounding. See TaxCalculator.ApplyRounding.
+    [ObservableProperty]
+    private RoundingMode _roundingMode = RoundingMode.None;
+
+    [ObservableProperty]
+    private decimal _roundingIncrement;
 
     [ObservableProperty]
     private decimal _discountAmount;
@@ -43,10 +59,23 @@ public partial class CartViewModel : ViewModelBase
 
     public decimal Subtotal => Lines.Sum(l => l.Subtotal);
 
-    public decimal TaxAmount => Math.Round(
-        (Subtotal - DiscountAmount) * (TaxRatePercent / 100m), 2, MidpointRounding.AwayFromZero);
+    // Computed by the same TaxCalculator function SaleService uses at sale
+    // completion, so this preview can never disagree with what actually
+    // gets charged.
+    public decimal TaxAmount => TaxCalculator.Calculate(
+        Lines.Select(l => new TaxCalculator.LineInput(l.Subtotal, l.TaxRatePercent)).ToList(),
+        DiscountAmount, PricesIncludeTax).TotalTax;
 
-    public decimal TotalAmount => Subtotal - DiscountAmount + TaxAmount;
+    private decimal PreRoundingTotal => PricesIncludeTax
+        ? Subtotal - DiscountAmount
+        : Subtotal - DiscountAmount + TaxAmount;
+
+    public decimal TotalAmount => TaxCalculator.ApplyRounding(PreRoundingTotal, RoundingMode, RoundingIncrement);
+
+    // How much rounding changed the total by - shown next to TOTAL in the
+    // cart only when HasRoundingAdjustment is true (see CartView.axaml).
+    public decimal RoundingAdjustment => TotalAmount - PreRoundingTotal;
+    public bool HasRoundingAdjustment => RoundingAdjustment != 0;
 
     public bool HasItems => Lines.Count > 0;
 
@@ -72,11 +101,14 @@ public partial class CartViewModel : ViewModelBase
             return;
         }
 
+        var taxRatePercent = TaxCalculator.ResolveRatePercent(product.Category, TaxRatePercent);
+
         Lines.Add(new CartLineViewModel(
             product.Id,
             product.Name,
             product.SellingPrice,
             product.CostPrice,
+            taxRatePercent,
             product.StockQuantity,
             quantity: 1,
             onChanged: RaiseTotalsChanged));
@@ -149,6 +181,9 @@ public partial class CartViewModel : ViewModelBase
 
     partial void OnDiscountAmountChanged(decimal value) => RaiseTotalsChanged();
     partial void OnTaxRatePercentChanged(decimal value) => RaiseTotalsChanged();
+    partial void OnPricesIncludeTaxChanged(bool value) => RaiseTotalsChanged();
+    partial void OnRoundingModeChanged(RoundingMode value) => RaiseTotalsChanged();
+    partial void OnRoundingIncrementChanged(decimal value) => RaiseTotalsChanged();
 
     private void RaiseTotalsChanged()
     {
@@ -168,6 +203,8 @@ public partial class CartViewModel : ViewModelBase
         OnPropertyChanged(nameof(Subtotal));
         OnPropertyChanged(nameof(TaxAmount));
         OnPropertyChanged(nameof(TotalAmount));
+        OnPropertyChanged(nameof(RoundingAdjustment));
+        OnPropertyChanged(nameof(HasRoundingAdjustment));
         OnPropertyChanged(nameof(HasItems));
     }
 }

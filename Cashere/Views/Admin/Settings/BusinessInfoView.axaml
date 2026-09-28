@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:models="clr-namespace:Cashere.Models"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
              x:Class="Cashere.Views.Admin.Settings.BusinessInfoView"
@@ -12,11 +13,46 @@
       <TextBlock Text="BUSINESS INFO" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 
-      <TextBlock Text="SHOP NAME" Classes="eyebrow"/>
+      
+      <Grid ColumnDefinitions="Auto,*">
+          <StackPanel Grid.Column="0" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Text="LOGO" Classes="eyebrow"/>
+        <Border Grid.Column="0" Width="200" Height="200" CornerRadius="{StaticResource RadiusMedium}"
+                Background="{StaticResource GrayLightBrush}" ClipToBounds="True" Margin="0,0,12,0">
+          <Grid>              
+            <Image Source="{Binding LogoPreview}" Stretch="Uniform" Margin="6"
+                   IsVisible="{Binding LogoPreview, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+            <mi:MaterialIcon Kind="ImageOutline" Width="22" Height="22" Foreground="{StaticResource GrayBrush}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              IsVisible="{Binding LogoPreview, Converter={x:Static ObjectConverters.IsNull}}"/>
+          </Grid>
+        </Border>
+              </StackPanel> 
+        <StackPanel Grid.Column="1" Spacing="6" >
+
+            <TextBlock Text="SHOP NAME" Classes="eyebrow"/>
       <TextBox Text="{Binding ShopName}"/>
 
       <TextBlock Text="ADDRESS" Classes="eyebrow"/>
       <TextBox Text="{Binding Address}"/>
+
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="chip" Command="{Binding PickLogoCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <mi:MaterialIcon Kind="Upload" Width="14" Height="14"/>
+                <TextBlock Text="CHOOSE LOGO"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="ghost" Command="{Binding RemoveLogoCommand}"
+                    IsVisible="{Binding LogoPreview, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+            </Button>
+          </StackPanel>
+          <TextBlock Text="Shown on this screen and the on-screen receipt preview. PNG, JPG or WEBP."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Grid>
 
       <Grid ColumnDefinitions="*,*">
         <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
@@ -38,15 +74,125 @@
           <TextBox Text="{Binding Currency}"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
-          <TextBlock Text="TAX RATE (%)" Classes="eyebrow"/>
+          <TextBlock Text="DEFAULT TAX RATE (%)" Classes="eyebrow"/>
           <TextBox Text="{Binding TaxRatePercent}"/>
         </StackPanel>
       </Grid>
+      <TextBlock Text="Used for any product whose category has no tax rate of its own - see TAX RATES below."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
       <TextBlock Text="TIMEZONE" Classes="eyebrow"/>
       <ComboBox ItemsSource="{Binding TimezoneOptions}" SelectedItem="{Binding Timezone}" HorizontalAlignment="Stretch"/>
       <TextBlock Text="Reference only (e.g. for printed info) - doesn't change how times are displayed. Times always follow this device's own local clock."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+      <TextBlock Text="BUSINESS HOURS" Classes="eyebrow"/>
+      <ItemsControl ItemsSource="{Binding BusinessHours}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:BusinessDayFormItem">
+            <Grid ColumnDefinitions="90,Auto,90,20,90" Margin="0,4">
+              <TextBlock Grid.Column="0" Text="{Binding DayLabel}" FontWeight="Bold" VerticalAlignment="Center"/>
+              <CheckBox Grid.Column="1" Content="CLOSED" IsChecked="{Binding IsClosed}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+              <TextBox Grid.Column="2" Text="{Binding OpenTime}" Watermark="09:00" Classes="compact" IsEnabled="{Binding !IsClosed}"/>
+              <TextBlock Grid.Column="3" Text="-" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              <TextBox Grid.Column="4" Text="{Binding CloseTime}" Watermark="17:00" Classes="compact" IsEnabled="{Binding !IsClosed}"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Text="Times are HH:mm, 24-hour. Informational only, same as Timezone above - not enforced anywhere in the till yet."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+      <TextBlock Text="TAX &amp; ROUNDING" Classes="eyebrow"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="PRICES INCLUDE TAX" FontWeight="Bold"/>
+          <TextBlock Text="When on, a product's selling price already has tax baked in, and the tax amount is backed out of it instead of added on top at checkout."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding PricesIncludeTax}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock Text="ROUNDING" Classes="eyebrow" FontSize="9"/>
+      <ComboBox ItemsSource="{Binding RoundingModes}" SelectedItem="{Binding RoundingMode}" HorizontalAlignment="Stretch"/>
+
+      <StackPanel Spacing="4" IsVisible="{Binding ShowRoundingIncrement}">
+        <TextBlock Text="ROUND TO NEAREST" Classes="eyebrow" FontSize="9"/>
+        <TextBox Text="{Binding RoundingIncrement}" Watermark="e.g. 100"/>
+        <TextBlock Text="Applied to the final total only, after discount and tax - a cash sale of Rp 23,430 rounds to Rp 23,500 with 'Nearest' at 100."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="TAX RATES" Classes="eyebrow" VerticalAlignment="Center"/>
+      </Grid>
+
+      <StackPanel Spacing="10" IsVisible="{Binding IsTaxRateServiceAvailable}">
+        <ItemsControl ItemsSource="{Binding TaxRates}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:TaxRate">
+              <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="1" Text="{Binding RatePercent, StringFormat='{}{0}%'}" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                  <Button Grid.Column="2" Classes="ghost"
+                          Command="{Binding $parent[UserControl].((vm:BusinessInfoViewModel)DataContext).DeleteTaxRateCommand}"
+                          CommandParameter="{Binding}" ToolTip.Tip="Delete">
+                    <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                  </Button>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid ColumnDefinitions="*,100,Auto">
+          <TextBox Grid.Column="0" Text="{Binding NewTaxRateName}" Watermark="e.g. Reduced" Margin="0,0,8,0"/>
+          <TextBox Grid.Column="1" Text="{Binding NewTaxRateValue}" Watermark="5" Margin="0,0,8,0"/>
+          <Button Grid.Column="2" Classes="accent-yellow" Command="{Binding AddTaxRateCommand}">
+            <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          </Button>
+        </Grid>
+
+        <TextBlock Text="{Binding TaxRateErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                   IsVisible="{Binding TaxRateErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+        <Border Classes="rule-thick" Margin="0,4"/>
+        <TextBlock Text="ASSIGN RATES TO CATEGORIES" Classes="eyebrow"/>
+        <TextBlock Text="A category left on DEFAULT uses the shop-wide default tax rate above."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+        <ItemsControl ItemsSource="{Binding CategoryAssignments}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CategoryTaxAssignmentItem">
+              <Grid ColumnDefinitions="*,140,Auto" Margin="0,4">
+                <TextBlock Grid.Column="0" Text="{Binding CategoryName}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableTaxRates}" SelectedItem="{Binding SelectedTaxRate}"
+                          PlaceholderText="DEFAULT" HorizontalAlignment="Stretch">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:TaxRate">
+                      <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="2" Classes="ghost" Command="{Binding ClearTaxRateCommand}"
+                        ToolTip.Tip="Use default" Margin="4,0,0,0">
+                  <mi:MaterialIcon Kind="CloseCircleOutline" Width="14" Height="14"/>
+                </Button>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Spacing="8" IsVisible="{Binding !IsTaxRateServiceAvailable}">
+        <mi:MaterialIcon Kind="AlertCircleOutline" Width="20" Height="20" Foreground="{StaticResource RedBrush}"/>
+        <TextBlock Text="TAX RATE MANAGEMENT UNAVAILABLE IN THIS BUILD" Classes="eyebrow"/>
+      </StackPanel>
 
       <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"
@@ -69,7 +215,7 @@
         <TextBlock Text="COMING SOON" Classes="eyebrow"/>
       </StackPanel>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Business logo, business hours, multiple tax rates, tax-inclusive pricing, and rounding rules aren't built yet."/>
+                 Text="Per-product tax overrides (today it's per-category), enforcing business hours against checkout, and printing the logo on the physical receipt (it currently only shows on screen) aren't built yet."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

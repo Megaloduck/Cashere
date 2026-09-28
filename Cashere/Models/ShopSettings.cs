@@ -10,6 +10,9 @@ public class ReceiptAdmin
     public string? Email { get; set; }
     public string? TaxId { get; set; }
     public string Currency { get; set; } = "IDR";
+    // The shop-wide default tax rate - used for any product whose Category
+    // has no TaxRate assigned (or has no Category at all). See
+    // Settings -> Business Info -> Tax Rates and TaxCalculator.
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
 
@@ -20,6 +23,34 @@ public class ReceiptAdmin
     // Actual display always follows this device's own local clock; see
     // ClockPreferenceService.
     public string? Timezone { get; set; }
+
+    // Settings -> Business Info: relative path (under the desktop's local
+    // media folder, "branding" subfolder) to the shop's logo - shown on the
+    // Business Info screen and the on-screen receipt preview. See
+    // Converters/LogoPathToImageConverter, which mirrors
+    // PhotoPathToImageConverter's "relative path resolved against a local
+    // media root" pattern.
+    public string? LogoPath { get; set; }
+
+    // Settings -> Business Info: per-day opening hours, serialized as JSON -
+    // a single flat column rather than a child table, since it's always
+    // read/written as a whole week at once. See
+    // Models/BusinessHours.cs (BusinessHoursSerializer) for the shape.
+    public string? BusinessHoursJson { get; set; }
+
+    // Settings -> Business Info -> Rounding: rounds Sale.TotalAmount (after
+    // discount and tax) to the nearest RoundingIncrement, e.g. 100, so cash
+    // change never needs odd small denominations. RoundingIncrement <= 0 or
+    // RoundingMode.None both mean "no rounding" - see
+    // TaxCalculator.ApplyRounding, used identically by CartViewModel's live
+    // preview and SaleService's authoritative total.
+    public RoundingMode RoundingMode { get; set; } = RoundingMode.None;
+    public decimal RoundingIncrement { get; set; }
+
+    // Settings -> Business Info: when true, Product.SellingPrice already has
+    // tax baked into it and TaxCalculator backs the tax amount out of the
+    // price instead of adding it on top. See TaxCalculator.Calculate.
+    public bool PricesIncludeTax { get; set; }
 
     // Settings -> Preferences. Drives the live day/date/month/year/hours
     // display in the Pos/Admin shell headers - see HeaderClockService,

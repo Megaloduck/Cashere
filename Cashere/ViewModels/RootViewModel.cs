@@ -30,6 +30,7 @@ public partial class RootViewModel : ViewModelBase
     private readonly IReceiptPrinterService? _receiptPrinter;
     private readonly IRefundService? _refundService;
     private readonly IVoucherAdminService? _voucherAdmin;
+    private readonly ITaxRateAdminService? _taxRateAdmin;
 
     [ObservableProperty]
     private ViewModelBase _currentView = null!;
@@ -51,7 +52,8 @@ public partial class RootViewModel : ViewModelBase
         IConnectedDeviceService? connectedDevices,
         IReceiptPrinterService? receiptPrinter,
         IRefundService? refundService,
-        IVoucherAdminService? voucherAdmin)
+        IVoucherAdminService? voucherAdmin,
+        ITaxRateAdminService? taxRateAdmin = null)
     {
         _productCatalog = productCatalog;
         _saleService = saleService;
@@ -70,6 +72,7 @@ public partial class RootViewModel : ViewModelBase
         _receiptPrinter = receiptPrinter;
         _refundService = refundService;
         _voucherAdmin = voucherAdmin;
+        _taxRateAdmin = taxRateAdmin;
 
         AutoLockService.LockTriggered += OnAutoLockTriggered;
     }
@@ -105,7 +108,7 @@ public partial class RootViewModel : ViewModelBase
 
     private async void OnLoginSucceeded(Cashier cashier)
     {
-        var taxRatePercent = await _shopContext.GetTaxRatePercentAsync();
+        var taxSettings = await _shopContext.GetTaxAndRoundingSettingsAsync();
 
         var security = await _shopContext.GetSecuritySettingsAsync();
         AutoLockService.Configure(security.AutoLockEnabled, security.AutoLockTimeoutMinutes);
@@ -123,7 +126,7 @@ public partial class RootViewModel : ViewModelBase
             _productCatalog,
             _saleService,
             _shopContext,
-            taxRatePercent,
+            taxSettings,
             cashier.Id,
             cashier.DisplayName,
             _customerAdmin,
@@ -134,7 +137,7 @@ public partial class RootViewModel : ViewModelBase
     _productAdmin, _categoryAdmin, _supplierAdmin, _purchaseAdmin, _cashierAdmin, _customerAdmin,
     _salesReport, _productCatalog, _shopContext, _shiftAdmin, _dataBackup, _aboutInfo,
     cashier.Id, cashier.Role, cashier.Username,
-    _connectedDevices, _receiptPrinter, _refundService, _voucherAdmin);
+    _connectedDevices, _receiptPrinter, _refundService, _voucherAdmin, _taxRateAdmin);
 
         var shell = new ShellViewModel(posViewModel, adminViewModel);
         shell.LogoutRequested += OnLogoutRequested;

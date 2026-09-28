@@ -46,6 +46,9 @@ public partial class CheckoutViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isPaymentConfirmed;
 
+    // TotalDue already reflects Settings -> Business Info -> Rounding - see
+    // CartViewModel.TotalAmount / TaxCalculator.ApplyRounding - so nothing
+    // else on this screen needs to know rounding happened.
     public decimal TotalDue => _cart.TotalAmount;
 
     public decimal ChangeDue => PaymentMethod == PaymentMethod.Cash
@@ -134,9 +137,10 @@ public partial class CheckoutViewModel : ViewModelBase
             var request = new CompleteSaleRequest(
                 CashierId: _cashierId,
                 CustomerId: SelectedCustomer?.Id,
-                Lines: _cart.Lines.Select(l => new SaleLineRequest(l.ProductId, l.Quantity, l.UnitPrice)).ToList(),
+                Lines: _cart.Lines
+                    .Select(l => new SaleLineRequest(l.ProductId, l.Quantity, l.UnitPrice, l.TaxRatePercent))
+                    .ToList(),
                 DiscountAmount: _cart.DiscountAmount,
-                TaxRatePercent: _cart.TaxRatePercent,
                 PaymentMethod: this.PaymentMethod,
                 AmountTendered: IsCashPayment ? AmountTendered : TotalDue,
                 PaymentReferenceNumber: IsCashPayment ? null : ReferenceNumber,

@@ -80,7 +80,8 @@ public partial class AdminViewModel : ViewModelBase
     IConnectedDeviceService? connectedDeviceService = null,
     IReceiptPrinterService? receiptPrinter = null,
     IRefundService? refundService = null,
-    IVoucherAdminService? voucherAdmin = null)
+    IVoucherAdminService? voucherAdmin = null,
+    ITaxRateAdminService? taxRateAdmin = null)
     {
         Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
@@ -92,7 +93,7 @@ public partial class AdminViewModel : ViewModelBase
         Vouchers = new VoucherAdminViewModel(voucherAdmin, currentRole);
         Settings = new SettingsShellViewModel(
            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo,
-           cashierAdmin, currentCashierId, currentRole, currentUsername);
+           cashierAdmin, currentCashierId, currentRole, currentUsername, taxRateAdmin);
 
         Settings.ManageCashiersRequested += () => SelectedSection = AdminSection.Cashiers;
         Settings.DatabaseWasReset += () => LogoutRequested?.Invoke();

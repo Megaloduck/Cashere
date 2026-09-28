@@ -10,6 +10,16 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
         builder.HasIndex(c => c.Name).IsUnique();
+
+        // SetNull rather than Restrict: deleting a tax rate that's still
+        // assigned to categories shouldn't block the delete - those
+        // categories simply fall back to the shop-wide default rate, same
+        // "orphaned reference just goes to the fallback" spirit as
+        // ProductConfiguration's own Category FK.
+        builder.HasOne(c => c.TaxRate)
+            .WithMany(t => t.Categories)
+            .HasForeignKey(c => c.TaxRateId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 
@@ -51,5 +61,7 @@ public class ReceiptAdminConfiguration : IEntityTypeConfiguration<ReceiptAdmin>
         builder.Property(s => s.ServerBindAddress).IsRequired().HasMaxLength(64);
         builder.Property(s => s.OutOfStockBehavior).HasConversion<string>().HasMaxLength(30);
         builder.Property(s => s.ThemeMode).HasConversion<string>().HasMaxLength(20);
+        builder.Property(s => s.RoundingMode).HasConversion<string>().HasMaxLength(20);
+        builder.Property(s => s.RoundingIncrement).HasPrecision(18, 2);
     }
 }

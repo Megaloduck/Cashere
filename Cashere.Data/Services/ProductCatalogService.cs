@@ -22,6 +22,10 @@ public class ProductCatalogService : IProductCatalogService
         return await db.Products
             .Where(p => p.IsActive)
             .Include(p => p.Category)
+                // Needed so CartViewModel.AddProduct can resolve this
+                // product's effective tax rate (TaxCalculator.ResolveRatePercent)
+                // without a second round trip.
+                .ThenInclude(c => c!.TaxRate)
             .OrderBy(p => p.Name)
             .AsNoTracking()
             .ToListAsync();

@@ -52,7 +52,11 @@ public class SaleService : ISaleService
         }
 
         var productIds = request.Lines.Select(l => l.ProductId).ToList();
-        var productList = await db.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
+        var productList = await db.Products
+            .Include(p => p.Category)
+                .ThenInclude(c => c!.TaxRate)
+            .Where(p => productIds.Contains(p.Id))
+            .ToListAsync();
         var products = productList.ToDictionary(p => p.Id);
 
         foreach (var line in request.Lines)
@@ -103,9 +107,29 @@ public class SaleService : ISaleService
             effectiveDiscount = VoucherAdminService.ComputeDiscount(voucher.DiscountType, voucher.DiscountValue, subtotal);
         }
 
-        var taxAmount = Math.Round(
-            (subtotal - effectiveDiscount) * (request.TaxRatePercent / 100m), 2, MidpointRounding.AwayFromZero);
-        var totalAmount = subtotal - effectiveDiscount + taxAmount;
+        // Tax is computed per line by TaxCalculator - the same function
+        // CartViewModel's live preview uses - at whatever rate each line
+        // carries (its product's Category.TaxRate, or the shop-wide
+        // default at the time it was added to the cart). PricesIncludeTax
+        // and rounding are deliberately re-read fresh from settings here
+        // rather than trusted from the request, the same "server re-checks
+        // what the UI already gated on" pattern as CashEnabled and
+        // RequireCustomerBeforeCheckout above.
+        var pricesIncludeTax = settings?.PricesIncludeTax ?? false;
+        var taxInputs = request.Lines
+            .Select(l => new TaxCalculator.LineInput(l.UnitPrice * l.Quantity, l.TaxRatePercent))
+            .ToList();
+        var taxCalculation = TaxCalculator.Calculate(taxInputs, effectiveDiscount, pricesIncludeTax);
+        var taxAmount = taxCalculation.TotalTax;
+
+        var preRoundingTotal = pricesIncludeTax
+            ? subtotal - effectiveDiscount
+            : subtotal - effectiveDiscount + taxAmount;
+
+        var roundingMode = settings?.RoundingMode ?? RoundingMode.None;
+        var roundingIncrement = settings?.RoundingIncrement ?? 0;
+        var totalAmount = TaxCalculator.ApplyRounding(preRoundingTotal, roundingMode, roundingIncrement);
+        var roundingAdjustment = totalAmount - preRoundingTotal;
 
         var todayUtc = DateTime.UtcNow.Date;
         var tomorrowUtc = todayUtc.AddDays(1);
@@ -121,12 +145,14 @@ public class SaleService : ISaleService
             Subtotal = subtotal,
             DiscountAmount = effectiveDiscount,
             TaxAmount = taxAmount,
+            RoundingAdjustment = roundingAdjustment,
             TotalAmount = totalAmount,
             Status = SaleStatus.Completed
         };
 
-        foreach (var line in request.Lines)
+        for (var i = 0; i < request.Lines.Count; i++)
         {
+            var line = request.Lines[i];
             var product = products[line.ProductId];
             sale.Items.Add(new SaleItem
             {
@@ -134,7 +160,8 @@ public class SaleService : ISaleService
                 Quantity = line.Quantity,
                 UnitPrice = line.UnitPrice,
                 UnitCostAtSale = product.CostPrice,
-                Subtotal = line.UnitPrice * line.Quantity
+                Subtotal = line.UnitPrice * line.Quantity,
+                TaxAmount = taxCalculation.Lines[i].TaxAmount
             });
         }
 
@@ -186,6 +213,7 @@ public class SaleService : ISaleService
             : 0;
 
         return new CompletedSaleResult(
-            sale.Id, sale.SaleNumber, subtotal, effectiveDiscount, taxAmount, totalAmount, changeDue, sale.SaleDate);
+            sale.Id, sale.SaleNumber, subtotal, effectiveDiscount, taxAmount, roundingAdjustment, totalAmount,
+            changeDue, sale.SaleDate);
     }
 }

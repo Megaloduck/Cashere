@@ -68,9 +68,10 @@ public partial class SettingsShellViewModel : ViewModelBase
         ICashierAdminService cashierAdmin,
         int currentCashierId,
         UserRole currentRole,
-        string currentUsername)
+        string currentUsername,
+        ITaxRateAdminService? taxRateAdmin = null)
     {
-        Business = new BusinessInfoViewModel(shopContext);
+        Business = new BusinessInfoViewModel(shopContext, taxRateAdmin);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
         Payments = new PaymentSettingsViewModel(shopContext);
         Inventory = new InventorySettingsViewModel(shopContext);

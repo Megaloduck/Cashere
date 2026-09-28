@@ -47,7 +47,17 @@ namespace Cashere.Services
     // and by PreferencesViewModel (to populate the toggles) - see
     // Settings -> Preferences.
     public record HeaderClockSettings(
-        bool IsVisible, bool ShowDay, bool ShowDate, bool ShowMonth, bool ShowYear, bool ShowHours);    
+        bool IsVisible, bool ShowDay, bool ShowDate, bool ShowMonth, bool ShowYear, bool ShowHours);
+
+    // Read by RootViewModel right after login (to seed CartViewModel) and by
+    // PosViewModel.RefreshTaxSettingsAsync (so a Business Info change takes
+    // effect the moment the cashier returns to the till, no restart needed) -
+    // see Settings -> Business Info -> Tax Rates / Rounding.
+    public record TaxAndRoundingSettings(
+        decimal DefaultTaxRatePercent,
+        bool PricesIncludeTax,
+        RoundingMode RoundingMode,
+        decimal RoundingIncrement);
 
     public interface IShopContextService
     {
@@ -60,5 +70,6 @@ namespace Cashere.Services
         Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync();
         Task<SecuritySettings> GetSecuritySettingsAsync();
         Task<HeaderClockSettings> GetHeaderClockSettingsAsync();
+        Task<TaxAndRoundingSettings> GetTaxAndRoundingSettingsAsync();
     }
 }
