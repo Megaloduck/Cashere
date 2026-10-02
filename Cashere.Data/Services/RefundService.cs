@@ -90,6 +90,13 @@ public class RefundService : IRefundService
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         await using var transaction = await db.Database.BeginTransactionAsync();
 
+        var approvingCashier = await db.Cashiers.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == processedByCashierId && c.IsActive);
+        if (approvingCashier is null || approvingCashier.Role == UserRole.Cashier)
+        {
+            throw new AdminValidationException("A valid Owner or Manager approval is required to refund or void a sale.");
+        }
+
         var sale = await db.Sales
             .Include(s => s.Items).ThenInclude(i => i.Product)
             .Include(s => s.Items).ThenInclude(i => i.RefundLineItems)

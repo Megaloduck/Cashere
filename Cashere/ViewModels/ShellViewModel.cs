@@ -46,6 +46,7 @@ public partial class ShellViewModel : ViewModelBase
         await Pos.RefreshPaymentSettingsAsync();
         await Pos.RefreshSalesBehaviorSettingsAsync();
         await Pos.RefreshTaxSettingsAsync();
+        await Pos.RefreshScannerSettingsAsync();
         await Pos.RefreshCustomersAsync();
     }
 

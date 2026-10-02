@@ -63,15 +63,51 @@
       <Grid Grid.Row="2" ColumnDefinitions="2*,1*">
         <views:ProductPickerView Grid.Column="0" DataContext="{Binding ProductPicker}" Margin="16"/>
 
-        <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="0,16,16,16">
-          <views:CartView Grid.Row="0" DataContext="{Binding Cart}"/>
-          <StackPanel Grid.Row="1" Spacing="10" Margin="0,14,0,0">
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,Auto" Margin="0,16,16,16">
+          <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8" IsVisible="{Binding HasMultipleOrderTypes}">
+            <TextBlock Text="ORDER TYPE" Classes="eyebrow" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding OrderTypes}" SelectedItem="{Binding SelectedOrderType}" HorizontalAlignment="Stretch"/>
+          </Grid>
+          <views:CartView Grid.Row="1" DataContext="{Binding Cart}"/>
+          <StackPanel Grid.Row="2" Spacing="10" Margin="0,14,0,0">
             <TextBlock Text="{Binding LastReceiptSummary}" TextWrapping="Wrap" Foreground="{StaticResource BlueBrush}" FontWeight="Bold"
                        IsVisible="{Binding LastReceiptSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-            <Button Content="CHECKOUT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                    Padding="0,16" FontSize="18" FontWeight="Bold"
-                    Command="{Binding OpenCheckoutCommand}" IsEnabled="{Binding Cart.HasItems}"/>
+            <Grid ColumnDefinitions="*,*">
+              <Button Grid.Column="0" Content="HOLD ORDER" Classes="accent-yellow" HorizontalAlignment="Stretch" Margin="0,0,4,0"
+                      IsVisible="{Binding IsHeldOrdersEnabled}"
+                      Command="{Binding HoldOrderCommand}" IsEnabled="{Binding Cart.HasItems}"/>
+              <Button Grid.Column="1" Content="CHECKOUT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="4,0,0,0"
+                      Padding="0,16" FontSize="18" FontWeight="Bold"
+                      Command="{Binding OpenCheckoutCommand}" IsEnabled="{Binding Cart.HasItems}"/>
+            </Grid>
           </StackPanel>
+          <Border Grid.Row="3" Classes="card" Padding="10" Margin="0,8,0,0"
+                  IsVisible="{Binding ShowHeldOrders}" MaxHeight="150">
+            <StackPanel Spacing="6">
+              <TextBlock Text="HELD ORDERS" Classes="eyebrow"/>
+              <ScrollViewer MaxHeight="112">
+                <ItemsControl ItemsSource="{Binding HeldOrders}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:HeldOrder">
+                      <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                        <StackPanel Grid.Column="0">
+                          <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="11"/>
+                          <TextBlock Text="{Binding OrderType, StringFormat='TYPE: {0}'}" FontSize="9" Foreground="{StaticResource GrayBrush}"/>
+                          <TextBlock Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontSize="10" Foreground="{StaticResource GrayBrush}"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="RESUME" Classes="accent-blue" Padding="8,4" Margin="0,0,3,0"
+                                Command="{Binding $parent[UserControl].((vm:PosViewModel)DataContext).ResumeHeldOrderCommand}"
+                                CommandParameter="{Binding}"/>
+                        <Button Grid.Column="2" Content="×" Classes="ghost" Padding="8,4"
+                                Command="{Binding $parent[UserControl].((vm:PosViewModel)DataContext).DiscardHeldOrderCommand}"
+                                CommandParameter="{Binding}" ToolTip.Tip="Discard held order"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </StackPanel>
+          </Border>
         </Grid>
       </Grid>
     </Grid>

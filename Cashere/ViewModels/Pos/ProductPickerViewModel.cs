@@ -26,6 +26,9 @@ public partial class ProductPickerViewModel : ViewModelBase
     [ObservableProperty]
     private Category? _selectedCategory;
 
+    [ObservableProperty]
+    private bool _autoAddScannedBarcode = true;
+
     // Raised when the user taps a product card; PosViewModel subscribes and
     // forwards the product into the cart.
     public event Action<Product>? ProductSelected;
@@ -88,5 +91,18 @@ public partial class ProductPickerViewModel : ViewModelBase
     {
         if (product is null) return;
         ProductSelected?.Invoke(product);
+    }
+
+    public bool TryAddScannedBarcode()
+    {
+        if (!AutoAddScannedBarcode || string.IsNullOrWhiteSpace(SearchText)) return false;
+        var code = SearchText.Trim();
+        var product = _allProducts.FirstOrDefault(p =>
+            p.Barcode is not null && p.Barcode.Equals(code, StringComparison.OrdinalIgnoreCase));
+        if (product is null) return false;
+
+        ProductSelected?.Invoke(product);
+        SearchText = string.Empty;
+        return true;
     }
 }

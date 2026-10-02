@@ -4,6 +4,20 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Cashere.Data.Configurations;
 
+public class AuditEventConfiguration : IEntityTypeConfiguration<AuditEvent>
+{
+    public void Configure(EntityTypeBuilder<AuditEvent> builder)
+    {
+        builder.Property(e => e.ActorName).IsRequired().HasMaxLength(100);
+        builder.Property(e => e.Action).IsRequired().HasMaxLength(20);
+        builder.Property(e => e.EntityType).IsRequired().HasMaxLength(50);
+        builder.Property(e => e.EntityId).HasMaxLength(64);
+        builder.Property(e => e.Summary).IsRequired().HasMaxLength(500);
+        builder.HasIndex(e => e.OccurredAtUtc);
+        builder.HasIndex(e => e.ActorCashierId);
+    }
+}
+
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
@@ -61,7 +75,14 @@ public class ReceiptAdminConfiguration : IEntityTypeConfiguration<ReceiptAdmin>
         builder.Property(s => s.ServerBindAddress).IsRequired().HasMaxLength(64);
         builder.Property(s => s.OutOfStockBehavior).HasConversion<string>().HasMaxLength(30);
         builder.Property(s => s.ThemeMode).HasConversion<string>().HasMaxLength(20);
+        builder.Property(s => s.UiDensity).HasConversion<string>().HasMaxLength(20);
+        builder.Property(s => s.DisplayCulture).IsRequired().HasMaxLength(32);
         builder.Property(s => s.RoundingMode).HasConversion<string>().HasMaxLength(20);
         builder.Property(s => s.RoundingIncrement).HasPrecision(18, 2);
+        builder.Property(s => s.SkuPrefix).IsRequired().HasMaxLength(12);
+        builder.Property(s => s.InternalBarcodePrefix).IsRequired().HasMaxLength(2);
+        builder.Property(s => s.SaleNumberPrefix).IsRequired().HasMaxLength(10);
+        builder.Property(s => s.ScheduledBackupTime).IsRequired().HasMaxLength(5);
+        builder.Property(s => s.OrderTypes).IsRequired().HasMaxLength(338);
     }
 }

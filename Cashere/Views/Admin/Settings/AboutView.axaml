@@ -54,9 +54,27 @@
       </Border>
 
       <Border Classes="rule-thick" Margin="0,4"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock Text="THIRD-PARTY SOFTWARE" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="A licenses page for third-party packages (Avalonia, EF Core, Material.Icons, ZXing.Net, and others) isn't built yet."/>
+                 Text="Packages used by the desktop build and their declared license identifiers. Use the links to review the full license terms; the index is generated from the restored NuGet dependency graph."/>
+      <ItemsControl ItemsSource="{Binding ThirdPartyLicenses}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ThirdPartyLicenseInfo">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,1" Padding="0,9">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="{Binding Package}" FontWeight="Bold" FontSize="12"/>
+                  <TextBlock Text="{Binding Version, StringFormat='Version {0}'}" Foreground="{StaticResource GrayBrush}" FontSize="10"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
+                  <TextBlock Text="{Binding License}" FontWeight="Bold" FontSize="11" HorizontalAlignment="Right"/>
+                  <TextBlock Text="{Binding LicenseUrl}" Foreground="{StaticResource BlueBrush}" FontSize="9" TextTrimming="CharacterEllipsis" MaxWidth="280" ToolTip.Tip="{Binding LicenseUrl}"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

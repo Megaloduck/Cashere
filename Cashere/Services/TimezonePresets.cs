@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Cashere.Services;
 
-// A labeled UTC offset, used only for Business Info's Timezone field - a
-// reference value describing where the shop physically is (e.g. for
-// printed/reference info), not something that affects how timestamps are
-// displayed. Actual display always follows this device's own local clock -
-// see ClockPreferenceService.
+// A labeled UTC offset used for store-hour enforcement. Displayed timestamps
+// still follow the device's own local clock - see ClockPreferenceService.
 public record TimezoneOption(string Label, int UtcOffsetMinutes)
 {
     public override string ToString() => Label; // lets a plain ComboBox render it with no ItemTemplate

@@ -16,6 +16,7 @@ namespace Cashere.Services
         public static IPhotoCaptureService? PhotoCapture { get; set; }
         public static IProductPhotoService? ProductPhoto { get; set; }
         public static IProductAdminService? ProductAdmin { get; set; }
+        public static IProductDataTransferService? ProductDataTransfer { get; set; }
         public static ICategoryAdminService? CategoryAdmin { get; set; }
         public static ISupplierAdminService? SupplierAdmin { get; set; }
         public static IPurchaseAdminService? PurchaseAdmin { get; set; }
@@ -24,6 +25,7 @@ namespace Cashere.Services
         public static ISalesReportService? SalesReport { get; set; }
         public static IConnectedDeviceService? ConnectedDevices { get; set; }
         public static IReceiptPrinterService? ReceiptPrinter { get; set; }
+        public static IPosFeedbackService? PosFeedback { get; set; }
         public static IShiftAdminService? ShiftAdmin { get; set; }
         public static IDataBackupService? DataBackup { get; set; }
         public static IAboutInfoService? AboutInfo { get; set; }
@@ -31,6 +33,8 @@ namespace Cashere.Services
         public static IVoucherAdminService? VoucherAdmin { get; set; }
         public static ITaxRateAdminService? TaxRateAdmin { get; set; }
         public static IReportExportService? ReportExport { get; set; }
+        public static IHistoricalSalesImportService? HistoricalSalesImport { get; set; }
+        public static IAuditLogService? AuditLog { get; set; }
         public static IPairingQrCodeService? PairingQrCode { get; set; }
     }
 }

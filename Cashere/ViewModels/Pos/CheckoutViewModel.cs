@@ -19,6 +19,9 @@ public partial class CheckoutViewModel : ViewModelBase
     private readonly int _cashierId;
     private readonly PaymentSettings _paymentSettings;
     private readonly SalesBehaviorSettings _salesBehaviorSettings;
+    private readonly string _orderType;
+    private readonly IPosFeedbackService? _posFeedback;
+    private readonly bool _posSoundsEnabled;
 
     public event Action<CompletedSaleResult>? SaleCompleted;
     public event Action? Cancelled;
@@ -103,6 +106,7 @@ public partial class CheckoutViewModel : ViewModelBase
         (!IsPendingConfirmationRequired || IsPaymentConfirmed);
 
     public bool IsCustomerRequired => _salesBehaviorSettings.RequireCustomerBeforeCheckout;
+    public string OrderType => _orderType;
 
     public bool CanComplete =>
         !IsProcessing &&
@@ -117,13 +121,19 @@ public partial class CheckoutViewModel : ViewModelBase
         int cashierId,
         PaymentSettings paymentSettings,
         SalesBehaviorSettings salesBehaviorSettings,
-        IReadOnlyList<Customer> customers)
+        IReadOnlyList<Customer> customers,
+        string orderType = "Sale",
+        IPosFeedbackService? posFeedback = null,
+        bool posSoundsEnabled = false)
     {
         _saleService = saleService;
         _cart = cart;
         _cashierId = cashierId;
         _paymentSettings = paymentSettings;
         _salesBehaviorSettings = salesBehaviorSettings;
+        _orderType = orderType;
+        _posFeedback = posFeedback;
+        _posSoundsEnabled = posSoundsEnabled;
         Customers = customers;
 
         PaymentMethods = Enum.GetValues<PaymentMethod>()
@@ -233,7 +243,8 @@ public partial class CheckoutViewModel : ViewModelBase
                     .Select(l => new PaymentInput(l.Method, l.Amount, l.FeeAmount, l.ReferenceNumber))
                     .ToList(),
                 AmountTendered: PaymentLines.Where(l => l.IsCash).Sum(l => l.CashTendered),
-                VoucherCode: _cart.AppliedVoucherCode);
+                VoucherCode: _cart.AppliedVoucherCode,
+                OrderType: _orderType);
 
             var result = await _saleService.CompleteSaleAsync(request);
             SaleCompleted?.Invoke(result);
@@ -241,19 +252,28 @@ public partial class CheckoutViewModel : ViewModelBase
         catch (InsufficientStockException ex)
         {
             ErrorMessage = ex.Message;
+            PlayCheckoutError();
         }
         catch (InvalidVoucherException ex)
         {
             ErrorMessage = ex.Message;
+            PlayCheckoutError();
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Checkout failed: {ex.Message}";
+            PlayCheckoutError();
         }
         finally
         {
             IsProcessing = false;
         }
+    }
+
+    private void PlayCheckoutError()
+    {
+        if (_posSoundsEnabled)
+            _posFeedback?.Play(PosSoundEvent.CheckoutFailed);
     }
 
     [RelayCommand]

@@ -18,6 +18,7 @@
     <TextBox Grid.Row="0"
              Watermark="SEARCH BY NAME, SKU OR BARCODE..."
              Text="{Binding SearchText}"
+             KeyDown="OnSearchKeyDown"
              Margin="0,0,0,12">
       <TextBox.InnerLeftContent>
         <mi:MaterialIcon Kind="Magnify" Width="16" Height="16" Foreground="{StaticResource GrayBrush}" Margin="12,0,0,0"/>

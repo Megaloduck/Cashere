@@ -44,6 +44,7 @@ public partial class App : Application
             {
                 var startupSettings = AppServices.ShopContext.GetSettingsAsync().GetAwaiter().GetResult();
                 ThemeApplier.Apply(startupSettings?.ThemeMode ?? AppThemeMode.System);
+                DisplayCultureApplier.Apply(startupSettings?.DisplayCulture);
 
                 var root = new RootViewModel(
                     AppServices.ProductCatalog,
@@ -63,7 +64,8 @@ public partial class App : Application
                     AppServices.ReceiptPrinter,
                     AppServices.RefundService,
                     AppServices.VoucherAdmin,
-                    AppServices.TaxRateAdmin);
+                    AppServices.TaxRateAdmin,
+                    AppServices.PosFeedback);
 
                 desktop.MainWindow = new MainWindow
                 {

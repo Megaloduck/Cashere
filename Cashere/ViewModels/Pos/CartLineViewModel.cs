@@ -18,6 +18,7 @@ public partial class CartLineViewModel : ViewModelBase
     public decimal UnitPrice { get; }
     public decimal UnitCost { get; }
     public int StockAvailable { get; }
+    public bool EnforceStock { get; }
 
     // Resolved once, at the moment this line was added to the cart (see
     // CartViewModel.AddProduct / TaxCalculator.ResolveRatePercent) - a later
@@ -39,7 +40,8 @@ public partial class CartLineViewModel : ViewModelBase
         decimal taxRatePercent,
         int stockAvailable,
         int quantity,
-        Action onChanged)
+        Action onChanged,
+        bool enforceStock = true)
     {
         ProductId = productId;
         Name = name;
@@ -47,6 +49,7 @@ public partial class CartLineViewModel : ViewModelBase
         UnitCost = unitCost;
         TaxRatePercent = taxRatePercent;
         StockAvailable = stockAvailable;
+        EnforceStock = enforceStock;
         _quantity = quantity;
         _onChanged = onChanged;
     }
@@ -60,7 +63,7 @@ public partial class CartLineViewModel : ViewModelBase
     [RelayCommand]
     private void Increment()
     {
-        if (Quantity < StockAvailable)
+        if (!EnforceStock || Quantity < StockAvailable)
         {
             Quantity++;
         }

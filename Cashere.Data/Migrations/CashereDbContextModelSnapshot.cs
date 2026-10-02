@@ -17,6 +17,51 @@ namespace Cashere.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("Cashere.Models.AuditEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ActorCashierId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ActorName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("OccurredAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorCashierId");
+
+                    b.HasIndex("OccurredAtUtc");
+
+                    b.ToTable("AuditEvents");
+                });
+
             modelBuilder.Entity("Cashere.Models.Cashier", b =>
                 {
                     b.Property<int>("Id")
@@ -219,6 +264,9 @@ namespace Cashere.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("OutOfStockBehaviorOverride")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("SellingPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
@@ -226,6 +274,10 @@ namespace Cashere.Data.Migrations
                     b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("TaxRateOverridePercent")
+                        .HasPrecision(5, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("StockQuantity")
@@ -334,6 +386,22 @@ namespace Cashere.Data.Migrations
                     b.Property<bool>("AutoGenerateSku")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("AutoAddScannedBarcode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("InternalBarcodePrefix")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SkuNumberLength")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SkuPrefix")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("AutoLockEnabled")
                         .HasColumnType("INTEGER");
 
@@ -343,11 +411,43 @@ namespace Cashere.Data.Migrations
                     b.Property<bool>("AutoPrintReceiptAfterPayment")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AutomaticBackupRetentionCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CashierCanApplyVouchers")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CashierCanRequestRefunds")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CashierCanRequestVoids")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CashierCanViewOwnSalesHistory")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableHeldOrders")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IncludeDateInSaleNumber")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("BusinessHoursJson")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("EnforceBusinessHoursAtCheckout")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("CashEnabled")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ScheduledBackupsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ScheduledBackupTime")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("CashFeePercent")
                         .HasColumnType("TEXT");
@@ -365,6 +465,17 @@ namespace Cashere.Data.Migrations
 
                     b.Property<bool>("EdcEnabled")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableCustomerDisplay")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableCashDrawerKick")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OrderTypes")
+                        .IsRequired()
+                        .HasMaxLength(338)
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("EdcFeePercent")
                         .HasColumnType("TEXT");
@@ -403,6 +514,14 @@ namespace Cashere.Data.Migrations
 
                     b.Property<string>("ReceiptFooterText")
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("SaleNumberPrefix")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SaleNumberSequenceDigits")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("RequireConfirmationForNonCash")
                         .HasColumnType("INTEGER");
@@ -450,6 +569,12 @@ namespace Cashere.Data.Migrations
                     b.Property<bool>("ShowHeaderYear")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("PosSoundsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowPosNotifications")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("TaxId")
                         .HasColumnType("TEXT");
 
@@ -460,6 +585,16 @@ namespace Cashere.Data.Migrations
                     b.Property<string>("ThemeMode")
                         .IsRequired()
                         .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UiDensity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DisplayCulture")
+                        .IsRequired()
+                        .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Timezone")
@@ -565,6 +700,11 @@ namespace Cashere.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SaleNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OrderType")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");

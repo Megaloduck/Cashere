@@ -23,6 +23,7 @@ public record SaleReceiptContext(
     string Currency,
     DateTime SaleDate,
     string SaleNumber,
+    string OrderType,
     string CashierName,
     IReadOnlyList<SaleReceiptLine> Lines,
     decimal Subtotal,
@@ -66,6 +67,7 @@ public static class SaleReceiptFormatter
         // (UTC) time on the till's own paper.
         var dateText = ClockPreferenceService.ToDisplay(ctx.SaleDate).ToString("dd MMM yyyy HH:mm");
         sb.AppendLine($"{dateText,-20}{ctx.SaleNumber,20}");
+        sb.AppendLine($"Order type: {ctx.OrderType}");
         sb.AppendLine($"Cashier: {ctx.CashierName}");
         sb.AppendLine(Divider);
 

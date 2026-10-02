@@ -11,11 +11,9 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels.Admin.Settings;
 
-// Printer selection and paper width - the only Hardware category with a
-// real device behind it today (WindowsReceiptPrinterService). Scanner
-// config, cash drawer, customer display and EDC pairing have no
-// implementation to configure yet, so they stay a "coming soon" note on
-// this same screen rather than getting their own controls.
+// Printer selection and paper width use the desktop print service. Barcode
+// scanners work in generic USB keyboard-wedge mode; cash drawers use the
+// standard ESC/POS pulse where supported, while EDC still needs its provider API.
 public partial class HardwareSettingsViewModel : ViewModelBase
 {
     private const string SystemDefaultLabel = "SYSTEM DEFAULT";
@@ -36,6 +34,13 @@ public partial class HardwareSettingsViewModel : ViewModelBase
     [ObservableProperty] private bool _isTestPrinting;
     [ObservableProperty] private string? _testPrintStatusMessage;
     [ObservableProperty] private bool _isPrinterServiceAvailable;
+    [ObservableProperty] private bool _autoAddScannedBarcode = true;
+    [ObservableProperty] private bool _enableCustomerDisplay;
+    [ObservableProperty] private bool _enableCashDrawerKick;
+    [ObservableProperty] private bool _isTestingCashDrawer;
+    [ObservableProperty] private string? _cashDrawerTestStatusMessage;
+
+    public bool SupportsCashDrawerKick => _receiptPrinter?.SupportsCashDrawerKick == true;
 
     public HardwareSettingsViewModel(IShopContextService shopContext, IReceiptPrinterService? receiptPrinter)
     {
@@ -73,6 +78,9 @@ public partial class HardwareSettingsViewModel : ViewModelBase
         }
 
         PaperWidthMm = settings.PrinterPaperWidthMm > 0 ? settings.PrinterPaperWidthMm : 80;
+        AutoAddScannedBarcode = settings.AutoAddScannedBarcode;
+        EnableCustomerDisplay = settings.EnableCustomerDisplay;
+        EnableCashDrawerKick = settings.EnableCashDrawerKick;
     }
 
     [RelayCommand]
@@ -84,6 +92,9 @@ public partial class HardwareSettingsViewModel : ViewModelBase
 
         settings.PrinterName = SelectedPrinterName == SystemDefaultLabel ? null : SelectedPrinterName;
         settings.PrinterPaperWidthMm = PaperWidthMm;
+        settings.AutoAddScannedBarcode = AutoAddScannedBarcode;
+        settings.EnableCustomerDisplay = EnableCustomerDisplay;
+        settings.EnableCashDrawerKick = EnableCashDrawerKick;
 
         await _shopContext.UpdateSettingsAsync(settings);
 
@@ -126,6 +137,35 @@ public partial class HardwareSettingsViewModel : ViewModelBase
         finally
         {
             IsTestPrinting = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task TestCashDrawer()
+    {
+        if (!SupportsCashDrawerKick || _receiptPrinter is null)
+        {
+            CashDrawerTestStatusMessage = "Cash drawer control is unavailable in this build.";
+            return;
+        }
+
+        IsTestingCashDrawer = true;
+        CashDrawerTestStatusMessage = null;
+        try
+        {
+            await Save();
+            var result = await _receiptPrinter.OpenCashDrawerAsync();
+            CashDrawerTestStatusMessage = result.Success
+                ? "Drawer pulse sent. Confirm the connected drawer opened."
+                : result.ErrorMessage ?? "Drawer pulse failed. Check printer and drawer compatibility.";
+        }
+        catch (Exception ex)
+        {
+            CashDrawerTestStatusMessage = $"Drawer pulse failed: {ex.Message}";
+        }
+        finally
+        {
+            IsTestingCashDrawer = false;
         }
     }
 }

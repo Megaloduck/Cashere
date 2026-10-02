@@ -41,6 +41,7 @@ sealed class Program
         AppServices.ShopContext = shopContextService;
         AppServices.ProductAdmin = new ProductAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.CategoryAdmin = new CategoryAdminService(dbContextFactory);
+        AppServices.ProductDataTransfer = new ProductDataTransferService(AppServices.ProductAdmin, AppServices.CategoryAdmin);
         AppServices.SupplierAdmin = new SupplierAdminService(dbContextFactory);
         AppServices.PurchaseAdmin = new PurchaseAdminService(dbContextFactory, serverHost.CatalogChangeNotifier);
         AppServices.RefundService = new RefundService(dbContextFactory, serverHost.CatalogChangeNotifier);
@@ -49,12 +50,16 @@ sealed class Program
         AppServices.CashierAdmin = new CashierAdminService(dbContextFactory, passwordHasher);
         AppServices.CustomerAdmin = new CustomerAdminService(dbContextFactory);
         AppServices.SalesReport = new SalesReportService(dbContextFactory);
-        AppServices.ReportExport = new ReportExportService(dbPath, AppServices.SalesReport);
+        AppServices.ReportExport = new ReportExportService(dbPath, AppServices.SalesReport, dbContextFactory);
+        AppServices.HistoricalSalesImport = new HistoricalSalesImportService(dbContextFactory, passwordHasher);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
         AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
+        AppServices.PosFeedback = new WindowsPosFeedbackService();
         AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);
         AppServices.DataBackup = new DataBackupService(dbPath);
+        var scheduledBackupService = new ScheduledBackupService(dbPath);
         AppServices.AboutInfo = new AboutInfoService(dbContextFactory, dbPath);
+        AppServices.AuditLog = new AuditLogService(dbContextFactory);
         AppServices.PairingQrCode = new QrCoderPairingQrCodeService();
 
         try
@@ -63,6 +68,7 @@ sealed class Program
         }
         finally
         {
+            scheduledBackupService.Dispose();
             serverHost.StopAsync().GetAwaiter().GetResult();
         }
     }

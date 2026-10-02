@@ -13,16 +13,28 @@
     <converters:PhotoPathToImageConverter x:Key="PhotoPathToImage"/>
   </UserControl.Resources>
 
-  <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="12">
     <!-- Header Section (Unchanged) -->
-    <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto"  Margin="0,0,0,12">
+    <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto,Auto,Auto"  Margin="0,0,0,12">
         <TextBlock Grid.Column="0" Text="PRODUCTS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
       <TextBox Grid.Column="1" Watermark="SEARCH BY NAME, SKU OR BARCODE..." Text="{Binding SearchText}" Margin="0,0,12,0">
         <TextBox.InnerLeftContent>
           <mi:MaterialIcon Kind="Magnify" Width="16" Height="16"  Margin="12,0,0,0" Foreground="{StaticResource GrayBrush}"/>
         </TextBox.InnerLeftContent>
       </TextBox>
-      <Button Grid.Column="2" Classes="accent-blue" Command="{Binding AddNewCommand}" IsVisible="{Binding CanManage}" >
+      <Button Grid.Column="2" Classes="chip" Click="OnImportCatalogClick" IsVisible="{Binding CanManage}" IsEnabled="{Binding !IsDataTransferBusy}" Margin="0,0,6,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Import" Width="16" Height="16"/>
+          <TextBlock Text="IMPORT CSV"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="3" Classes="chip" Click="OnExportCatalogClick" IsVisible="{Binding CanManage}" IsEnabled="{Binding !IsDataTransferBusy}" Margin="0,0,6,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <mi:MaterialIcon Kind="Export" Width="16" Height="16"/>
+          <TextBlock Text="EXPORT CSV"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="4" Classes="accent-blue" Command="{Binding AddNewCommand}" IsVisible="{Binding CanManage}" >
         <StackPanel Orientation="Horizontal" Spacing="6">
           <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
           <TextBlock Text="NEW PRODUCT"/>
@@ -31,7 +43,19 @@
     </Grid>
 
     <!-- List Header (Unchanged) -->
-    <Grid Grid.Row="1" ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190" Margin="0,0,0,4">
+    <StackPanel Grid.Row="1" Spacing="6" Margin="0,0,0,8" IsVisible="{Binding CanManage}">
+      <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding CanManage}">
+        <TextBlock Grid.Column="0" Text="Matching SKUs are skipped by default. Enable updates to replace catalog fields; existing stock counts are always preserved." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Text="UPDATE MATCHES" Classes="eyebrow" FontSize="9"/>
+          <ToggleSwitch IsChecked="{Binding UpdateExistingProducts}"/>
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="{Binding DataTransferStatus}" TextWrapping="Wrap" Foreground="{StaticResource BlueBrush}" FontWeight="Bold"
+                 IsVisible="{Binding DataTransferStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+    </StackPanel>
+
+    <Grid Grid.Row="2" ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190" Margin="0,0,0,4">
       <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
       <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
       <TextBlock Grid.Column="3" Text="BARCODE" Classes="eyebrow"/>
@@ -40,10 +64,10 @@
       <TextBlock Grid.Column="6" Text="STATUS" Classes="eyebrow"/>
       <TextBlock Grid.Column="7" Text="ACTIONS" Classes="eyebrow"/>
     </Grid>
-    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+    <Border Grid.Row="2" Classes="rule-thick" VerticalAlignment="Bottom"/>
 
     <!-- List Content (Unchanged) -->
-    <ScrollViewer Grid.Row="2">
+    <ScrollViewer Grid.Row="3">
       <ItemsControl ItemsSource="{Binding FilteredProducts}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="models:Product">
@@ -226,6 +250,20 @@
                     <TextBox Text="{Binding FormLowStockThreshold}"/>
                   </StackPanel>
                 </Grid>
+
+                <StackPanel Spacing="2">
+                  <TextBlock Text="OUT-OF-STOCK BEHAVIOR" Classes="eyebrow"/>
+                  <ComboBox ItemsSource="{Binding OutOfStockOptions}" SelectedItem="{Binding FormOutOfStockOption}" HorizontalAlignment="Stretch"/>
+                  <TextBlock Text="Use shop default unless this product needs a different rule."
+                             FontSize="10" Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <StackPanel Spacing="2">
+                  <TextBlock Text="TAX RATE OVERRIDE" Classes="eyebrow"/>
+                  <TextBox Text="{Binding FormTaxRateOverridePercent}" Watermark="Leave blank to inherit"/>
+                  <TextBlock Text="Enter a percentage from 0 to 100. Blank uses the category rate, then the shop rate."
+                             FontSize="10" Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"/>
+                </StackPanel>
 
                 <!-- Error Message -->
                 <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"

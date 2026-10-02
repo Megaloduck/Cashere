@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using Cashere.Models;
 using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,12 +12,14 @@ namespace Cashere.ViewModels.Admin.Settings;
 // the login screen existing. Auto-lock is the one item here with an actual
 // mechanism behind it (AutoLockService, armed from RootViewModel and reset
 // from MainWindow on every input event); PIN sign-in is already satisfied
-// by Login itself, and everything else from the original placeholder list
-// (manager authorization, audit log, local DB encryption) stays "coming
-// soon" until there's a real feature to attach it to.
+// by Login itself. The recent-activity list below is filled by the database
+// audit trail; sensitive-action approvals and local DB encryption remain.
 public partial class SecuritySettingsViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
+    private readonly IAuditLogService? _auditLog;
+    public ObservableCollection<AuditLogEntry> RecentActivity { get; } = new();
+    [ObservableProperty] private bool _hasNoRecentActivity = true;
 
     public IReadOnlyList<int> TimeoutOptions { get; } = new[] { 1, 5, 10, 15, 30, 60 };
 
@@ -24,9 +27,10 @@ public partial class SecuritySettingsViewModel : ViewModelBase
     [ObservableProperty] private int _autoLockTimeoutMinutes = 15;
     [ObservableProperty] private string? _statusMessage;
 
-    public SecuritySettingsViewModel(IShopContextService shopContext)
+    public SecuritySettingsViewModel(IShopContextService shopContext, IAuditLogService? auditLog = null)
     {
         _shopContext = shopContext;
+        _auditLog = auditLog;
     }
 
     public async Task LoadAsync()
@@ -34,6 +38,18 @@ public partial class SecuritySettingsViewModel : ViewModelBase
         var settings = await _shopContext.GetSecuritySettingsAsync();
         AutoLockEnabled = settings.AutoLockEnabled;
         AutoLockTimeoutMinutes = settings.AutoLockTimeoutMinutes;
+        await RefreshAuditAsync();
+    }
+
+    [RelayCommand]
+    private async Task RefreshAudit() => await RefreshAuditAsync();
+
+    private async Task RefreshAuditAsync()
+    {
+        RecentActivity.Clear();
+        if (_auditLog is not null)
+            foreach (var entry in await _auditLog.GetRecentAsync()) RecentActivity.Add(entry);
+        HasNoRecentActivity = RecentActivity.Count == 0;
     }
 
     [RelayCommand]

@@ -28,6 +28,7 @@ public partial class RootViewModel : ViewModelBase
     private readonly IAboutInfoService _aboutInfo;
     private readonly IConnectedDeviceService? _connectedDevices;
     private readonly IReceiptPrinterService? _receiptPrinter;
+    private readonly IPosFeedbackService? _posFeedback;
     private readonly IRefundService? _refundService;
     private readonly IVoucherAdminService? _voucherAdmin;
     private readonly ITaxRateAdminService? _taxRateAdmin;
@@ -53,7 +54,8 @@ public partial class RootViewModel : ViewModelBase
         IReceiptPrinterService? receiptPrinter,
         IRefundService? refundService,
         IVoucherAdminService? voucherAdmin,
-        ITaxRateAdminService? taxRateAdmin = null)
+        ITaxRateAdminService? taxRateAdmin = null,
+        IPosFeedbackService? posFeedback = null)
     {
         _productCatalog = productCatalog;
         _saleService = saleService;
@@ -70,6 +72,7 @@ public partial class RootViewModel : ViewModelBase
         _aboutInfo = aboutInfo;
         _connectedDevices = connectedDevices;
         _receiptPrinter = receiptPrinter;
+        _posFeedback = posFeedback;
         _refundService = refundService;
         _voucherAdmin = voucherAdmin;
         _taxRateAdmin = taxRateAdmin;
@@ -82,6 +85,7 @@ public partial class RootViewModel : ViewModelBase
     private Task ShowLoginAsync()
     {
         AutoLockService.Stop();
+        CurrentCashierContext.Clear();
 
         var login = new LoginViewModel(_cashierAdmin, "Cashere");
         login.LoginSucceeded += OnLoginSucceeded;
@@ -108,6 +112,7 @@ public partial class RootViewModel : ViewModelBase
 
     private async void OnLoginSucceeded(Cashier cashier)
     {
+        CurrentCashierContext.Set(cashier.Id, cashier.DisplayName);
         var taxSettings = await _shopContext.GetTaxAndRoundingSettingsAsync();
 
         var security = await _shopContext.GetSecuritySettingsAsync();
@@ -118,6 +123,8 @@ public partial class RootViewModel : ViewModelBase
         // this device's own local time. See ClockPreferenceService.
 
         var headerClock = await _shopContext.GetHeaderClockSettingsAsync();
+        var cashierPermissions = await _shopContext.GetSettingsAsync();
+        UiDensityApplier.Apply(cashierPermissions?.UiDensity ?? UiDensity.Comfortable);
         HeaderClockService.Current.Configure(
             headerClock.IsVisible, headerClock.ShowDay, headerClock.ShowDate,
             headerClock.ShowMonth, headerClock.ShowYear, headerClock.ShowHours);
@@ -131,13 +138,18 @@ public partial class RootViewModel : ViewModelBase
             cashier.DisplayName,
             _customerAdmin,
             _receiptPrinter,
-            _voucherAdmin);
+            _voucherAdmin,
+            cashier.Role,
+            _posFeedback);
 
         var adminViewModel = new AdminViewModel(
     _productAdmin, _categoryAdmin, _supplierAdmin, _purchaseAdmin, _cashierAdmin, _customerAdmin,
     _salesReport, _productCatalog, _shopContext, _shiftAdmin, _dataBackup, _aboutInfo,
     cashier.Id, cashier.Role, cashier.Username,
-    _connectedDevices, _receiptPrinter, _refundService, _voucherAdmin, _taxRateAdmin);
+    _connectedDevices, _receiptPrinter, _refundService, _voucherAdmin, _taxRateAdmin,
+    cashierPermissions?.CashierCanViewOwnSalesHistory ?? false,
+    cashierPermissions?.CashierCanRequestRefunds ?? false,
+    cashierPermissions?.CashierCanRequestVoids ?? false);
 
         var shell = new ShellViewModel(posViewModel, adminViewModel);
         shell.LogoutRequested += OnLogoutRequested;

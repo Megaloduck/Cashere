@@ -85,7 +85,8 @@ public class ShopContextService : IShopContextService
 
         return new SalesBehaviorSettings(
             settings?.RequireCustomerBeforeCheckout ?? false,
-            settings?.AutoPrintReceiptAfterPayment ?? false);
+            settings?.AutoPrintReceiptAfterPayment ?? false,
+            settings?.EnableHeldOrders ?? true);
     }
 
     public async Task<SecuritySettings> GetSecuritySettingsAsync()

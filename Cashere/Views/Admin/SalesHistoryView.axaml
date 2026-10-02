@@ -82,11 +82,11 @@
                     <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
                   </Button>
                   <Button Classes="ghost" Click="OnRefundClick" ToolTip.Tip="Refund"
-                          IsVisible="{Binding $parent[UserControl].((vm:SalesHistoryViewModel)DataContext).CanManage}">
+                          IsVisible="{Binding $parent[UserControl].((vm:SalesHistoryViewModel)DataContext).CanManageRefunds}">
                     <mi:MaterialIcon Kind="CashRefund" Width="16" Height="16"/>
                   </Button>
                   <Button Classes="ghost" Click="OnVoidClick" ToolTip.Tip="Void sale"
-                          IsVisible="{Binding $parent[UserControl].((vm:SalesHistoryViewModel)DataContext).CanManage}">
+                          IsVisible="{Binding $parent[UserControl].((vm:SalesHistoryViewModel)DataContext).CanManageVoids}">
                     <mi:MaterialIcon Kind="CancelOutline" Width="16" Height="16" Foreground="{StaticResource RedBrush}"/>
                   </Button>
                 </StackPanel>
@@ -109,6 +109,10 @@
               <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" Text="CASHIER"/>
                 <TextBlock Grid.Column="1" Text="{Binding CashierName}" FontWeight="Bold"/>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="ORDER TYPE"/>
+                <TextBlock Grid.Column="1" Text="{Binding OrderType}" FontWeight="Bold"/>
               </Grid>
               <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" Text="CUSTOMER"/>
@@ -154,7 +158,8 @@
               </Border>
 
               <Border Classes="rule-thick"/>
-              <Grid ColumnDefinitions="*,Auto">
+              <Grid ColumnDefinitions="*,Auto"
+                    IsVisible="{Binding $parent[UserControl].((vm:SalesHistoryViewModel)DataContext).CanViewProfitMetrics}">
                 <TextBlock Grid.Column="0" Text="GROSS PROFIT" FontWeight="Bold" Foreground="{StaticResource BlueBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding GrossProfit, StringFormat='Rp {0:N0}'}" FontWeight="Bold" Foreground="{StaticResource BlueBrush}"/>
               </Grid>
@@ -196,14 +201,14 @@
 
           <Grid ColumnDefinitions="*,*" IsVisible="{Binding CanManage}">
             <Button Grid.Column="0" Classes="accent-yellow" Command="{Binding OpenRefundDialogCommand}" Margin="0,0,4,0"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" IsVisible="{Binding CanManageRefunds}">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <mi:MaterialIcon Kind="CashRefund" Width="16" Height="16"/>
                 <TextBlock Text="REFUND"/>
               </StackPanel>
             </Button>
             <Button Grid.Column="1" Classes="accent-red" Command="{Binding OpenVoidPromptCommand}" Margin="4,0,0,0"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" IsVisible="{Binding CanManageVoids}">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <mi:MaterialIcon Kind="CancelOutline" Width="16" Height="16"/>
                 <TextBlock Text="VOID SALE"/>
@@ -254,6 +259,12 @@
             </ItemsControl>
           </ScrollViewer>
 
+          <StackPanel Spacing="6" IsVisible="{Binding RequiresManagerApproval}">
+            <TextBlock Text="MANAGER APPROVAL REQUIRED" Classes="eyebrow"/>
+            <TextBlock Text="An Owner or Manager must approve with their own account." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+            <TextBox Text="{Binding AuthorizationUsername}" Watermark="Manager username"/>
+            <TextBox Text="{Binding AuthorizationPin}" Watermark="Manager PIN" PasswordChar="•"/>
+          </StackPanel>
           <TextBlock Text="REASON (OPTIONAL)" Classes="eyebrow"/>
           <TextBox Text="{Binding RefundReason}" AcceptsReturn="True" Height="50"/>
 
@@ -286,6 +297,12 @@
           <TextBlock Text="This cancels everything still refundable on this sale and returns the stock. It can't be undone."
                      TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"/>
 
+          <StackPanel Spacing="6" IsVisible="{Binding RequiresManagerApproval}">
+            <TextBlock Text="MANAGER APPROVAL REQUIRED" Classes="eyebrow"/>
+            <TextBlock Text="An Owner or Manager must approve with their own account." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+            <TextBox Text="{Binding AuthorizationUsername}" Watermark="Manager username"/>
+            <TextBox Text="{Binding AuthorizationPin}" Watermark="Manager PIN" PasswordChar="•"/>
+          </StackPanel>
           <TextBlock Text="REASON (OPTIONAL)" Classes="eyebrow"/>
           <TextBox Text="{Binding VoidReason}" AcceptsReturn="True" Height="50"/>
 

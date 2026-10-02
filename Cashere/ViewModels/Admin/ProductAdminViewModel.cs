@@ -19,6 +19,7 @@ public partial class ProductAdminViewModel : ViewModelBase
     private readonly IProductAdminService _productAdmin;
     private readonly ICategoryAdminService _categoryAdmin;
     private readonly IShopContextService? _shopContext;
+    private readonly IProductDataTransferService? _dataTransfer;
     private readonly UserRole _currentRole;
 
     private List<Product> _allProducts = new();
@@ -40,6 +41,10 @@ public partial class ProductAdminViewModel : ViewModelBase
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+    [ObservableProperty] private bool _isDataTransferBusy;
+    [ObservableProperty] private string? _dataTransferStatus;
+    [ObservableProperty] private bool _updateExistingProducts;
+
     [ObservableProperty]
     private bool _isEditorOpen;
 
@@ -53,11 +58,13 @@ public partial class ProductAdminViewModel : ViewModelBase
     [ObservableProperty] private string _formBarcode = string.Empty;
     [ObservableProperty] private string _formName = string.Empty;
     [ObservableProperty] private Category? _formCategory;
+    [ObservableProperty] private string _formTaxRateOverridePercent = string.Empty;
     [ObservableProperty] private string _formUnit = "pcs";
     [ObservableProperty] private string _formCostPrice = "0";
     [ObservableProperty] private string _formSellingPrice = "0";
     [ObservableProperty] private string _formStockQuantity = "0";
     [ObservableProperty] private string _formLowStockThreshold = "5";
+    [ObservableProperty] private OutOfStockOption _formOutOfStockOption = new("Use shop default", null);
     [ObservableProperty] private string _newCategoryName = string.Empty;
     [ObservableProperty] private Bitmap? _formPhotoPreview;
     [ObservableProperty] private Bitmap? _formQrPreview;
@@ -65,6 +72,12 @@ public partial class ProductAdminViewModel : ViewModelBase
 
     public bool HasFormPhotoPreview => FormPhotoPreview is not null;
     public bool HasFormQrPreview => FormQrPreview is not null;
+    public IReadOnlyList<OutOfStockOption> OutOfStockOptions { get; } =
+    [
+        new OutOfStockOption("Use shop default", null),
+        new OutOfStockOption("Block sale when out of stock", OutOfStockBehavior.Block),
+        new OutOfStockOption("Allow negative stock", OutOfStockBehavior.AllowNegativeStock)
+    ];
 
     // Reflect Settings -> Inventory, refreshed on every LoadAsync() so this
     // screen never needs its own reload-on-nav wiring - it simply picks up
@@ -76,12 +89,14 @@ public partial class ProductAdminViewModel : ViewModelBase
         IProductAdminService productAdmin,
         ICategoryAdminService categoryAdmin,
         UserRole currentRole,
-        IShopContextService? shopContext = null)
+        IShopContextService? shopContext = null,
+        IProductDataTransferService? dataTransfer = null)
     {
         _productAdmin = productAdmin;
         _categoryAdmin = categoryAdmin;
         _currentRole = currentRole;
         _shopContext = shopContext;
+        _dataTransfer = dataTransfer;
     }
 
     public async Task LoadAsync()
@@ -89,6 +104,7 @@ public partial class ProductAdminViewModel : ViewModelBase
         var categories = await _categoryAdmin.GetAllCategoriesAsync();
         Categories.Clear();
         foreach (var category in categories) Categories.Add(category);
+
 
         if (_shopContext is not null)
         {
@@ -100,6 +116,48 @@ public partial class ProductAdminViewModel : ViewModelBase
 
         _allProducts = await _productAdmin.GetAllProductsAsync();
         ApplyFilter();
+    }
+
+    public async Task<string?> ExportProductsCsvAsync()
+    {
+        if (!CanManage || _dataTransfer is null) return null;
+        IsDataTransferBusy = true;
+        DataTransferStatus = null;
+        try
+        {
+            return await _dataTransfer.ExportCsvAsync();
+        }
+        catch (Exception ex)
+        {
+            DataTransferStatus = $"Catalog export failed: {ex.Message}";
+            return null;
+        }
+        finally
+        {
+            IsDataTransferBusy = false;
+        }
+    }
+
+    public async Task ImportProductsCsvAsync(string csvContents)
+    {
+        if (!CanManage || _dataTransfer is null) return;
+        IsDataTransferBusy = true;
+        DataTransferStatus = null;
+        try
+        {
+            var result = await _dataTransfer.ImportCsvAsync(csvContents, UpdateExistingProducts);
+            await LoadAsync();
+            DataTransferStatus = $"Import complete: {result.Added} added, {result.Updated} updated, {result.Skipped} skipped." +
+                                 (result.Details is null ? string.Empty : Environment.NewLine + result.Details);
+        }
+        catch (Exception ex)
+        {
+            DataTransferStatus = $"Catalog import failed: {ex.Message}";
+        }
+        finally
+        {
+            IsDataTransferBusy = false;
+        }
     }
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
@@ -135,11 +193,13 @@ public partial class ProductAdminViewModel : ViewModelBase
         FormBarcode = string.Empty;
         FormName = string.Empty;
         FormCategory = null;
+        FormTaxRateOverridePercent = string.Empty;
         FormUnit = "pcs";
         FormCostPrice = "0";
         FormSellingPrice = "0";
         FormStockQuantity = "0";
         FormLowStockThreshold = _defaultLowStockThreshold.ToString();
+        FormOutOfStockOption = OutOfStockOptions[0];
         SetFormPhotoPreview(null);
         ErrorMessage = null;
         IsEditorOpen = true;
@@ -156,11 +216,13 @@ public partial class ProductAdminViewModel : ViewModelBase
         FormBarcode = product.Barcode ?? string.Empty;
         FormName = product.Name;
         FormCategory = Categories.FirstOrDefault(c => c.Id == product.CategoryId);
+        FormTaxRateOverridePercent = product.TaxRateOverridePercent?.ToString() ?? string.Empty;
         FormUnit = product.Unit;
         FormCostPrice = product.CostPrice.ToString();
         FormSellingPrice = product.SellingPrice.ToString();
         FormStockQuantity = product.StockQuantity.ToString();
         FormLowStockThreshold = product.LowStockThreshold.ToString();
+        FormOutOfStockOption = OutOfStockOptions.First(option => option.Value == product.OutOfStockBehaviorOverride);
         _formPhotoData = null;
         _formPhotoExtension = null;
         LoadExistingPhotoPreview(product.PhotoPath);
@@ -312,9 +374,21 @@ public partial class ProductAdminViewModel : ViewModelBase
             return;
         }
 
+        decimal? taxRateOverridePercent = null;
+        if (!string.IsNullOrWhiteSpace(FormTaxRateOverridePercent))
+        {
+            if (!decimal.TryParse(FormTaxRateOverridePercent, out var parsedTaxRate) || parsedTaxRate is < 0 or > 100)
+            {
+                ErrorMessage = "Product tax override must be a percentage from 0 to 100, or left blank.";
+                return;
+            }
+            taxRateOverridePercent = parsedTaxRate;
+        }
+
         var input = new ProductInput(
             FormSku, string.IsNullOrWhiteSpace(FormBarcode) ? null : FormBarcode,
-            FormName, FormCategory?.Id, FormUnit, costPrice, sellingPrice, stockQuantity, lowStockThreshold);
+            FormName, FormCategory?.Id, FormUnit, costPrice, sellingPrice, stockQuantity, lowStockThreshold,
+            FormOutOfStockOption.Value, taxRateOverridePercent);
 
         try
         {

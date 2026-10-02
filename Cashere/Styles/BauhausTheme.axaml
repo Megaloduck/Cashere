@@ -110,9 +110,9 @@
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
-    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Padding" Value="{DynamicResource TextInputPadding}"/>
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
-    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="FontSize" Value="{DynamicResource TextInputFontSize}"/>
     <Setter Property="FontWeight" Value="Medium"/>
     <Setter Property="SelectionBrush" Value="{DynamicResource YellowBrush}"/>
     <Setter Property="SelectionForegroundBrush" Value="{DynamicResource InkBrush}"/>
@@ -214,7 +214,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
-    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Padding" Value="{DynamicResource ChoiceControlPadding}"/>
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
@@ -235,7 +235,7 @@
   <Style Selector="ComboBoxItem">
     <Setter Property="Background" Value="{DynamicResource PaperBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>
-    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="Padding" Value="{DynamicResource ChoiceItemPadding}"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusSmall}"/>
   </Style>
   <Style Selector="ComboBoxItem:pointerover">
@@ -254,7 +254,7 @@
     <Setter Property="BorderThickness" Value="2"/>
     <Setter Property="CornerRadius" Value="{DynamicResource RadiusMedium}"/>
     <Setter Property="Foreground" Value="{DynamicResource InkBrush}"/>      
-    <Setter Property="Height" Value="35"/>      
+    <Setter Property="Height" Value="{DynamicResource DatePickerControlHeight}"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="FontWeight" Value="Bold"/>
   </Style>
@@ -322,7 +322,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource InkBrush}"/>
     <Setter Property="BorderThickness" Value="2,2,2,0"/>
     <Setter Property="CornerRadius" Value="8,8,0,0"/>
-    <Setter Property="Padding" Value="16,10"/>
+    <Setter Property="Padding" Value="{DynamicResource ButtonControlPadding}"/>
     <Setter Property="FontWeight" Value="Bold"/>
     <Setter Property="FontSize" Value="12"/>
   </Style>

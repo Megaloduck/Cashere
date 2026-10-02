@@ -5,6 +5,15 @@
              x:Class="Cashere.App"
              RequestedThemeVariant="Light">
 
+    <Application.Resources>
+        <Thickness x:Key="TextInputPadding">10,8</Thickness>
+        <x:Double x:Key="TextInputFontSize">13</x:Double>
+        <Thickness x:Key="ButtonControlPadding">16,10</Thickness>
+        <Thickness x:Key="ChoiceControlPadding">10,8</Thickness>
+        <Thickness x:Key="ChoiceItemPadding">10,8</Thickness>
+        <x:Double x:Key="DatePickerControlHeight">35</x:Double>
+    </Application.Resources>
+
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>

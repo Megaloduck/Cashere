@@ -76,14 +76,14 @@
                 </StackPanel>
               </Button>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Purchases}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Purchases}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Purchases}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="TruckDeliveryOutline" Width="18" Height="18"/>
                   <TextBlock Text="PURCHASES"/>
                 </StackPanel>
               </Button>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Suppliers}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Suppliers}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Suppliers}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="OfficeBuildingOutline" Width="18" Height="18"/>
                   <TextBlock Text="SUPPLIERS"/>
@@ -92,7 +92,7 @@
 
               <TextBlock Text="PROMOTIONS" Classes="nav-group-label"/>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Vouchers}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Vouchers}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Vouchers}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="TicketPercentOutline" Width="18" Height="18"/>
                   <TextBlock Text="VOUCHERS"/>
@@ -101,14 +101,14 @@
 
               <TextBlock Text="PEOPLE" Classes="nav-group-label"/>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Customers}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Customers}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="AccountGroupOutline" Width="18" Height="18"/>
                   <TextBlock Text="CUSTOMERS"/>
                 </StackPanel>
               </Button>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Cashiers}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Cashiers}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Cashiers}" IsVisible="{Binding CanManageCashierAccounts}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
                   <TextBlock Text="CASHIERS"/>
@@ -117,14 +117,14 @@
 
               <TextBlock Text="INSIGHTS" Classes="nav-group-label"/>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesHistory}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesHistory}" IsVisible="{Binding CanAccessSalesHistory}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="History" Width="18" Height="18"/>
                   <TextBlock Text="SALES HISTORY"/>
                 </StackPanel>
               </Button>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=SalesReport}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.SalesReport}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="ChartBar" Width="18" Height="18"/>
                   <TextBlock Text="SALES REPORTS"/>
@@ -133,7 +133,7 @@
 
               <TextBlock Text="SYSTEM" Classes="nav-group-label"/>
               <Button Classes="nav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Settings}"
-                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}">
+                      Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:AdminSection.Settings}" IsVisible="{Binding CanAccessAdminManagement}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                   <mi:MaterialIcon Kind="CogOutline" Width="18" Height="18"/>
                   <TextBlock Text="SETTINGS"/>

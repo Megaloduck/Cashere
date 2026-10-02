@@ -33,10 +33,22 @@ public class SaleService : ISaleService
 
         var settings = await db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
 
+        var configuredOrderTypes = (settings?.OrderTypes ?? "Sale")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(10)
+            .ToArray();
+        if (configuredOrderTypes.Length == 0)
+            configuredOrderTypes = new[] { "Sale" };
+        var orderType = request.OrderType?.Trim();
+        if (string.IsNullOrWhiteSpace(orderType) ||
+            !configuredOrderTypes.Contains(orderType, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Choose one of the configured order types before completing checkout.");
+        }
+
         var trackInventory = settings?.TrackInventory ?? true;
         var outOfStockBehavior = settings?.OutOfStockBehavior ?? OutOfStockBehavior.Block;
-        var enforceStock = trackInventory && outOfStockBehavior == OutOfStockBehavior.Block;
-
         // Built once from the freshly-read settings row so method-enabled
         // checks and fee computation below go through the exact same
         // PaymentSettings logic CheckoutViewModel uses for its preview.
@@ -66,6 +78,16 @@ public class SaleService : ISaleService
                 "A customer is required before completing this sale (Settings -> Sales Behavior).");
         }
 
+        if (settings?.EnforceBusinessHoursAtCheckout == true)
+        {
+            var offsetMinutes = TimezonePresets.FindByLabel(settings.Timezone)?.UtcOffsetMinutes
+                ?? (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+            if (!BusinessHoursPolicy.IsOpenAt(settings.BusinessHoursJson, offsetMinutes, DateTime.UtcNow))
+            {
+                throw new InvalidOperationException("Checkout is closed outside the shop's configured business hours.");
+            }
+        }
+
         var productIds = request.Lines.Select(l => l.ProductId).ToList();
         var productList = await db.Products
             .Include(p => p.Category)
@@ -81,7 +103,8 @@ public class SaleService : ISaleService
                 throw new InvalidOperationException($"Product {line.ProductId} was not found.");
             }
 
-            if (enforceStock && product.StockQuantity < line.Quantity)
+            var productOutOfStockBehavior = product.OutOfStockBehaviorOverride ?? outOfStockBehavior;
+            if (trackInventory && productOutOfStockBehavior == OutOfStockBehavior.Block && product.StockQuantity < line.Quantity)
             {
                 throw new InsufficientStockException(product.Name, line.Quantity, product.StockQuantity);
             }
@@ -96,6 +119,14 @@ public class SaleService : ISaleService
         // amount is always computed fresh here, never trusted from the UI.
         Voucher? voucher = null;
         var effectiveDiscount = request.DiscountAmount;
+
+        var requestingCashier = await db.Cashiers.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == request.CashierId);
+        if (requestingCashier is null || !requestingCashier.IsActive)
+            throw new InvalidOperationException("The cashier account is no longer active.");
+        if (requestingCashier.Role == UserRole.Cashier && settings?.CashierCanApplyVouchers == false &&
+            (!string.IsNullOrWhiteSpace(request.VoucherCode) || request.DiscountAmount != 0))
+            throw new InvalidOperationException("Discounts are disabled for this cashier.");
 
         if (!string.IsNullOrWhiteSpace(request.VoucherCode))
         {
@@ -165,17 +196,33 @@ public class SaleService : ISaleService
             throw new InvalidOperationException("Every payment line must be for more than zero.");
         }
 
-        var todayUtc = DateTime.UtcNow.Date;
-        var tomorrowUtc = todayUtc.AddDays(1);
-        var saleCountToday = await db.Sales.CountAsync(s => s.SaleDate >= todayUtc && s.SaleDate < tomorrowUtc);
-        var saleNumber = $"S{DateTime.UtcNow:yyyyMMdd}-{saleCountToday + 1:D4}";
+        var saleDate = DateTime.UtcNow;
+        var includeDate = settings?.IncludeDateInSaleNumber ?? true;
+        var prefix = settings?.SaleNumberPrefix ?? "S";
+        var sequenceDigits = settings?.SaleNumberSequenceDigits is >= 1 and <= 9
+            ? settings.SaleNumberSequenceDigits
+            : 4;
+        var sequenceBase = includeDate
+            ? await db.Sales.CountAsync(s => s.SaleDate >= saleDate.Date && s.SaleDate < saleDate.Date.AddDays(1))
+            : await db.Sales.CountAsync();
+        var sequence = sequenceBase + 1;
+        string saleNumber;
+        do
+        {
+            var datePart = includeDate ? saleDate.ToString("yyyyMMdd") : string.Empty;
+            var separator = includeDate ? string.Empty : "-";
+            saleNumber = $"{prefix}{datePart}{separator}{sequence.ToString("D" + sequenceDigits)}";
+            sequence++;
+        }
+        while (await db.Sales.AnyAsync(s => s.SaleNumber == saleNumber));
 
         var sale = new Sale
         {
             SaleNumber = saleNumber,
+            OrderType = configuredOrderTypes.First(type => string.Equals(type, orderType, StringComparison.OrdinalIgnoreCase)),
             CashierId = request.CashierId,
             CustomerId = request.CustomerId,
-            SaleDate = DateTime.UtcNow,
+            SaleDate = saleDate,
             Subtotal = subtotal,
             DiscountAmount = effectiveDiscount,
             TaxAmount = taxAmount,

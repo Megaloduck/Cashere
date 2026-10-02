@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Collections.ObjectModel;
+using Avalonia.Platform;
 using Cashere.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +22,8 @@ public partial class AboutViewModel : ViewModelBase
     [ObservableProperty] private string _lastModifiedDisplay = string.Empty;
     [ObservableProperty] private int _appliedMigrationCount;
 
+    public ObservableCollection<ThirdPartyLicenseInfo> ThirdPartyLicenses { get; } = new();
+
     public AboutViewModel(IAboutInfoService aboutInfo)
     {
         _aboutInfo = aboutInfo;
@@ -33,8 +38,34 @@ public partial class AboutViewModel : ViewModelBase
         DatabaseSizeDisplay = info.DatabaseSizeDisplay;
         LastModifiedDisplay = info.LastModifiedDisplay;
         AppliedMigrationCount = info.AppliedMigrationCount;
+
+        LoadThirdPartyLicenses();
+    }
+
+    private void LoadThirdPartyLicenses()
+    {
+        ThirdPartyLicenses.Clear();
+        var assetUri = new Uri("avares://Cashere/Assets/ThirdPartyLicenses.tsv");
+        using var stream = AssetLoader.Open(assetUri);
+        using var reader = new StreamReader(stream);
+        _ = reader.ReadLine(); // TSV header
+
+        while (reader.ReadLine() is { } line)
+        {
+            var columns = line.Split('\t');
+            if (columns.Length < 5) continue;
+            ThirdPartyLicenses.Add(new ThirdPartyLicenseInfo(
+                columns[0], columns[1], columns[2], columns[3], columns[4]));
+        }
     }
 
     [RelayCommand]
     private async Task Refresh() => await LoadAsync();
 }
+
+public sealed record ThirdPartyLicenseInfo(
+    string Package,
+    string Version,
+    string License,
+    string LicenseUrl,
+    string PackageUrl);

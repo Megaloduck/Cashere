@@ -18,6 +18,10 @@ public partial class SalesHistoryViewModel : ViewModelBase
     private readonly IRefundService? _refundService;
     private readonly int _currentCashierId;
     private readonly UserRole _currentRole;
+    private readonly ICashierAdminService? _cashierAdmin;
+    private readonly bool _cashierCanViewOwnSalesHistory;
+    private readonly bool _cashierCanRequestRefunds;
+    private readonly bool _cashierCanRequestVoids;
     private int? _activeSaleId;
 
     public ObservableCollection<SaleListItem> Sales { get; } = new();
@@ -29,15 +33,20 @@ public partial class SalesHistoryViewModel : ViewModelBase
     [ObservableProperty] private SaleDetail? _selectedSaleDetail;
     [ObservableProperty] private string? _errorMessage;
 
-    // Void/Refund is money-sensitive, same view-vs-manage split as every
-    // other admin screen - Cashier logins can browse history and open the
-    // detail panel but never see these buttons.
-    public bool CanManage => RolePermissions.CanManage(_currentRole) && _refundService is not null;
+    public bool RequiresManagerApproval => _currentRole == UserRole.Cashier;
+    public bool CanManageRefunds => _refundService is not null &&
+        (_currentRole != UserRole.Cashier || _cashierCanViewOwnSalesHistory && _cashierCanRequestRefunds);
+    public bool CanManageVoids => _refundService is not null &&
+        (_currentRole != UserRole.Cashier || _cashierCanViewOwnSalesHistory && _cashierCanRequestVoids);
+    public bool CanManage => CanManageRefunds || CanManageVoids;
+    public bool CanViewProfitMetrics => _currentRole != UserRole.Cashier;
 
     [ObservableProperty] private bool _isRefundDialogOpen;
     [ObservableProperty] private string _refundReason = string.Empty;
     [ObservableProperty] private string? _refundErrorMessage;
     [ObservableProperty] private bool _isProcessingRefund;
+    [ObservableProperty] private string _authorizationUsername = string.Empty;
+    [ObservableProperty] private string _authorizationPin = string.Empty;
     public ObservableCollection<RefundLineFormItem> RefundLines { get; } = new();
 
     // Lightweight confirm-with-reason prompt for the one-click VOID action -
@@ -52,12 +61,20 @@ public partial class SalesHistoryViewModel : ViewModelBase
         ISalesReportService reportService,
         UserRole currentRole,
         int currentCashierId,
-        IRefundService? refundService = null)
+        IRefundService? refundService = null,
+        ICashierAdminService? cashierAdmin = null,
+        bool cashierCanViewOwnSalesHistory = false,
+        bool cashierCanRequestRefunds = false,
+        bool cashierCanRequestVoids = false)
     {
         _reportService = reportService;
         _currentRole = currentRole;
         _currentCashierId = currentCashierId;
         _refundService = refundService;
+        _cashierAdmin = cashierAdmin;
+        _cashierCanViewOwnSalesHistory = cashierCanViewOwnSalesHistory;
+        _cashierCanRequestRefunds = cashierCanRequestRefunds;
+        _cashierCanRequestVoids = cashierCanRequestVoids;
     }
 
     public async Task LoadAsync() => await RefreshAsync();
@@ -95,12 +112,18 @@ public partial class SalesHistoryViewModel : ViewModelBase
     private async Task RefreshAsync()
     {
         ErrorMessage = null;
+        if (_currentRole == UserRole.Cashier && !_cashierCanViewOwnSalesHistory)
+        {
+            Sales.Clear();
+            return;
+        }
         try
         {
             var from = (FromDate ?? DateTimeOffset.Now).Date;
             var to = (ToDate ?? DateTimeOffset.Now).Date;
 
-            var results = await _reportService.GetSalesHistoryAsync(from, to);
+            var results = await _reportService.GetSalesHistoryAsync(from, to,
+                _currentRole == UserRole.Cashier ? _currentCashierId : null);
             Sales.Clear();
             foreach (var sale in results) Sales.Add(sale);
         }
@@ -116,7 +139,8 @@ public partial class SalesHistoryViewModel : ViewModelBase
         if (item is null) return;
 
         _activeSaleId = item.Id;
-        SelectedSaleDetail = await _reportService.GetSaleDetailAsync(item.Id);
+        SelectedSaleDetail = await _reportService.GetSaleDetailAsync(item.Id,
+            _currentRole == UserRole.Cashier ? _currentCashierId : null);
         IsDetailOpen = SelectedSaleDetail is not null;
     }
 
@@ -130,12 +154,14 @@ public partial class SalesHistoryViewModel : ViewModelBase
     [RelayCommand]
     private async Task OpenRefundDialog(SaleListItem? item)
     {
-        if (!CanManage || _refundService is null) return;
+        if (!CanManageRefunds || _refundService is null) return;
 
         var target = item ?? Sales.FirstOrDefault(s => s.Id == _activeSaleId);
-        if (target is null) return;
+        if (target is null || !Sales.Any(s => s.Id == target.Id)) return;
 
         RefundErrorMessage = null;
+        AuthorizationUsername = string.Empty;
+        AuthorizationPin = string.Empty;
         RefundReason = string.Empty;
         _activeSaleId = target.Id;
 
@@ -163,12 +189,13 @@ public partial class SalesHistoryViewModel : ViewModelBase
         IsRefundDialogOpen = false;
         RefundLines.Clear();
         RefundErrorMessage = null;
+        AuthorizationPin = string.Empty;
     }
 
     [RelayCommand]
     private async Task ProcessRefund()
     {
-        if (!CanManage || _refundService is null || _activeSaleId is not int saleId) return;
+        if (!CanManageRefunds || _refundService is null || _activeSaleId is not int saleId) return;
 
         RefundErrorMessage = null;
 
@@ -199,17 +226,31 @@ public partial class SalesHistoryViewModel : ViewModelBase
             return;
         }
 
+        var approvingManager = await VerifyManagerApprovalAsync(message => RefundErrorMessage = message);
+        if (RequiresManagerApproval && approvingManager is null) return;
+
         IsProcessingRefund = true;
         try
         {
+            var previousActor = CurrentCashierContext.Snapshot();
+            if (approvingManager is not null)
+                CurrentCashierContext.Set(approvingManager.Id, approvingManager.DisplayName);
+            try
+            {
             await _refundService.RefundLinesAsync(
-                saleId, _currentCashierId, lines,
+                saleId, approvingManager?.Id ?? _currentCashierId, lines,
                 string.IsNullOrWhiteSpace(RefundReason) ? null : RefundReason.Trim());
+            }
+            finally
+            {
+                RestoreActor(previousActor);
+            }
 
             IsRefundDialogOpen = false;
             RefundLines.Clear();
             await RefreshAsync();
-            SelectedSaleDetail = await _reportService.GetSaleDetailAsync(saleId);
+            SelectedSaleDetail = await _reportService.GetSaleDetailAsync(saleId,
+                _currentRole == UserRole.Cashier ? _currentCashierId : null);
         }
         catch (AdminValidationException ex)
         {
@@ -218,20 +259,23 @@ public partial class SalesHistoryViewModel : ViewModelBase
         finally
         {
             IsProcessingRefund = false;
+            AuthorizationPin = string.Empty;
         }
     }
 
     [RelayCommand]
     private void OpenVoidPrompt(SaleListItem? item)
     {
-        if (!CanManage || _refundService is null) return;
+        if (!CanManageVoids || _refundService is null) return;
 
         var target = item ?? Sales.FirstOrDefault(s => s.Id == _activeSaleId);
-        if (target is null) return;
+        if (target is null || !Sales.Any(s => s.Id == target.Id)) return;
 
         _activeSaleId = target.Id;
         VoidReason = string.Empty;
         VoidErrorMessage = null;
+        AuthorizationUsername = string.Empty;
+        AuthorizationPin = string.Empty;
         IsVoidPromptOpen = true;
     }
 
@@ -240,24 +284,39 @@ public partial class SalesHistoryViewModel : ViewModelBase
     {
         IsVoidPromptOpen = false;
         VoidErrorMessage = null;
+        AuthorizationPin = string.Empty;
     }
 
     [RelayCommand]
     private async Task ConfirmVoid()
     {
-        if (!CanManage || _refundService is null || _activeSaleId is not int saleId) return;
+        if (!CanManageVoids || _refundService is null || _activeSaleId is not int saleId) return;
+
+        var approvingManager = await VerifyManagerApprovalAsync(message => VoidErrorMessage = message);
+        if (RequiresManagerApproval && approvingManager is null) return;
 
         IsProcessingVoid = true;
         VoidErrorMessage = null;
         try
         {
+            var previousActor = CurrentCashierContext.Snapshot();
+            if (approvingManager is not null)
+                CurrentCashierContext.Set(approvingManager.Id, approvingManager.DisplayName);
+            try
+            {
             await _refundService.VoidSaleAsync(
-                saleId, _currentCashierId,
+                saleId, approvingManager?.Id ?? _currentCashierId,
                 string.IsNullOrWhiteSpace(VoidReason) ? null : VoidReason.Trim());
+            }
+            finally
+            {
+                RestoreActor(previousActor);
+            }
 
             IsVoidPromptOpen = false;
             await RefreshAsync();
-            SelectedSaleDetail = await _reportService.GetSaleDetailAsync(saleId);
+            SelectedSaleDetail = await _reportService.GetSaleDetailAsync(saleId,
+                _currentRole == UserRole.Cashier ? _currentCashierId : null);
         }
         catch (AdminValidationException ex)
         {
@@ -266,6 +325,49 @@ public partial class SalesHistoryViewModel : ViewModelBase
         finally
         {
             IsProcessingVoid = false;
+            AuthorizationPin = string.Empty;
         }
+    }
+
+    private async Task<Cashier?> VerifyManagerApprovalAsync(Action<string> reportError)
+    {
+        if (!RequiresManagerApproval) return null;
+        if (_cashierAdmin is null)
+        {
+            reportError("Manager approval is unavailable in this build.");
+            return null;
+        }
+        if (string.IsNullOrWhiteSpace(AuthorizationUsername) || string.IsNullOrWhiteSpace(AuthorizationPin))
+        {
+            reportError("Enter a Manager or Owner username and PIN to approve this action.");
+            return null;
+        }
+
+        Cashier? approver;
+        try
+        {
+            approver = await _cashierAdmin.VerifyCredentialsAsync(AuthorizationUsername.Trim(), AuthorizationPin);
+        }
+        catch (Exception ex)
+        {
+            AuthorizationPin = string.Empty;
+            reportError($"Could not verify manager approval: {ex.Message}");
+            return null;
+        }
+        AuthorizationPin = string.Empty;
+        if (approver is null || approver.Role == UserRole.Cashier)
+        {
+            reportError("The credentials are invalid or the account is not an Owner or Manager.");
+            return null;
+        }
+        return approver;
+    }
+
+    private static void RestoreActor((int? CashierId, string DisplayName) previousActor)
+    {
+        if (previousActor.CashierId is int cashierId)
+            CurrentCashierContext.Set(cashierId, previousActor.DisplayName);
+        else
+            CurrentCashierContext.Clear();
     }
 }

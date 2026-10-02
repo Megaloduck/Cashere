@@ -22,10 +22,8 @@ namespace Cashere.ViewModels.Admin.Settings;
 // row in one admin session; that avoids clobbering whatever Receipts or
 // Synchronization saved most recently.
 //
-// Timezone here is purely informational (what timezone the shop is
-// physically in, e.g. for reference/printed info) - it does not affect how
-// any timestamp is displayed. Display always follows this device's own
-// local time; see ClockPreferenceService and PreferencesView's note.
+// Timezone configures the shop-hours rule. Displayed timestamps still follow
+// this device's local time; see ClockPreferenceService and PreferencesView.
 public partial class BusinessInfoViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
@@ -57,6 +55,7 @@ public partial class BusinessInfoViewModel : ViewModelBase
     // ---- Business hours -----------------------------------------------------
 
     public ObservableCollection<BusinessDayFormItem> BusinessHours { get; } = new();
+    [ObservableProperty] private bool _enforceBusinessHoursAtCheckout;
 
     // ---- Rounding & tax-inclusive pricing -----------------------------------
 
@@ -105,6 +104,7 @@ public partial class BusinessInfoViewModel : ViewModelBase
             {
                 BusinessHours.Add(new BusinessDayFormItem(day));
             }
+            EnforceBusinessHoursAtCheckout = settings.EnforceBusinessHoursAtCheckout;
 
             RoundingMode = settings.RoundingMode;
             RoundingIncrement = settings.RoundingIncrement.ToString();
@@ -256,6 +256,7 @@ public partial class BusinessInfoViewModel : ViewModelBase
 
         settings.LogoPath = LogoPath;
         settings.BusinessHoursJson = BusinessHoursSerializer.Serialize(BusinessHours.Select(d => d.ToModel()));
+        settings.EnforceBusinessHoursAtCheckout = EnforceBusinessHoursAtCheckout;
         settings.RoundingMode = RoundingMode;
         settings.RoundingIncrement = roundingIncrement;
         settings.PricesIncludeTax = PricesIncludeTax;

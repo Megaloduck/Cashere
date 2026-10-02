@@ -42,8 +42,13 @@ public partial class CartViewModel : ViewModelBase
     [ObservableProperty]
     private decimal _roundingIncrement;
 
+    public bool TrackInventory { get; set; } = true;
+    public OutOfStockBehavior DefaultOutOfStockBehavior { get; set; } = OutOfStockBehavior.Block;
+
     [ObservableProperty]
     private decimal _discountAmount;
+
+    public bool HasDiscount => DiscountAmount > 0;
 
     [ObservableProperty]
     private string _voucherCodeInput = string.Empty;
@@ -56,6 +61,9 @@ public partial class CartViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isApplyingVoucher;
+
+    [ObservableProperty]
+    private bool _canApplyVouchers = true;
 
     public decimal Subtotal => Lines.Sum(l => l.Subtotal);
 
@@ -89,19 +97,21 @@ public partial class CartViewModel : ViewModelBase
         var existing = Lines.FirstOrDefault(l => l.ProductId == product.Id);
         if (existing is not null)
         {
-            if (existing.Quantity < existing.StockAvailable)
+            if (!existing.EnforceStock || existing.Quantity < existing.StockAvailable)
             {
                 existing.Quantity++;
             }
             return;
         }
 
-        if (product.StockQuantity <= 0)
+        var enforceStock = TrackInventory &&
+            (product.OutOfStockBehaviorOverride ?? DefaultOutOfStockBehavior) == OutOfStockBehavior.Block;
+        if (enforceStock && product.StockQuantity <= 0)
         {
             return;
         }
 
-        var taxRatePercent = TaxCalculator.ResolveRatePercent(product.Category, TaxRatePercent);
+        var taxRatePercent = TaxCalculator.ResolveRatePercent(product.TaxRateOverridePercent, product.Category, TaxRatePercent);
 
         Lines.Add(new CartLineViewModel(
             product.Id,
@@ -111,7 +121,50 @@ public partial class CartViewModel : ViewModelBase
             taxRatePercent,
             product.StockQuantity,
             quantity: 1,
-            onChanged: RaiseTotalsChanged));
+            onChanged: RaiseTotalsChanged,
+            enforceStock: enforceStock));
+
+        RaiseTotalsChanged();
+    }
+
+    public async Task RestoreHeldOrderAsync(HeldOrder order)
+    {
+        Clear();
+        foreach (var line in order.Lines)
+        {
+            Lines.Add(new CartLineViewModel(
+                line.ProductId, line.Name, line.UnitPrice, line.UnitCost,
+                line.TaxRatePercent, line.StockAvailable, line.Quantity,
+                onChanged: RaiseTotalsChanged, enforceStock: line.EnforceStock));
+        }
+
+        if (CanApplyVouchers && !string.IsNullOrWhiteSpace(order.VoucherCode) && _voucherAdmin is not null)
+        {
+            var result = await _voucherAdmin.ValidateVoucherAsync(order.VoucherCode, Subtotal);
+            if (result.IsValid)
+            {
+                AppliedVoucherCode = order.VoucherCode;
+                _appliedVoucherType = result.DiscountType;
+                _appliedVoucherValue = result.DiscountValue;
+                DiscountAmount = result.DiscountAmount;
+            }
+            else
+            {
+                VoucherErrorMessage = result.ErrorMessage ?? "The held order's voucher is no longer valid.";
+            }
+        }
+        else
+        {
+            DiscountAmount = order.VoucherCode is null ? order.DiscountAmount : 0;
+            if (!CanApplyVouchers && order.VoucherCode is not null)
+            {
+                VoucherErrorMessage = "Voucher use is disabled for this cashier. Ask an Owner to update staff permissions.";
+            }
+            else if (order.VoucherCode is not null)
+            {
+                VoucherErrorMessage = "The held order's voucher could not be checked. Apply it again before checkout.";
+            }
+        }
 
         RaiseTotalsChanged();
     }
@@ -145,6 +198,11 @@ public partial class CartViewModel : ViewModelBase
     private async Task ApplyVoucher()
     {
         VoucherErrorMessage = null;
+        if (!CanApplyVouchers)
+        {
+            VoucherErrorMessage = "Voucher use is disabled for this cashier.";
+            return;
+        }
         if (_voucherAdmin is null || string.IsNullOrWhiteSpace(VoucherCodeInput)) return;
 
         IsApplyingVoucher = true;
@@ -201,6 +259,7 @@ public partial class CartViewModel : ViewModelBase
         }
 
         OnPropertyChanged(nameof(Subtotal));
+        OnPropertyChanged(nameof(HasDiscount));
         OnPropertyChanged(nameof(TaxAmount));
         OnPropertyChanged(nameof(TotalAmount));
         OnPropertyChanged(nameof(RoundingAdjustment));

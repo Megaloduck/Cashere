@@ -43,7 +43,8 @@ namespace Cashere.Services
         // DiscountAmount the UI cached. Null for a plain sale with no
         // voucher (DiscountAmount above is used as-is, unchanged from before
         // this field existed).
-        string? VoucherCode = null);
+        string? VoucherCode = null,
+        string OrderType = "Sale");
 
     public record CompletedSaleResult(
         int SaleId,

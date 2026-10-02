@@ -14,6 +14,7 @@ namespace Cashere.ViewModels.Admin;
 public partial class CashierAdminViewModel : ViewModelBase
 {
     private readonly ICashierAdminService _cashierAdmin;
+    private readonly bool _canManageCashiers;
     private int? _editingCashierId;
 
     public ObservableCollection<Cashier> Cashiers { get; } = new();
@@ -32,9 +33,10 @@ public partial class CashierAdminViewModel : ViewModelBase
         ? "PASSWORD"
         : "PASSWORD (LEAVE BLANK TO KEEP CURRENT)";
 
-    public CashierAdminViewModel(ICashierAdminService cashierAdmin)
+    public CashierAdminViewModel(ICashierAdminService cashierAdmin, UserRole currentRole)
     {
         _cashierAdmin = cashierAdmin;
+        _canManageCashiers = currentRole == UserRole.Owner;
     }
 
     public async Task LoadAsync()
@@ -47,6 +49,7 @@ public partial class CashierAdminViewModel : ViewModelBase
     [RelayCommand]
     private void AddNew()
     {
+        if (!_canManageCashiers) return;
         _editingCashierId = null;
         EditorTitle = "NEW CASHIER";
         FormUsername = string.Empty;
@@ -61,6 +64,7 @@ public partial class CashierAdminViewModel : ViewModelBase
     [RelayCommand]
     private void EditCashier(Cashier? cashier)
     {
+        if (!_canManageCashiers) return;
         if (cashier is null) return;
 
         _editingCashierId = cashier.Id;
@@ -77,6 +81,7 @@ public partial class CashierAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task ToggleActive(Cashier? cashier)
     {
+        if (!_canManageCashiers) return;
         if (cashier is null) return;
         await _cashierAdmin.SetActiveAsync(cashier.Id, !cashier.IsActive);
         await LoadAsync();
@@ -85,6 +90,7 @@ public partial class CashierAdminViewModel : ViewModelBase
     [RelayCommand]
     private async Task Save()
     {
+        if (!_canManageCashiers) return;
         ErrorMessage = null;
 
         if (string.IsNullOrWhiteSpace(FormUsername) || string.IsNullOrWhiteSpace(FormDisplayName))

@@ -50,6 +50,23 @@
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoGenerateBarcode}" VerticalAlignment="Center"/>
       </Grid>
 
+      <Grid ColumnDefinitions="*,*">
+        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+          <TextBlock Text="SKU PREFIX" Classes="eyebrow"/>
+          <TextBox Text="{Binding SkuPrefix}" Watermark="SKU"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+          <TextBlock Text="SKU NUMBER LENGTH" Classes="eyebrow"/>
+          <TextBox Text="{Binding SkuNumberLength}" Watermark="6"/>
+        </StackPanel>
+      </Grid>
+      <StackPanel Spacing="4">
+        <TextBlock Text="INTERNAL BARCODE PREFIX" Classes="eyebrow"/>
+        <TextBox Text="{Binding InternalBarcodePrefix}" Watermark="20" MaxLength="2"/>
+        <TextBlock Text="Generated EAN-13 barcodes use an in-store prefix from 20 to 29. These are for your own labels, not registered product barcodes."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+      </StackPanel>
+
 <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"
            FontWeight="Bold"
@@ -64,10 +81,6 @@
               Padding="0,14"
               Margin="0,8,0,4"/>
 
-      <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
-      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Per-product out-of-stock overrides and SKU/barcode format customization aren't built yet."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

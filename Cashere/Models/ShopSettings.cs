@@ -16,12 +16,8 @@ public class ReceiptAdmin
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
 
-    // Business Info's Timezone picker. Purely informational/reference (what
-    // timezone the shop is physically in, e.g. for printed info) - it does
-    // NOT affect how any timestamp is displayed. Stored as a TimezoneOption
-    // label (e.g. "Jakarta (GMT+7)") from TimezonePresets.FixedOffsets.
-    // Actual display always follows this device's own local clock; see
-    // ClockPreferenceService.
+    // Business Info's timezone preset. Displayed clocks remain local to each
+    // device; this offset is used when checkout-hour enforcement is enabled.
     public string? Timezone { get; set; }
 
     // Settings -> Business Info: relative path (under the desktop's local
@@ -37,6 +33,7 @@ public class ReceiptAdmin
     // read/written as a whole week at once. See
     // Models/BusinessHours.cs (BusinessHoursSerializer) for the shape.
     public string? BusinessHoursJson { get; set; }
+    public bool EnforceBusinessHoursAtCheckout { get; set; }
 
     // Settings -> Business Info -> Rounding: rounds Sale.TotalAmount (after
     // discount and tax) to the nearest RoundingIncrement, e.g. 100, so cash
@@ -67,6 +64,9 @@ public class ReceiptAdmin
     public int DefaultLowStockThreshold { get; set; } = 5;
     public bool AutoGenerateSku { get; set; }
     public bool AutoGenerateBarcode { get; set; }
+    public string SkuPrefix { get; set; } = "SKU";
+    public int SkuNumberLength { get; set; } = 6;
+    public string InternalBarcodePrefix { get; set; } = "20";
 
     public bool CashEnabled { get; set; } = true;
     public bool QrisEnabled { get; set; } = true;
@@ -83,6 +83,24 @@ public class ReceiptAdmin
 
     public bool RequireCustomerBeforeCheckout { get; set; }
     public bool AutoPrintReceiptAfterPayment { get; set; }
+    public bool EnableHeldOrders { get; set; } = true;
+    public string SaleNumberPrefix { get; set; } = "S";
+    public bool IncludeDateInSaleNumber { get; set; } = true;
+    public int SaleNumberSequenceDigits { get; set; } = 4;
+    public bool ScheduledBackupsEnabled { get; set; }
+    public string ScheduledBackupTime { get; set; } = "23:00";
+    public int AutomaticBackupRetentionCount { get; set; } = 30;
+    public bool CashierCanViewOwnSalesHistory { get; set; }
+    public bool CashierCanRequestRefunds { get; set; }
+    public bool CashierCanRequestVoids { get; set; }
+    public bool CashierCanApplyVouchers { get; set; } = true;
+    public bool AutoAddScannedBarcode { get; set; } = true;
+    public bool EnableCustomerDisplay { get; set; }
+    public bool EnableCashDrawerKick { get; set; }
+    // Settings -> Sales Behavior. A comma-separated, owner-configured list
+    // keeps order types optional for simple retail and supports shop-specific
+    // labels (for example Dine-in, Takeaway, Delivery) without imposing them.
+    public string OrderTypes { get; set; } = "Sale";
 
     // Settings -> Security. Enforced by AutoLockService, configured from
     // RootViewModel right after login and re-applied live on Save - same
@@ -94,6 +112,12 @@ public class ReceiptAdmin
     // IShopContextService, so the mobile app always renders Light,
     // unchanged from before this setting existed).
     public AppThemeMode ThemeMode { get; set; } = AppThemeMode.System;
+    public UiDensity UiDensity { get; set; } = UiDensity.Comfortable;
+    // Empty means follow this device's OS culture; otherwise stores a BCP-47
+    // culture name used for app-wide number/date formatting.
+    public string DisplayCulture { get; set; } = string.Empty;
+    public bool PosSoundsEnabled { get; set; }
+    public bool ShowPosNotifications { get; set; } = true;
 
     public string ServerBindAddress { get; set; } = "0.0.0.0";
     public int ServerPort { get; set; } = 5177;

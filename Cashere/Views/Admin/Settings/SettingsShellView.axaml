@@ -67,14 +67,14 @@
 
           <TextBlock Text="PEOPLE &amp; ACCESS" Classes="setnav-group-label"/>
           <Button Classes="setnav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Staff}"
-                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Staff}">
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Staff}" IsVisible="{Binding CanAccessStaffSettings}">
             <StackPanel Orientation="Horizontal" Spacing="10">
               <mi:MaterialIcon Kind="AccountTieOutline" Width="18" Height="18"/>
               <TextBlock Text="STAFF &amp; PERMISSIONS"/>
             </StackPanel>
           </Button>
           <Button Classes="setnav-item" Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Security}"
-                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Security}">
+                  Command="{Binding SelectSectionCommand}" CommandParameter="{x:Static vm:SettingsSection.Security}" IsVisible="{Binding CanAccessSecuritySettings}">
             <StackPanel Orientation="Horizontal" Spacing="10">
               <mi:MaterialIcon Kind="ShieldLockOutline" Width="18" Height="18"/>
               <TextBlock Text="SECURITY"/>

@@ -54,12 +54,11 @@ namespace Cashere.Services
             Math.Round(amount * (FeePercentFor(method) / 100m), 2, MidpointRounding.AwayFromZero);
     }
 
-    // Read by CheckoutViewModel/SaleService (RequireCustomerBeforeCheckout)
-    // and PosViewModel (AutoPrintReceiptAfterPayment) - see Settings ->
-    // Sales Behavior.
+    // Read by checkout, sales, and POS behavior configured in Sales Behavior.
     public record SalesBehaviorSettings(
         bool RequireCustomerBeforeCheckout,
-        bool AutoPrintReceiptAfterPayment);
+        bool AutoPrintReceiptAfterPayment,
+        bool EnableHeldOrders);
 
     // Read by RootViewModel right after login (to arm AutoLockService) and
     // by SecuritySettingsViewModel (to populate the toggle/picker) - see
