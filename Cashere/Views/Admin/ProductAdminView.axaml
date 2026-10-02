@@ -14,6 +14,7 @@
   </UserControl.Resources>
 
   <Grid RowDefinitions="Auto,Auto,*" Margin="12">
+    <!-- Header Section (Unchanged) -->
     <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto"  Margin="0,0,0,12">
         <TextBlock Grid.Column="0" Text="PRODUCTS" Classes="headline" FontSize="18" VerticalAlignment="Center"/>
       <TextBox Grid.Column="1" Watermark="SEARCH BY NAME, SKU OR BARCODE..." Text="{Binding SearchText}" Margin="0,0,12,0">
@@ -29,133 +30,217 @@
       </Button>
     </Grid>
 
+    <!-- List Header (Unchanged) -->
     <Grid Grid.Row="1" ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190" Margin="0,0,0,4">
-  <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
-  <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
-  <TextBlock Grid.Column="3" Text="BARCODE" Classes="eyebrow"/>
-  <TextBlock Grid.Column="4" Text="PRICE" Classes="eyebrow"/>
-  <TextBlock Grid.Column="5" Text="STOCK" Classes="eyebrow"/>
-  <TextBlock Grid.Column="6" Text="STATUS" Classes="eyebrow"/>
-  <TextBlock Grid.Column="7" Text="ACTIONS" Classes="eyebrow"/>
-</Grid>
-<Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
+      <TextBlock Grid.Column="1" Text="NAME" Classes="eyebrow"/>
+      <TextBlock Grid.Column="2" Text="SKU" Classes="eyebrow"/>
+      <TextBlock Grid.Column="3" Text="BARCODE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="4" Text="PRICE" Classes="eyebrow"/>
+      <TextBlock Grid.Column="5" Text="STOCK" Classes="eyebrow"/>
+      <TextBlock Grid.Column="6" Text="STATUS" Classes="eyebrow"/>
+      <TextBlock Grid.Column="7" Text="ACTIONS" Classes="eyebrow"/>
+    </Grid>
+    <Border Grid.Row="1" Classes="rule-thick" VerticalAlignment="Bottom"/>
 
-<ScrollViewer Grid.Row="2">
-  <ItemsControl ItemsSource="{Binding FilteredProducts}">
-    <ItemsControl.ItemTemplate>
-      <DataTemplate x:DataType="models:Product">
-        <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
-          <Grid ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190">
-            <Border Grid.Column="0" Width="40" Height="40" CornerRadius="{StaticResource RadiusSmall}"
-                    Background="{StaticResource GrayLightBrush}" ClipToBounds="True" VerticalAlignment="Center">
-              <Grid>
-                <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
-                       IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Stretch="UniformToFill"/>
-                <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18" Foreground="{StaticResource GrayBrush}"
-                                  HorizontalAlignment="Center" VerticalAlignment="Center"
-                                  IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}"/>
+    <!-- List Content (Unchanged) -->
+    <ScrollViewer Grid.Row="2">
+      <ItemsControl ItemsSource="{Binding FilteredProducts}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="models:Product">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,10">
+              <Grid ColumnDefinitions="48,2*,1*,1.2*,1*,1*,1*,190">
+                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="{StaticResource RadiusSmall}"
+                        Background="{StaticResource GrayLightBrush}" ClipToBounds="True" VerticalAlignment="Center">
+                  <Grid>
+                    <Image Source="{Binding PhotoPath, Converter={StaticResource PhotoPathToImage}}"
+                           IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           Stretch="UniformToFill"/>
+                    <mi:MaterialIcon Kind="PackageVariantClosed" Width="18" Height="18" Foreground="{StaticResource GrayBrush}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNull}}"/>
+                  </Grid>
+                </Border>
+                <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="10,0,0,0"/>
+                <TextBlock Grid.Column="2" Text="{Binding Sku}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="3" Text="{Binding Barcode, TargetNullValue='—'}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="4" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="6" VerticalAlignment="Center">
+                  <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
+                  <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="4"
+                            IsVisible="{Binding $parent[UserControl].((vm:ProductAdminViewModel)DataContext).CanManage}">
+                  <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
+                    <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
+                    <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
+                    <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
+                  </Button>
+                  <Button Classes="ghost" Click="OnRemovePhotoClick"
+                          IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                          ToolTip.Tip="Remove photo">
+                    <mi:MaterialIcon Kind="ImageRemoveOutline" Width="16" Height="16"/>
+                  </Button>
+                </StackPanel>
               </Grid>
             </Border>
-            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="10,0,0,0"/>
-            <TextBlock Grid.Column="2" Text="{Binding Sku}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="3" Text="{Binding Barcode, TargetNullValue='—'}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="4" Text="{Binding SellingPrice, StringFormat='Rp {0:N0}'}" VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="{Binding StockQuantity}" VerticalAlignment="Center"/>
-            <StackPanel Grid.Column="6" VerticalAlignment="Center">
-              <TextBlock Text="ACTIVE" Foreground="{StaticResource BlueBrush}" FontWeight="Bold" IsVisible="{Binding IsActive}"/>
-              <TextBlock Text="INACTIVE" Foreground="{StaticResource RedBrush}" FontWeight="Bold" IsVisible="{Binding !IsActive}"/>
-            </StackPanel>
-            <StackPanel Grid.Column="7" Orientation="Horizontal" Spacing="4"
-                        IsVisible="{Binding $parent[UserControl].((vm:ProductAdminViewModel)DataContext).CanManage}">
-              <Button Classes="ghost" Click="OnEditClick" ToolTip.Tip="Edit">
-                <mi:MaterialIcon Kind="PencilOutline" Width="16" Height="16"/>
-              </Button>
-              <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding IsActive}" ToolTip.Tip="Deactivate">
-                <mi:MaterialIcon Kind="EyeOffOutline" Width="16" Height="16"/>
-              </Button>
-              <Button Classes="ghost" Click="OnToggleActiveClick" IsVisible="{Binding !IsActive}" ToolTip.Tip="Reactivate">
-                <mi:MaterialIcon Kind="EyeOutline" Width="16" Height="16"/>
-              </Button>
-              <Button Classes="ghost" Click="OnRemovePhotoClick"
-                      IsVisible="{Binding PhotoPath, Converter={x:Static ObjectConverters.IsNotNull}}"
-                      ToolTip.Tip="Remove photo">
-                <mi:MaterialIcon Kind="ImageRemoveOutline" Width="16" Height="16"/>
-              </Button>
-            </StackPanel>
-          </Grid>
-        </Border>
-      </DataTemplate>
-    </ItemsControl.ItemTemplate>
-  </ItemsControl>
-</ScrollViewer>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
 
+    <!-- MODIFIED: Add New Product Form Overlay -->
     <Border Grid.RowSpan="3" Background="#CC141414" IsVisible="{Binding IsEditorOpen}">
-      <Border Classes="card" Width="460" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <ScrollViewer MaxHeight="600">
-          <StackPanel Spacing="10">
+
+      <!-- Add New Product Form -->
+      <!-- Increased width to 800 to accommodate the side-by-side layout -->
+      <Border Classes="card" Width="800" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Hidden">
+          <StackPanel Spacing="15">
+            <!-- Header -->
             <TextBlock Text="{Binding EditorTitle}" Classes="headline" FontSize="18"/>
             <Border Classes="rule-thick"/>
 
-            <TextBlock Text="SKU" Classes="eyebrow"/>
-<TextBox Text="{Binding FormSku}"/>
-<TextBlock Text="Leave blank to auto-generate (Settings → Inventory)" FontSize="10" Foreground="{StaticResource GrayBrush}"
-           IsVisible="{Binding AutoGenerateSkuEnabled}"/>
+            <!-- Main Content Grid: Left (Images) vs Right (Fields) -->
+            <Grid ColumnDefinitions="220, *">
 
-<TextBlock Text="BARCODE (OPTIONAL)" Classes="eyebrow"/>
-<TextBox Text="{Binding FormBarcode}"/>
-<TextBlock Text="Leave blank to auto-generate (Settings → Inventory)" FontSize="10" Foreground="{StaticResource GrayBrush}"
-           IsVisible="{Binding AutoGenerateBarcodeEnabled}"/>
+              <!-- LEFT COLUMN: Image Uploads -->
+              <StackPanel Grid.Column="0" Spacing="20" Margin="0,0,20,0">
 
-            <TextBlock Text="NAME" Classes="eyebrow"/>
-            <TextBox Text="{Binding FormName}"/>
+                <!-- Product Photo Section -->
+                <StackPanel Spacing="5">
+                  <TextBlock Text="PRODUCT PHOTO" Classes="eyebrow"/>
+                  <Border BorderBrush="{StaticResource GrayBrush}" BorderThickness="1" CornerRadius="8"
+                          Height="180" Background="{StaticResource GrayLightBrush}" ClipToBounds="True">
+                    <Grid>
+                      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5"
+                                  IsVisible="{Binding !HasFormPhotoPreview}">
+                        <mi:MaterialIcon Kind="Upload" Width="32" Height="32" Foreground="{StaticResource GrayBrush}"/>
+                        <TextBlock Text="Choose a photo" HorizontalAlignment="Center" Foreground="{StaticResource GrayBrush}"/>
+                      </StackPanel>
+                      <Image Source="{Binding FormPhotoPreview}" Stretch="UniformToFill"
+                             IsVisible="{Binding HasFormPhotoPreview}"/>
+                      <Button Background="Transparent" Click="OnPickProductPhotoClick"
+                              ToolTip.Tip="Choose a product photo"/>
+                    </Grid>
+                  </Border>
+                  <TextBlock Text="Saved with the product. PNG, JPG, or WebP, up to 10 MB."
+                             FontSize="10" Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"/>
+                </StackPanel>
 
-            <TextBlock Text="CATEGORY" Classes="eyebrow"/>
-            <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FormCategory}" HorizontalAlignment="Stretch">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="models:Category">
-                  <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBox Grid.Column="0" Text="{Binding NewCategoryName}" Watermark="New category name"/>
-              <Button Grid.Column="1" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding AddCategoryCommand}">
-                <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
-              </Button>
+                <StackPanel Spacing="5">
+                  <TextBlock Text="AUTO-GENERATED CASHERE QR IDENTITY" Classes="eyebrow" TextWrapping="Wrap"/>
+                  <Border BorderBrush="{StaticResource GrayBrush}" BorderThickness="1" CornerRadius="8"
+                          Height="180" Background="{StaticResource GrayLightBrush}" ClipToBounds="True">
+                    <Grid>
+                      <TextBlock Text="Save the product to generate its unique QR identity."
+                                 TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Margin="14" Foreground="{StaticResource GrayBrush}"
+                                 IsVisible="{Binding !HasFormQrPreview}"/>
+                      <Image Source="{Binding FormQrPreview}" Width="148" Height="148"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                             IsVisible="{Binding HasFormQrPreview}"/>
+                    </Grid>
+                  </Border>
+                  <TextBlock Text="{Binding FormQrIdentity}" FontSize="10"
+                             Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"
+                             IsVisible="{Binding HasFormQrPreview}"/>
+                  <TextBlock Text="Scan this Cashere identity to add the product to the shared cart."
+                             FontSize="10" Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"
+                             IsVisible="{Binding HasFormQrPreview}"/>
+                </StackPanel>
+              </StackPanel>
+
+              <!-- RIGHT COLUMN: Form Fields -->
+              <StackPanel Grid.Column="1" Spacing="12">
+
+                <!-- Name -->
+                <StackPanel Spacing="2">
+                  <TextBlock Text="NAME" Classes="eyebrow"/>
+                  <TextBox Text="{Binding FormName}"/>
+                </StackPanel>
+
+                <!-- SKU -->
+                <StackPanel Spacing="2">
+                  <TextBlock Text="SKU" Classes="eyebrow"/>
+                  <TextBox Text="{Binding FormSku}" Watermark="Leave blank to auto-generate (Settings → Inventory)" />
+                </StackPanel>
+
+                <!-- Barcode -->
+                <StackPanel Spacing="2">
+                  <TextBlock Text="BARCODE" Classes="eyebrow"/>
+                  <TextBox Text="{Binding FormBarcode}" Watermark="Leave blank to auto-generate (Settings → Inventory)"/>
+                  <TextBlock Text="Leave blank to auto-generate (Settings → Inventory)" FontSize="10" Foreground="{StaticResource GrayBrush}"
+                             IsVisible="{Binding AutoGenerateBarcodeEnabled}"/>
+                </StackPanel>
+
+                <!-- Category -->
+                <StackPanel Spacing="2">
+                  <TextBlock Text="CATEGORY" Classes="eyebrow"/>
+                  <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding FormCategory}" HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="models:Category">
+                        <TextBlock Text="{Binding Name}"/>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                  <!-- Add Category Row -->
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0" Text="{Binding NewCategoryName}" Watermark="New category name"/>
+                    <Button Grid.Column="1" Classes="accent-yellow" Margin="8,0,0,0" Command="{Binding AddCategoryCommand}">
+                      <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+                    </Button>
+                  </Grid>
+                </StackPanel>
+
+                <!-- Unit -->
+                <StackPanel Spacing="2">
+                  <TextBlock Text="UNIT" Classes="eyebrow"/>
+                  <TextBox Text="{Binding FormUnit}"/>
+                </StackPanel>
+
+                <!-- Cost & Selling Price -->
+                <Grid ColumnDefinitions="*,*">
+                  <StackPanel Grid.Column="0" Spacing="2" Margin="0,0,6,0">
+                    <TextBlock Text="COST PRICE" Classes="eyebrow"/>
+                    <TextBox Text="{Binding FormCostPrice}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="2" Margin="6,0,0,0">
+                    <TextBlock Text="SELLING PRICE" Classes="eyebrow"/>
+                    <TextBox Text="{Binding FormSellingPrice}"/>
+                  </StackPanel>
+                </Grid>
+
+                <!-- Stock & Low Stock Alert -->
+                <Grid ColumnDefinitions="*,*">
+                  <StackPanel Grid.Column="0" Spacing="2" Margin="0,0,6,0">
+                    <TextBlock Text="STOCK QUANTITY" Classes="eyebrow"/>
+                    <TextBox Text="{Binding FormStockQuantity}"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="2" Margin="6,0,0,0">
+                    <TextBlock Text="LOW STOCK ALERT" Classes="eyebrow"/>
+                    <TextBox Text="{Binding FormLowStockThreshold}"/>
+                  </StackPanel>
+                </Grid>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+              </StackPanel>
             </Grid>
 
-            <TextBlock Text="UNIT" Classes="eyebrow"/>
-            <TextBox Text="{Binding FormUnit}"/>
-
-            <Grid ColumnDefinitions="*,*">
-              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
-                <TextBlock Text="COST PRICE" Classes="eyebrow"/>
-                <TextBox Text="{Binding FormCostPrice}"/>
-              </StackPanel>
-              <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
-                <TextBlock Text="SELLING PRICE" Classes="eyebrow"/>
-                <TextBox Text="{Binding FormSellingPrice}"/>
-              </StackPanel>
+            <!-- Action Buttons (Bottom) -->
+            <Grid ColumnDefinitions="*,*" Margin="0,10,0,0">
+              <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}"
+                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Height="40"/>
+              <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}"
+                      Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Height="40"/>
             </Grid>
 
-            <Grid ColumnDefinitions="*,*">
-              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
-                <TextBlock Text="STOCK QTY" Classes="eyebrow"/>
-                <TextBox Text="{Binding FormStockQuantity}"/>
-              </StackPanel>
-              <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
-                <TextBlock Text="LOW STOCK ALERT" Classes="eyebrow"/>
-                <TextBox Text="{Binding FormLowStockThreshold}"/>
-              </StackPanel>
-            </Grid>
-
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-
-            <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
-              <Button Grid.Column="0" Content="CANCEL" Classes="accent-red" Command="{Binding CancelEditCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
-              <Button Grid.Column="1" Content="SAVE" Classes="accent-blue" Command="{Binding SaveCommand}" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
-            </Grid>
           </StackPanel>
         </ScrollViewer>
       </Border>

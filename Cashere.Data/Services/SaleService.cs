@@ -23,6 +23,11 @@ public class SaleService : ISaleService
             throw new InvalidOperationException("Cannot complete a sale with no items.");
         }
 
+        if (request.Payments.Count == 0)
+        {
+            throw new InvalidOperationException("Cannot complete a sale with no payment.");
+        }
+
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         await using var transaction = await db.Database.BeginTransactionAsync();
 
@@ -32,17 +37,27 @@ public class SaleService : ISaleService
         var outOfStockBehavior = settings?.OutOfStockBehavior ?? OutOfStockBehavior.Block;
         var enforceStock = trackInventory && outOfStockBehavior == OutOfStockBehavior.Block;
 
-        var methodEnabled = request.PaymentMethod switch
+        // Built once from the freshly-read settings row so method-enabled
+        // checks and fee computation below go through the exact same
+        // PaymentSettings logic CheckoutViewModel uses for its preview.
+        var paymentSettings = new PaymentSettings(
+            settings?.CashEnabled ?? true,
+            settings?.QrisEnabled ?? true,
+            settings?.EdcEnabled ?? true,
+            settings?.QrisAccountInfo,
+            settings?.EdcAccountInfo,
+            settings?.RequireConfirmationForNonCash ?? false,
+            settings?.CashFeePercent ?? 0,
+            settings?.QrisFeePercent ?? 0,
+            settings?.EdcFeePercent ?? 0);
+
+        foreach (var method in request.Payments.Select(p => p.Method).Distinct())
         {
-            PaymentMethod.Cash => settings?.CashEnabled ?? true,
-            PaymentMethod.Qris => settings?.QrisEnabled ?? true,
-            PaymentMethod.Edc => settings?.EdcEnabled ?? true,
-            _ => true
-        };
-        if (!methodEnabled)
-        {
-            throw new InvalidOperationException(
-                $"{request.PaymentMethod} is currently disabled in Settings -> Payments.");
+            if (!paymentSettings.IsMethodEnabled(method))
+            {
+                throw new InvalidOperationException(
+                    $"{method} is currently disabled in Settings -> Payments.");
+            }
         }
 
         if ((settings?.RequireCustomerBeforeCheckout ?? false) && request.CustomerId is null)
@@ -131,6 +146,25 @@ public class SaleService : ISaleService
         var totalAmount = TaxCalculator.ApplyRounding(preRoundingTotal, roundingMode, roundingIncrement);
         var roundingAdjustment = totalAmount - preRoundingTotal;
 
+        // The payment lines must add up to exactly the authoritative total
+        // computed just above - not whatever total the UI thought it
+        // previewed, which could have drifted (a price/voucher/rate changed
+        // mid-checkout). A cent of slack absorbs decimal rounding noise, no
+        // more. Anything else means the cashier would be settling the wrong
+        // amount, so refuse rather than silently record a mismatched sale.
+        var paymentsTotal = request.Payments.Sum(p => p.Amount);
+        if (Math.Abs(paymentsTotal - totalAmount) > 0.01m)
+        {
+            throw new InvalidOperationException(
+                $"Payments total Rp {paymentsTotal:N0} doesn't match the sale total of Rp {totalAmount:N0} - " +
+                "the cart may have changed. Cancel and try again.");
+        }
+
+        if (request.Payments.Any(p => p.Amount <= 0))
+        {
+            throw new InvalidOperationException("Every payment line must be for more than zero.");
+        }
+
         var todayUtc = DateTime.UtcNow.Date;
         var tomorrowUtc = todayUtc.AddDays(1);
         var saleCountToday = await db.Sales.CountAsync(s => s.SaleDate >= todayUtc && s.SaleDate < tomorrowUtc);
@@ -165,13 +199,26 @@ public class SaleService : ISaleService
             });
         }
 
-        sale.Payments.Add(new Payment
+        // One Payment row per line the cashier added. FeeAmount is always
+        // recomputed here from the fee % just read from settings - the
+        // client-supplied PaymentInput.FeeAmount is only a preview and is
+        // deliberately ignored, same "never trust the client's number"
+        // philosophy as the voucher discount above.
+        decimal totalFees = 0;
+        foreach (var payment in request.Payments)
         {
-            Method = request.PaymentMethod,
-            Amount = totalAmount,
-            ReferenceNumber = request.PaymentReferenceNumber,
-            PaidAt = DateTime.UtcNow
-        });
+            var feeAmount = paymentSettings.ComputeFee(payment.Method, payment.Amount);
+            totalFees += feeAmount;
+
+            sale.Payments.Add(new Payment
+            {
+                Method = payment.Method,
+                Amount = payment.Amount,
+                FeeAmount = feeAmount,
+                ReferenceNumber = payment.Method == PaymentMethod.Cash ? null : payment.ReferenceNumber,
+                PaidAt = DateTime.UtcNow
+            });
+        }
 
         db.Sales.Add(sale);
         await db.SaveChangesAsync();
@@ -208,12 +255,18 @@ public class SaleService : ISaleService
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
 
-        var changeDue = request.PaymentMethod == PaymentMethod.Cash
-            ? Math.Max(0, request.AmountTendered - totalAmount)
+        // Change only ever comes from cash: physically-handed-over cash
+        // minus the portion of the sale that cash lines actually settled.
+        // Non-cash lines can't overpay, so they never contribute change.
+        var cashApplied = request.Payments
+            .Where(p => p.Method == PaymentMethod.Cash)
+            .Sum(p => p.Amount);
+        var changeDue = cashApplied > 0
+            ? Math.Max(0, request.AmountTendered - cashApplied)
             : 0;
 
         return new CompletedSaleResult(
             sale.Id, sale.SaleNumber, subtotal, effectiveDiscount, taxAmount, roundingAdjustment, totalAmount,
-            changeDue, sale.SaleDate);
+            totalFees, changeDue, sale.SaleDate);
     }
 }

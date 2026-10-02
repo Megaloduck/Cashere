@@ -19,7 +19,7 @@ public partial class PosViewModel : ViewModelBase
     private readonly ICustomerAdminService? _customerAdmin;
     private readonly IReceiptPrinterService? _receiptPrinter;
 
-    private PaymentSettings _paymentSettings = new(true, true, true, null, null, false);
+    private PaymentSettings _paymentSettings = new(true, true, true, null, null, false, 0, 0, 0);
     private SalesBehaviorSettings _salesBehaviorSettings = new(false, false);
     private List<Customer> _customers = new();
 
@@ -189,11 +189,10 @@ public partial class PosViewModel : ViewModelBase
                 taxBreakdown,
                 result.RoundingAdjustment,
                 result.TotalAmount,
-                checkout.IsCashPayment,
-                checkout.PaymentMethod.ToString(),
-                checkout.AmountTendered,
+                checkout.PaymentLines.Select(payment => new SaleReceiptPayment(
+                    payment.Method.ToString(), payment.Amount, payment.FeeAmount,
+                    payment.ReferenceNumber, payment.CashTendered, payment.ChangeGiven)).ToList(),
                 checkout.ChangeDue,
-                checkout.ReferenceNumber,
                 settings?.ReceiptFooterText);
 
             await _receiptPrinter!.PrintAsync(SaleReceiptFormatter.Format(context));

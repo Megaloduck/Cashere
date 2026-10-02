@@ -1,4 +1,5 @@
 using Cashere.Data;
+using Cashere.Models;
 using Cashere.Server.Services;
 using Cashere.Sync.Dtos;
 using Cashere.Sync.Hubs;
@@ -50,12 +51,14 @@ public class PosSyncHub : Hub<IPosSyncClient>, IPosSyncHub
     // pushes the updated cart to every connected client (desktop + mobile).
     public async Task<ScanResultDto> ScanBarcode(ScanBarcodeRequest request)
     {
-        var product = await _db.Products
-            .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.IsActive);
+        var scanValue = request.Barcode?.Trim();
+        var product = ProductQrIdentity.TryGetProductId(scanValue, out var productId)
+            ? await _db.Products.FirstOrDefaultAsync(p => p.Id == productId && p.IsActive)
+            : await _db.Products.FirstOrDefaultAsync(p => p.Barcode == scanValue && p.IsActive);
 
         if (product is null)
         {
-            return new ScanResultDto(false, null, "No product matches that barcode.", null);
+            return new ScanResultDto(false, null, "No product matches that barcode or Cashere QR identity.", null);
         }
 
         var cart = _cart.AddItem(product.Id, product.Name, product.SellingPrice, request.Quantity);

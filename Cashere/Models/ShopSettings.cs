@@ -74,6 +74,9 @@ public class ReceiptAdmin
     public string? QrisAccountInfo { get; set; }
     public string? EdcAccountInfo { get; set; }
     public bool RequireConfirmationForNonCash { get; set; }
+    public decimal CashFeePercent { get; set; }
+    public decimal QrisFeePercent { get; set; }
+    public decimal EdcFeePercent { get; set; }
 
     public string? PrinterName { get; set; }
     public int PrinterPaperWidthMm { get; set; } = 80;

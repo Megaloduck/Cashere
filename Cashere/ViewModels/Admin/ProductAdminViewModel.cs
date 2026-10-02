@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Cashere.Services;
@@ -8,6 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Cashere.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Media.Imaging;
+using QRCoder;
 
 namespace Cashere.ViewModels.Admin;
 
@@ -21,6 +24,8 @@ public partial class ProductAdminViewModel : ViewModelBase
     private List<Product> _allProducts = new();
     private int? _editingProductId;
     private int _defaultLowStockThreshold = 5;
+    private byte[]? _formPhotoData;
+    private string? _formPhotoExtension;
 
     public ObservableCollection<Product> FilteredProducts { get; } = new();
     public ObservableCollection<Category> Categories { get; } = new();
@@ -54,6 +59,12 @@ public partial class ProductAdminViewModel : ViewModelBase
     [ObservableProperty] private string _formStockQuantity = "0";
     [ObservableProperty] private string _formLowStockThreshold = "5";
     [ObservableProperty] private string _newCategoryName = string.Empty;
+    [ObservableProperty] private Bitmap? _formPhotoPreview;
+    [ObservableProperty] private Bitmap? _formQrPreview;
+    [ObservableProperty] private string _formQrIdentity = string.Empty;
+
+    public bool HasFormPhotoPreview => FormPhotoPreview is not null;
+    public bool HasFormQrPreview => FormQrPreview is not null;
 
     // Reflect Settings -> Inventory, refreshed on every LoadAsync() so this
     // screen never needs its own reload-on-nav wiring - it simply picks up
@@ -115,6 +126,10 @@ public partial class ProductAdminViewModel : ViewModelBase
         if (!CanManage) return;
 
         _editingProductId = null;
+        _formPhotoData = null;
+        _formPhotoExtension = null;
+        FormQrIdentity = string.Empty;
+        SetFormQrPreview(null);
         EditorTitle = "NEW PRODUCT";
         FormSku = string.Empty;
         FormBarcode = string.Empty;
@@ -125,6 +140,7 @@ public partial class ProductAdminViewModel : ViewModelBase
         FormSellingPrice = "0";
         FormStockQuantity = "0";
         FormLowStockThreshold = _defaultLowStockThreshold.ToString();
+        SetFormPhotoPreview(null);
         ErrorMessage = null;
         IsEditorOpen = true;
     }
@@ -145,8 +161,96 @@ public partial class ProductAdminViewModel : ViewModelBase
         FormSellingPrice = product.SellingPrice.ToString();
         FormStockQuantity = product.StockQuantity.ToString();
         FormLowStockThreshold = product.LowStockThreshold.ToString();
+        _formPhotoData = null;
+        _formPhotoExtension = null;
+        LoadExistingPhotoPreview(product.PhotoPath);
+        FormQrIdentity = ProductQrIdentity.ForProductId(product.Id);
+        SetFormQrPreview(CreateQrPreview(FormQrIdentity));
         ErrorMessage = null;
         IsEditorOpen = true;
+    }
+
+    public async Task SetFormPhotoAsync(byte[] imageData, string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        if (extension is not (".png" or ".jpg" or ".jpeg" or ".webp"))
+        {
+            ErrorMessage = "Choose a PNG, JPG, JPEG, or WebP image.";
+            return;
+        }
+        if (imageData.Length == 0 || imageData.Length > 10 * 1024 * 1024)
+        {
+            ErrorMessage = "The image must be smaller than 10 MB.";
+            return;
+        }
+
+        try
+        {
+            using var stream = new MemoryStream(imageData);
+            var preview = new Bitmap(stream);
+            SetFormPhotoPreview(preview);
+            _formPhotoData = imageData;
+            _formPhotoExtension = extension;
+            ErrorMessage = null;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidDataException)
+        {
+            ErrorMessage = "The selected file is not a valid image.";
+        }
+        await Task.CompletedTask;
+    }
+
+    private void LoadExistingPhotoPreview(string? relativePath)
+    {
+        try
+        {
+            var fullPath = string.IsNullOrWhiteSpace(relativePath)
+                ? null
+                : Cashere.Converters.PhotoPathToImageConverter.GetFullPath(relativePath);
+            SetFormPhotoPreview(fullPath is not null && File.Exists(fullPath) ? new Bitmap(fullPath) : null);
+        }
+        catch
+        {
+            SetFormPhotoPreview(null);
+        }
+    }
+
+    private void SetFormPhotoPreview(Bitmap? preview)
+    {
+        FormPhotoPreview?.Dispose();
+        FormPhotoPreview = preview;
+        OnPropertyChanged(nameof(HasFormPhotoPreview));
+    }
+
+    private static Bitmap? CreateQrPreview(string identity)
+    {
+        if (string.IsNullOrEmpty(identity)) return null;
+        using var generator = new QRCodeGenerator();
+        using var data = generator.CreateQrCode(identity, QRCodeGenerator.ECCLevel.M);
+        using var stream = new MemoryStream(new PngByteQRCode(data).GetGraphic(8));
+        return new Bitmap(stream);
+    }
+
+    private void SetFormQrPreview(Bitmap? preview)
+    {
+        FormQrPreview?.Dispose();
+        FormQrPreview = preview;
+        OnPropertyChanged(nameof(HasFormQrPreview));
+    }
+
+    private async Task SaveFormPhotoAsync(int productId)
+    {
+        if (_formPhotoData is null || _formPhotoExtension is null) return;
+
+        var relativePath = $"products/{productId}{_formPhotoExtension}";
+        var fullPath = Cashere.Converters.PhotoPathToImageConverter.GetFullPath(relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        var temporaryPath = fullPath + ".tmp";
+        await File.WriteAllBytesAsync(temporaryPath, _formPhotoData);
+        File.Move(temporaryPath, fullPath, overwrite: true);
+        await _productAdmin.SetPhotoPathAsync(productId, relativePath);
+        _formPhotoData = null;
+        _formPhotoExtension = null;
     }
 
     [RelayCommand]
@@ -214,15 +318,20 @@ public partial class ProductAdminViewModel : ViewModelBase
 
         try
         {
+            int savedProductId;
             if (_editingProductId is int id)
             {
                 await _productAdmin.UpdateProductAsync(id, input);
+                savedProductId = id;
             }
             else
             {
-                await _productAdmin.CreateProductAsync(input);
+                var product = await _productAdmin.CreateProductAsync(input);
+                savedProductId = product.Id;
+                _editingProductId = product.Id;
             }
 
+            await SaveFormPhotoAsync(savedProductId);
             IsEditorOpen = false;
             await LoadAsync();
         }
@@ -230,8 +339,20 @@ public partial class ProductAdminViewModel : ViewModelBase
         {
             ErrorMessage = ex.Message;
         }
+        catch (IOException ex)
+        {
+            ErrorMessage = $"Product saved, but the photo could not be saved: {ex.Message}";
+        }
     }
 
     [RelayCommand]
-    private void CancelEdit() => IsEditorOpen = false;
+    private void CancelEdit()
+    {
+        _formPhotoData = null;
+        _formPhotoExtension = null;
+        SetFormPhotoPreview(null);
+        FormQrIdentity = string.Empty;
+        SetFormQrPreview(null);
+        IsEditorOpen = false;
+    }
 }

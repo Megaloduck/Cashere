@@ -20,6 +20,9 @@ public partial class PaymentSettingsViewModel : ViewModelBase
     [ObservableProperty] private string _qrisAccountInfo = string.Empty;
     [ObservableProperty] private string _edcAccountInfo = string.Empty;
     [ObservableProperty] private bool _requireConfirmationForNonCash;
+    [ObservableProperty] private string _cashFeePercent = "0";
+    [ObservableProperty] private string _qrisFeePercent = "0";
+    [ObservableProperty] private string _edcFeePercent = "0";
     [ObservableProperty] private string? _statusMessage;
 
     public PaymentSettingsViewModel(IShopContextService shopContext)
@@ -38,6 +41,9 @@ public partial class PaymentSettingsViewModel : ViewModelBase
         QrisAccountInfo = settings.QrisAccountInfo ?? string.Empty;
         EdcAccountInfo = settings.EdcAccountInfo ?? string.Empty;
         RequireConfirmationForNonCash = settings.RequireConfirmationForNonCash;
+        CashFeePercent = settings.CashFeePercent.ToString();
+        QrisFeePercent = settings.QrisFeePercent.ToString();
+        EdcFeePercent = settings.EdcFeePercent.ToString();
     }
 
     [RelayCommand]
@@ -51,6 +57,14 @@ public partial class PaymentSettingsViewModel : ViewModelBase
             return;
         }
 
+        if (!decimal.TryParse(CashFeePercent, out var cashFee) || cashFee < 0 ||
+            !decimal.TryParse(QrisFeePercent, out var qrisFee) || qrisFee < 0 ||
+            !decimal.TryParse(EdcFeePercent, out var edcFee) || edcFee < 0)
+        {
+            StatusMessage = "Payment fees must be valid, non-negative percentages.";
+            return;
+        }
+
         var settings = await _shopContext.GetSettingsAsync() ?? new ReceiptAdmin();
 
         settings.CashEnabled = CashEnabled;
@@ -59,6 +73,9 @@ public partial class PaymentSettingsViewModel : ViewModelBase
         settings.QrisAccountInfo = string.IsNullOrWhiteSpace(QrisAccountInfo) ? null : QrisAccountInfo.Trim();
         settings.EdcAccountInfo = string.IsNullOrWhiteSpace(EdcAccountInfo) ? null : EdcAccountInfo.Trim();
         settings.RequireConfirmationForNonCash = RequireConfirmationForNonCash;
+        settings.CashFeePercent = cashFee;
+        settings.QrisFeePercent = qrisFee;
+        settings.EdcFeePercent = edcFee;
 
         await _shopContext.UpdateSettingsAsync(settings);
 

@@ -72,6 +72,7 @@ public partial class ProductPickerViewModel : ViewModelBase
             query = query.Where(p =>
                 p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
                 p.Sku.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                ProductQrIdentity.ForProductId(p.Id).Contains(term, StringComparison.OrdinalIgnoreCase) ||
                 (p.Barcode is not null && p.Barcode.Contains(term, StringComparison.OrdinalIgnoreCase)));
         }
 

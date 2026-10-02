@@ -72,7 +72,10 @@ public class ShopContextService : IShopContextService
             settings?.EdcEnabled ?? true,
             settings?.QrisAccountInfo,
             settings?.EdcAccountInfo,
-            settings?.RequireConfirmationForNonCash ?? false);
+            settings?.RequireConfirmationForNonCash ?? false,
+            settings?.CashFeePercent ?? 0,
+            settings?.QrisFeePercent ?? 0,
+            settings?.EdcFeePercent ?? 0);
     }
 
     public async Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync()

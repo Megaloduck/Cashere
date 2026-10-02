@@ -26,7 +26,7 @@ public static class ProductEndpoints
                 .Where(p => p.IsActive)
                 .Include(p => p.Category)
                 .Select(p => new ProductDto(
-                    p.Id, p.Sku, p.Barcode, p.Name, p.Unit,
+                    p.Id, p.Sku, p.Barcode, Cashere.Models.ProductQrIdentity.ForProductId(p.Id), p.Name, p.Unit,
                     p.SellingPrice, p.StockQuantity,
                     p.Category != null ? p.Category.Name : null,
                     p.IsActive,

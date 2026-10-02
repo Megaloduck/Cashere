@@ -121,8 +121,8 @@
 
             <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="10,8">
               <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
-                <TextBlock Grid.Column="1" Text="{Binding FormTotal, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+                <TextBlock Grid.Column="0" Text="TOTAL" FontWeight="Black" Foreground="Black"/>
+                <TextBlock Grid.Column="1" Text="{Binding FormTotal, StringFormat='Rp {0:N0}'}" FontWeight="Black" Foreground="Black"/>
               </Grid>
             </Border>
 

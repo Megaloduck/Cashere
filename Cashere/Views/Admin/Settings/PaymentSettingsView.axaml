@@ -15,8 +15,10 @@
         <TextBlock Grid.Column="0" Text="CASH" FontWeight="Bold" VerticalAlignment="Center"/>
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashEnabled}"/>
       </Grid>
-
-
+      <StackPanel Spacing="4" IsVisible="{Binding CashEnabled}">
+        <TextBlock Text="CASH FEE (%)" Classes="eyebrow"/>
+        <TextBox Text="{Binding CashFeePercent}" Watermark="0"/>
+      </StackPanel>
 
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0" Text="QRIS" FontWeight="Bold" VerticalAlignment="Center"/>
@@ -25,6 +27,8 @@
       <StackPanel Spacing="4" IsVisible="{Binding QrisEnabled}">
         <TextBlock Text="QRIS ACCOUNT / PROVIDER INFO (OPTIONAL)" Classes="eyebrow"/>
         <TextBox Text="{Binding QrisAccountInfo}" Watermark="e.g. Merchant ID 123456"/>
+        <TextBlock Text="QRIS FEE (%)" Classes="eyebrow"/>
+        <TextBox Text="{Binding QrisFeePercent}" Watermark="0"/>
       </StackPanel>
 
 
@@ -35,6 +39,8 @@
       <StackPanel Spacing="4" IsVisible="{Binding EdcEnabled}">
         <TextBlock Text="EDC ACCOUNT / PROVIDER INFO (OPTIONAL)" Classes="eyebrow"/>
         <TextBox Text="{Binding EdcAccountInfo}" Watermark="e.g. BCA EDC Terminal 1"/>
+        <TextBlock Text="EDC FEE (%)" Classes="eyebrow"/>
+        <TextBox Text="{Binding EdcFeePercent}" Watermark="0"/>
       </StackPanel>
 
 
@@ -62,9 +68,8 @@
               Margin="0,8,0,4"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Per-method payment fees, refunds, and partial/split payments aren't built yet - none of those exist as checkout flows to configure."/>
+                 Text="Fees are calculated per payment line and shown separately from the sale total."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
