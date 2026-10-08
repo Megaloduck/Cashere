@@ -3,12 +3,10 @@ using System.Collections.Generic;
 
 namespace Cashere.Models;
 
-// A named tax rate a Category can be assigned - see Category.TaxRateId. A
-// product with no category, or a category with no TaxRate assigned, falls
-// back to the shop-wide ReceiptAdmin.TaxRatePercent - see
-// TaxCalculator.ResolveRatePercent, called identically by CartViewModel's
-// live checkout preview and SaleService's authoritative computation, so the
-// two can never resolve a different rate for the same line.
+// A named tax rate a Category can be assigned - see Category.TaxRateId.
+// Product-specific percentage overrides take precedence over category
+// rates; products without one use their category rate, then the shop-wide
+// default.
 public class TaxRate
 {
     public int Id { get; set; }

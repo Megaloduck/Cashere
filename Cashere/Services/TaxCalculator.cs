@@ -16,12 +16,12 @@ public static class TaxCalculator
     public record LineResult(decimal TaxAmount, decimal RatePercent);
     public record CalculationResult(IReadOnlyList<LineResult> Lines, decimal TotalTax);
 
-    // Resolves the tax rate a product's line should use: its category's
-    // assigned TaxRate if one is set, otherwise the shop-wide default from
-    // Settings -> Business Info. Category is optional since not every
-    // product has one (see Product.CategoryId).
-    public static decimal ResolveRatePercent(Category? category, decimal defaultRatePercent) =>
-        category?.TaxRate?.RatePercent ?? defaultRatePercent;
+    // Resolves the tax rate a product's line should use: a product override,
+    // then its category's assigned TaxRate, then the shop-wide default from
+    // Settings -> Business Info.
+    public static decimal ResolveRatePercent(
+        decimal? productOverridePercent, Category? category, decimal defaultRatePercent) =>
+        productOverridePercent ?? category?.TaxRate?.RatePercent ?? defaultRatePercent;
 
     // Splits a cart-level discount across lines pro-rata by subtotal share,
     // then computes each line's tax at its own rate - exclusive (added on

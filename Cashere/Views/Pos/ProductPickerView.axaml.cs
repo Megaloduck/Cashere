@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
+using Avalonia.Input;
 using Cashere.Models;
 using Cashere.ViewModels.Pos;
 
@@ -36,5 +37,11 @@ public partial class ProductPickerView : UserControl
         {
             vm.SelectedCategory = null;
         }
+    }
+
+    private void OnSearchKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && DataContext is ProductPickerViewModel vm && vm.TryAddScannedBarcode())
+            e.Handled = true;
     }
 }

@@ -17,6 +17,22 @@
       <TextBlock Text="System follows your OS's light/dark setting, including if you change it while Cashere is running."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
+      <TextBlock Text="CONTROL DENSITY" Classes="eyebrow" Margin="0,8,0,0"/>
+      <ComboBox ItemsSource="{Binding UiDensities}" SelectedItem="{Binding SelectedUiDensity}" HorizontalAlignment="Stretch"/>
+      <TextBlock Text="Compact reduces padding and height on common inputs, buttons, pickers and date controls. Comfortable keeps the default touch-friendly size."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <TextBlock Text="NUMBER AND DATE FORMAT" Classes="eyebrow" Margin="0,8,0,0"/>
+      <ComboBox ItemsSource="{Binding DisplayCultures}" SelectedItem="{Binding SelectedDisplayCulture}" HorizontalAlignment="Stretch">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:DisplayCultureOption">
+            <TextBlock Text="{Binding DisplayName}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBlock Text="This changes number separators and date/month formatting. The app interface remains in English; the selected format takes effect after restarting Cashere."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Grid.Column="0" Spacing="2">
           <TextBlock Text="SHOW CLOCK IN HEADER" FontWeight="Bold"/>
@@ -49,6 +65,24 @@
         </Grid>
       </StackPanel>
 
+      <TextBlock Text="POS FEEDBACK" Classes="eyebrow" Margin="0,8,0,0"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="SOUND ON CHECKOUT RESULT" FontWeight="Bold"/>
+          <TextBlock Text="Plays a Windows system sound when a sale completes or checkout fails."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding PosSoundsEnabled}" VerticalAlignment="Center"/>
+      </Grid>
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="SHOW POS SUCCESS NOTICES" FontWeight="Bold"/>
+          <TextBlock Text="Shows confirmations when an order is held, resumed, or completed. Checkout errors stay visible."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowPosNotifications}" VerticalAlignment="Center"/>
+      </Grid>
+
       <TextBlock Text="{Binding StatusMessage}"
                  Foreground="{StaticResource BlueBrush}"
                  FontWeight="Bold"
@@ -70,9 +104,9 @@
       </StackPanel>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock Text="LOCALIZATION ROADMAP" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Language, date/time/number format, sound &amp; notifications, and UI density all need infrastructure that doesn't exist yet in this app."/>
+                 Text="Translated interface labels and notification support on platforms other than Windows desktop still need localization and platform work."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

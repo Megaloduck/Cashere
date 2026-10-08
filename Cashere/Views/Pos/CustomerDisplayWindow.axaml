@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
+        x:Class="Cashere.Views.Pos.CustomerDisplayWindow"
+        x:DataType="vm:CartViewModel"
+        Title="Cashere Customer Display"
+        Width="1024" Height="768"
+        Background="#101820"
+        SystemDecorations="None"
+        CanResize="False"
+        ShowInTaskbar="False">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="48">
+    <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+      <Border Width="22" Height="22" Background="#E53935"/>
+      <StackPanel Grid.Column="1" Spacing="3">
+        <TextBlock Text="CASHERE" FontSize="22" FontWeight="Black" Foreground="White"/>
+        <TextBlock Text="YOUR ORDER" FontSize="12" FontWeight="Bold" Foreground="#AAB7C4"/>
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Row="1" Margin="0,40" IsVisible="{Binding HasItems}">
+      <Grid RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+          <TextBlock Text="ITEM" FontSize="14" FontWeight="Bold" Foreground="#93A4B5"/>
+          <TextBlock Grid.Column="1" Text="QTY" Width="100" TextAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#93A4B5"/>
+          <TextBlock Grid.Column="2" Text="AMOUNT" Width="190" TextAlignment="Right" FontSize="14" FontWeight="Bold" Foreground="#93A4B5"/>
+        </Grid>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl ItemsSource="{Binding Lines}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CartLineViewModel">
+                <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,18">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding Name}" FontSize="25" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding UnitPrice, StringFormat='Rp {0:N0} each'}" FontSize="15" Foreground="#AAB7C4"/>
+                  </StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding Quantity}" Width="100" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Foreground="White"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Subtotal, StringFormat='Rp {0:N0}'}" Width="190" TextAlignment="Right" VerticalAlignment="Center" FontSize="24" Foreground="White"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+
+    <StackPanel Grid.Row="1" IsVisible="{Binding !HasItems}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+      <TextBlock Text="Welcome!" FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+      <TextBlock Text="Your items will appear here." FontSize="22" Foreground="#AAB7C4" HorizontalAlignment="Center"/>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Spacing="10">
+      <Border Height="1" Background="#40505E"/>
+      <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasItems}">
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasDiscount}">
+            <TextBlock Text="DISCOUNT" FontSize="16" Foreground="#AAB7C4"/>
+            <TextBlock Grid.Column="1" Text="{Binding DiscountAmount, StringFormat='− Rp {0:N0}'}" FontSize="16" Foreground="#AAB7C4"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="TAX" FontSize="16" Foreground="#AAB7C4"/>
+            <TextBlock Grid.Column="1" Text="{Binding TaxAmount, StringFormat='Rp {0:N0}'}" FontSize="16" Foreground="#AAB7C4"/>
+          </Grid>
+        </StackPanel>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
+          <TextBlock Text="TOTAL" FontSize="15" FontWeight="Bold" Foreground="#AAB7C4" HorizontalAlignment="Right"/>
+          <TextBlock Text="{Binding TotalAmount, StringFormat='Rp {0:N0}'}" FontSize="42" FontWeight="Black" Foreground="#FFD54F"/>
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="Thank you!" FontSize="16" Foreground="#AAB7C4" HorizontalAlignment="Center" IsVisible="{Binding HasItems}"/>
+    </StackPanel>
+  </Grid>
+</Window>

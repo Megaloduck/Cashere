@@ -11,11 +11,13 @@ public class Product
     public string Name { get; set; } = string.Empty;
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
+    public decimal? TaxRateOverridePercent { get; set; }
     public string Unit { get; set; } = "pcs";
     public decimal CostPrice { get; set; }
     public decimal SellingPrice { get; set; }
     public int StockQuantity { get; set; }
     public int LowStockThreshold { get; set; } = 5;
+    public OutOfStockBehavior? OutOfStockBehaviorOverride { get; set; }
     public bool IsActive { get; set; } = true;
     // Relative path under the desktop's local media folder, e.g. "products/17.jpg".
     // Null until a photo has been uploaded from the mobile labeling flow (or set manually).

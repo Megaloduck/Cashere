@@ -68,6 +68,28 @@
 
       </Grid>
 
+      <Border Classes="card" Padding="14">
+        <StackPanel Spacing="10">
+          <TextBlock Text="AUTOMATIC BACKUP SCHEDULE" Classes="headline" FontSize="14"/>
+          <TextBlock Text="Create one local database backup each day while Cashere is running. If Cashere is closed at the chosen time, it runs the backup after the next launch." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Enable daily backups" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsChecked="{Binding ScheduledBackupsEnabled}"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,*" IsVisible="{Binding ScheduledBackupsEnabled}">
+            <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+              <TextBlock Text="TIME (24-HOUR)" Classes="eyebrow" FontSize="9"/>
+              <TextBox Text="{Binding ScheduledBackupTime}" Watermark="23:00"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="4" Margin="6,0,0,0">
+              <TextBlock Text="KEEP AUTOMATIC BACKUPS" Classes="eyebrow" FontSize="9"/>
+              <TextBox Text="{Binding AutomaticBackupRetentionCount}" Watermark="30"/>
+            </StackPanel>
+          </Grid>
+          <Button Content="SAVE BACKUP SCHEDULE" Classes="accent-blue" Command="{Binding SaveBackupScheduleCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
       <!-- Table column headers - shown only when there is at least one backup -->
       <Grid ColumnDefinitions="*,80,140,Auto"
             Margin="0,4,0,0"
@@ -130,9 +152,23 @@
                  IsVisible="{Binding ExportStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock Text="HISTORICAL SALES IMPORT" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Automatic scheduled backups with retention, and CSV/Excel export/import of catalog and sales data, aren't built yet."/>
+                 Text="Import past transactions from the Cashere XLSX format. Download the template, map your old POS data into its sheets, and review totals before importing. Product SKUs must match your catalog. Imports preserve history and do not change current stock."/>
+      <Button Content="CREATE IMPORT TEMPLATE (XLSX)"
+              Classes="ghost"
+              Click="OnCreateSalesImportTemplateClick"
+              IsVisible="{Binding CanImportHistoricalSales}"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,12"/>
+      <Button Content="IMPORT HISTORICAL SALES (XLSX)"
+              Classes="accent-blue"
+              Click="OnImportHistoricalSalesClick"
+              IsVisible="{Binding CanImportHistoricalSales}"
+              IsEnabled="{Binding !IsImportingSales}"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,14"/>
+      <TextBlock Text="{Binding ImportStatusMessage}"
+                 Foreground="{StaticResource BlueBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                 IsVisible="{Binding ImportStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
 

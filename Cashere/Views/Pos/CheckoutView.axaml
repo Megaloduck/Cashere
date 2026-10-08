@@ -5,9 +5,10 @@
              xmlns:vm="clr-namespace:Cashere.ViewModels.Pos"
              xmlns:models="clr-namespace:Cashere.Models"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="540"
+             mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="640"
              x:Class="Cashere.Views.Pos.CheckoutView"
              x:DataType="vm:CheckoutViewModel">
+  <ScrollViewer MaxHeight="640">
   <StackPanel Spacing="12">
     <StackPanel Orientation="Horizontal" Spacing="8">
       <mi:MaterialIcon Kind="CartOutline" Width="20" Height="20"/>
@@ -36,31 +37,79 @@
       </ComboBox>
     </StackPanel>
 
-    <StackPanel Spacing="4">
-      <TextBlock Text="PAYMENT METHOD" Classes="eyebrow"/>
-      <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PaymentMethod}" HorizontalAlignment="Stretch"/>
-    </StackPanel>
+    <Border Classes="rule-thick" Margin="0,4"/>
 
-    <StackPanel Spacing="4" IsVisible="{Binding IsCashPayment}">
-      <TextBlock Text="AMOUNT TENDERED" Classes="eyebrow"/>
-      <TextBox Text="{Binding AmountTendered}" Watermark="0"/>
-      <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-        <TextBlock Grid.Column="0" Text="CHANGE DUE" FontWeight="Bold"/>
-        <TextBlock Grid.Column="1" Text="{Binding ChangeDue, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
-      </Grid>
-    </StackPanel>
+    <!-- Payment lines already added -->
+    <ItemsControl ItemsSource="{Binding PaymentLines}" IsVisible="{Binding PaymentLines.Count}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:PaymentLineViewModel">
+          <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+              <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Text="{Binding Method}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding FeeAmount, StringFormat='+ Rp {0:N0} fee'}" FontSize="10"
+                           Foreground="{StaticResource GrayBrush}" IsVisible="{Binding HasFee}"/>
+                <TextBlock Text="{Binding ChangeGiven, StringFormat='Rp {0:N0} change given'}" FontSize="10"
+                           Foreground="{StaticResource GrayBrush}" IsVisible="{Binding HasChange}"/>
+                <TextBlock Text="{Binding ReferenceNumber, StringFormat='Ref: {0}'}" FontSize="10"
+                           Foreground="{StaticResource GrayBrush}" IsVisible="{Binding HasReference}"/>
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat='Rp {0:N0}'}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+              <Button Grid.Column="2" Classes="ghost"
+                      Command="{Binding $parent[UserControl].((vm:CheckoutViewModel)DataContext).RemovePaymentLineCommand}"
+                      CommandParameter="{Binding}" ToolTip.Tip="Remove">
+                <mi:MaterialIcon Kind="CloseCircleOutline" Width="16" Height="16"/>
+              </Button>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
 
-    <StackPanel Spacing="4" IsVisible="{Binding IsNonCashPayment}">
-      <TextBlock Text="REFERENCE / TRANSACTION NUMBER" Classes="eyebrow"/>
-      <TextBox Text="{Binding ReferenceNumber}"/>
+    <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding PaymentLines.Count}">
+      <TextBlock Grid.Column="0" Text="AMOUNT REMAINING" FontWeight="Bold"/>
+      <TextBlock Grid.Column="1" Text="{Binding AmountRemaining, StringFormat='Rp {0:N0}'}" FontWeight="Black"
+                 Foreground="{StaticResource RedBrush}"/>
+    </Grid>
 
-      <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" IsVisible="{Binding HasSelectedMethodAccountInfo}">
-        <mi:MaterialIcon Kind="InformationOutline" Width="14" Height="14" Foreground="{StaticResource BlueBrush}"/>
-        <TextBlock Text="{Binding SelectedMethodAccountInfo}" TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+    <!-- Pending line composer - hidden once the sale is fully paid -->
+    <StackPanel Spacing="8" IsVisible="{Binding !IsFullyPaid}">
+      <TextBlock Text="ADD PAYMENT" Classes="eyebrow"/>
+      <ComboBox ItemsSource="{Binding PaymentMethods}" SelectedItem="{Binding PendingMethod}" HorizontalAlignment="Stretch"/>
+
+      <StackPanel Spacing="4" IsVisible="{Binding IsPendingCash}">
+        <TextBlock Text="CASH TENDERED" Classes="eyebrow"/>
+        <TextBox Text="{Binding PendingCashTendered}" Watermark="0"/>
+        <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasPendingChangeDue}">
+          <TextBlock Grid.Column="0" Text="CHANGE DUE" FontWeight="Bold"/>
+          <TextBlock Grid.Column="1" Text="{Binding PendingChangeDue, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+        </Grid>
       </StackPanel>
 
-      <CheckBox Content="Payment received and confirmed" IsChecked="{Binding IsPaymentConfirmed}"
-                Margin="0,8,0,0" IsVisible="{Binding IsConfirmationRequired}"/>
+      <StackPanel Spacing="4" IsVisible="{Binding !IsPendingCash}">
+        <TextBlock Text="AMOUNT" Classes="eyebrow"/>
+        <TextBox Text="{Binding PendingAmount}"/>
+
+        <TextBlock Text="REFERENCE / TRANSACTION NUMBER" Classes="eyebrow"/>
+        <TextBox Text="{Binding PendingReferenceNumber}"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" IsVisible="{Binding HasPendingMethodAccountInfo}">
+          <mi:MaterialIcon Kind="InformationOutline" Width="14" Height="14" Foreground="{StaticResource BlueBrush}"/>
+          <TextBlock Text="{Binding PendingMethodAccountInfo}" TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+        </StackPanel>
+
+        <CheckBox Content="Payment received and confirmed" IsChecked="{Binding IsPaymentConfirmed}"
+                  Margin="0,8,0,0" IsVisible="{Binding IsPendingConfirmationRequired}"/>
+      </StackPanel>
+
+      <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasPendingFee}">
+        <TextBlock Grid.Column="0" Text="{Binding PendingMethod, StringFormat='{}{0} FEE'}" Classes="eyebrow"/>
+        <TextBlock Grid.Column="1" Text="{Binding PendingFeeAmount, StringFormat='Rp {0:N0}'}" FontWeight="Bold"/>
+      </Grid>
+
+      <Button Content="ADD PAYMENT" Classes="accent-yellow" Command="{Binding AddPaymentLineCommand}"
+              IsEnabled="{Binding CanAddPaymentLine}"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,12"/>
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
@@ -85,4 +134,5 @@
       </Button>
     </Grid>
   </StackPanel>
+  </ScrollViewer>
 </UserControl>

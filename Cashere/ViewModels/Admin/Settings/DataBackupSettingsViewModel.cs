@@ -11,8 +11,11 @@ namespace Cashere.ViewModels.Admin.Settings;
 public partial class DataBackupSettingsViewModel : ViewModelBase
 {
     private readonly IDataBackupService _backupService;
+    private readonly IShopContextService _shopContext;
     private readonly IReportExportService? _reportExport;
     private readonly ICashierAdminService _cashierAdmin;
+    private readonly IHistoricalSalesImportService? _historicalSalesImport;
+    private readonly int _currentCashierId;
     private readonly UserRole _currentRole;
     private readonly string _currentUsername;
 
@@ -23,11 +26,16 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
     [ObservableProperty] private string _lastModifiedDisplay = string.Empty;
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string? _statusMessage;
+    [ObservableProperty] private bool _scheduledBackupsEnabled;
+    [ObservableProperty] private string _scheduledBackupTime = "23:00";
+    [ObservableProperty] private string _automaticBackupRetentionCount = "30";
 
     [ObservableProperty] private DateTimeOffset? _exportFromDate = DateTimeOffset.Now.Date.AddDays(-29);
     [ObservableProperty] private DateTimeOffset? _exportToDate = DateTimeOffset.Now.Date;
     [ObservableProperty] private bool _isExporting;
     [ObservableProperty] private string? _exportStatusMessage;
+    [ObservableProperty] private bool _isImportingSales;
+    [ObservableProperty] private string? _importStatusMessage;
 
     [ObservableProperty] private bool _isResetPromptOpen;
     [ObservableProperty] private string _resetPin = string.Empty;
@@ -36,6 +44,7 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
 
     public bool CanResetDatabase => _currentRole == UserRole.Owner;
     public bool IsReportExportAvailable => _reportExport is not null;
+    public bool CanImportHistoricalSales => _currentRole == UserRole.Owner && _historicalSalesImport is not null;
     public bool HasNoBackups => Backups.Count == 0;
 
     // Bubbled up the same way Staff.ManageCashiersRequested is, so
@@ -46,19 +55,54 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
 
     public DataBackupSettingsViewModel(
         IDataBackupService backupService,
+        IShopContextService shopContext,
         IReportExportService? reportExport,
         ICashierAdminService cashierAdmin,
+        int currentCashierId,
         UserRole currentRole,
-        string currentUsername)
+        string currentUsername,
+        IHistoricalSalesImportService? historicalSalesImport)
     {
         _backupService = backupService;
+        _shopContext = shopContext;
         _reportExport = reportExport;
         _cashierAdmin = cashierAdmin;
+        _currentCashierId = currentCashierId;
         _currentRole = currentRole;
         _currentUsername = currentUsername;
+        _historicalSalesImport = historicalSalesImport;
 
         // Keep HasNoBackups in sync whenever the collection changes.
         Backups.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoBackups));
+    }
+
+    public async Task<byte[]?> CreateSalesImportTemplateAsync()
+    {
+        if (!CanImportHistoricalSales || _historicalSalesImport is null) return null;
+        ImportStatusMessage = null;
+        try
+        {
+            return await _historicalSalesImport.CreateTemplateAsync();
+        }
+        catch (Exception ex)
+        {
+            ImportStatusMessage = $"Template failed: {ex.Message}";
+            return null;
+        }
+    }
+
+    public async Task ImportHistoricalSalesAsync(byte[] workbookBytes)
+    {
+        if (!CanImportHistoricalSales || _historicalSalesImport is null) return;
+        ImportStatusMessage = null;
+        IsImportingSales = true;
+        try
+        {
+            var result = await _historicalSalesImport.ImportAsync(workbookBytes, _currentCashierId, _currentRole);
+            ImportStatusMessage = $"Imported {result.ImportedSales} sales; skipped {result.SkippedDuplicates} duplicate sale numbers. Current stock was not changed.";
+        }
+        catch (Exception ex) { ImportStatusMessage = $"Import failed: {ex.Message}"; }
+        finally { IsImportingSales = false; }
     }
 
     public async Task LoadAsync()
@@ -66,6 +110,14 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
         var status = await _backupService.GetStatusAsync();
         DatabasePath = status.DatabasePath;
         DatabaseSizeDisplay = FormatBytes(status.FileSizeBytes);
+
+        var settings = await _shopContext.GetSettingsAsync();
+        if (settings is not null)
+        {
+            ScheduledBackupsEnabled = settings.ScheduledBackupsEnabled;
+            ScheduledBackupTime = settings.ScheduledBackupTime;
+            AutomaticBackupRetentionCount = settings.AutomaticBackupRetentionCount.ToString();
+        }
 
         // FileInfo.LastWriteTimeUtc already carries Kind=Utc correctly (unlike
         // values round-tripped through SQLite), but this still goes through
@@ -101,6 +153,29 @@ public partial class DataBackupSettingsViewModel : ViewModelBase
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task SaveBackupSchedule()
+    {
+        StatusMessage = null;
+        if (!TimeSpan.TryParseExact(ScheduledBackupTime, "hh\\:mm", System.Globalization.CultureInfo.InvariantCulture, out _))
+        {
+            StatusMessage = "Enter the daily backup time as HH:mm (24-hour time).";
+            return;
+        }
+        if (!int.TryParse(AutomaticBackupRetentionCount, out var retention) || retention is < 1 or > 365)
+        {
+            StatusMessage = "Keep between 1 and 365 automatic backups.";
+            return;
+        }
+
+        var settings = await _shopContext.GetSettingsAsync() ?? new ReceiptAdmin();
+        settings.ScheduledBackupsEnabled = ScheduledBackupsEnabled;
+        settings.ScheduledBackupTime = ScheduledBackupTime;
+        settings.AutomaticBackupRetentionCount = retention;
+        await _shopContext.UpdateSettingsAsync(settings);
+        StatusMessage = "Backup schedule saved.";
     }
 
     [RelayCommand]

@@ -7,27 +7,44 @@ using System.Threading.Tasks;
 
 namespace Cashere.Services
 {
-    // TaxRatePercent moved here from CompleteSaleRequest: each line now
-    // carries whatever rate CartViewModel resolved for it (its product's
-    // Category.TaxRate, or the shop-wide default) via TaxCalculator, so a
-    // sale can mix rates instead of applying one flat percentage to
-    // everything. See SaleService.CompleteSaleAsync.
+    // TaxRatePercent lives on each line: every line carries whatever rate
+    // CartViewModel resolved for it (its product's Category.TaxRate, or the
+    // shop-wide default) via TaxCalculator, so a sale can mix rates. See
+    // SaleService.CompleteSaleAsync.
     public record SaleLineRequest(int ProductId, int Quantity, decimal UnitPrice, decimal TaxRatePercent);
+
+    // One line of a (possibly split) payment. Amount is how much of the sale
+    // this line settles - for Cash, that's the *applied* portion, never the
+    // amount physically handed over (that's CompleteSaleRequest.AmountTendered,
+    // which SaleService uses only to work out change). FeeAmount is what the
+    // client computed for preview purposes; SaleService recomputes it from
+    // settings and never trusts this value - see SaleService.CompleteSaleAsync.
+    public record PaymentInput(
+        PaymentMethod Method,
+        decimal Amount,
+        decimal FeeAmount,
+        string? ReferenceNumber);
 
     public record CompleteSaleRequest(
         int CashierId,
         int? CustomerId,
         IReadOnlyList<SaleLineRequest> Lines,
         decimal DiscountAmount,
-        PaymentMethod PaymentMethod,
+        // Replaces the old single PaymentMethod/PaymentReferenceNumber pair.
+        // Must contain at least one entry, and the sum of Amount across all
+        // entries must equal the sale total - SaleService re-validates both.
+        IReadOnlyList<PaymentInput> Payments,
+        // Total physical cash handed over across every Cash payment line -
+        // used only to compute change (AmountTendered minus the sum of cash
+        // Amounts). Ignored (and treated as zero) if no Cash line is present.
         decimal AmountTendered,
-        string? PaymentReferenceNumber,
         // Optional - when set, SaleService re-validates and computes the
         // authoritative discount server-side, overriding whatever
         // DiscountAmount the UI cached. Null for a plain sale with no
         // voucher (DiscountAmount above is used as-is, unchanged from before
         // this field existed).
-        string? VoucherCode = null);
+        string? VoucherCode = null,
+        string OrderType = "Sale");
 
     public record CompletedSaleResult(
         int SaleId,
@@ -39,6 +56,9 @@ namespace Cashere.Services
         // by - zero whenever rounding is off. See TaxCalculator.ApplyRounding.
         decimal RoundingAdjustment,
         decimal TotalAmount,
+        // Sum of every payment line's fee (Settings -> Payments -> per-method
+        // fee). Informational - not part of TotalAmount.
+        decimal TotalFees,
         decimal ChangeDue,
         DateTime SaleDate);
 

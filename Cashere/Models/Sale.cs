@@ -7,6 +7,7 @@ public class Sale
 {
     public int Id { get; set; }
     public string SaleNumber { get; set; } = string.Empty;
+    public string OrderType { get; set; } = "Sale";
     public int CashierId { get; set; }
     public Cashier Cashier { get; set; } = null!;
     public int? CustomerId { get; set; }

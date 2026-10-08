@@ -72,7 +72,10 @@ public class ShopContextService : IShopContextService
             settings?.EdcEnabled ?? true,
             settings?.QrisAccountInfo,
             settings?.EdcAccountInfo,
-            settings?.RequireConfirmationForNonCash ?? false);
+            settings?.RequireConfirmationForNonCash ?? false,
+            settings?.CashFeePercent ?? 0,
+            settings?.QrisFeePercent ?? 0,
+            settings?.EdcFeePercent ?? 0);
     }
 
     public async Task<SalesBehaviorSettings> GetSalesBehaviorSettingsAsync()
@@ -82,7 +85,8 @@ public class ShopContextService : IShopContextService
 
         return new SalesBehaviorSettings(
             settings?.RequireCustomerBeforeCheckout ?? false,
-            settings?.AutoPrintReceiptAfterPayment ?? false);
+            settings?.AutoPrintReceiptAfterPayment ?? false,
+            settings?.EnableHeldOrders ?? true);
     }
 
     public async Task<SecuritySettings> GetSecuritySettingsAsync()

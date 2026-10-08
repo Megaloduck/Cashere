@@ -45,13 +45,13 @@ public class ProductAdminService : IProductAdminService
             {
                 throw new AdminValidationException("SKU is required.");
             }
-            sku = await GenerateUniqueSkuAsync(db);
+            sku = await GenerateUniqueSkuAsync(db, settings.SkuPrefix, settings.SkuNumberLength);
         }
 
         var barcode = NormalizeBarcode(input.Barcode);
         if (barcode is null && settings?.AutoGenerateBarcode == true)
         {
-            barcode = await GenerateUniqueBarcodeAsync(db);
+            barcode = await GenerateUniqueBarcodeAsync(db, settings.InternalBarcodePrefix);
         }
 
         // Re-project through the record so downstream logic (uniqueness
@@ -72,6 +72,8 @@ public class ProductAdminService : IProductAdminService
             SellingPrice = effectiveInput.SellingPrice,
             StockQuantity = effectiveInput.StockQuantity,
             LowStockThreshold = effectiveInput.LowStockThreshold,
+            OutOfStockBehaviorOverride = effectiveInput.OutOfStockBehaviorOverride,
+            TaxRateOverridePercent = effectiveInput.TaxRateOverridePercent,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -101,6 +103,8 @@ public class ProductAdminService : IProductAdminService
         product.SellingPrice = input.SellingPrice;
         product.StockQuantity = input.StockQuantity;
         product.LowStockThreshold = input.LowStockThreshold;
+        product.OutOfStockBehaviorOverride = input.OutOfStockBehaviorOverride;
+        product.TaxRateOverridePercent = input.TaxRateOverridePercent;
         product.UpdatedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync();
@@ -156,43 +160,44 @@ public class ProductAdminService : IProductAdminService
 
     // Sequential-looking (SKU-000042), falling back to a timestamp if the
     // count-based guess somehow collides five times in a row.
-    private static async Task<string> GenerateUniqueSkuAsync(CashereDbContext db)
+    private static async Task<string> GenerateUniqueSkuAsync(CashereDbContext db, string prefix, int numberLength)
     {
         var baseCount = await db.Products.CountAsync();
         for (var attempt = 0; attempt < 5; attempt++)
         {
-            var candidate = $"SKU-{baseCount + 1 + attempt:D6}";
+            var candidate = $"{prefix}-{(baseCount + 1 + attempt).ToString("D" + numberLength)}";
             if (!await db.Products.AnyAsync(p => p.Sku == candidate))
             {
                 return candidate;
             }
         }
-        return $"SKU-{DateTime.UtcNow:yyMMddHHmmssfff}";
+        return $"{prefix}-{DateTime.UtcNow:yyMMddHHmmssfff}";
     }
 
-    private static async Task<string> GenerateUniqueBarcodeAsync(CashereDbContext db)
+    private static async Task<string> GenerateUniqueBarcodeAsync(CashereDbContext db, string prefix)
     {
         for (var attempt = 0; attempt < 5; attempt++)
         {
-            var candidate = GenerateEan13InternalUseBarcode();
+            var candidate = GenerateEan13InternalUseBarcode(prefix);
             if (!await db.Products.AnyAsync(p => p.Barcode == candidate))
             {
                 return candidate;
             }
         }
-        return GenerateEan13InternalUseBarcode();
+        return GenerateEan13InternalUseBarcode(prefix);
     }
 
     // GS1 reserves the "20"-"29" prefix range for internal/in-store use, so
     // this is safe to generate locally without a real GS1 company prefix -
     // it's still a valid EAN-13 (correct check digit), just not globally
     // unique the way a purchased barcode would be.
-    private static string GenerateEan13InternalUseBarcode()
+    private static string GenerateEan13InternalUseBarcode(string prefix)
     {
         var random = Random.Shared;
         var digits = new int[12];
-        digits[0] = 2;
-        for (var i = 1; i < 12; i++)
+        digits[0] = prefix[0] - '0';
+        digits[1] = prefix[1] - '0';
+        for (var i = 2; i < 12; i++)
         {
             digits[i] = random.Next(0, 10);
         }

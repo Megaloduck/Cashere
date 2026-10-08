@@ -43,6 +43,12 @@ public class ProductCatalogService : IProductCatalogService
     public async Task<Product?> FindByBarcodeAsync(string barcode)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
+        if (ProductQrIdentity.TryGetProductId(barcode.Trim(), out var productId))
+        {
+            return await db.Products.AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == productId && p.IsActive);
+        }
+
         return await db.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Barcode == barcode && p.IsActive);

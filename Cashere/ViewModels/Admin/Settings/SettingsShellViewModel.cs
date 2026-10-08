@@ -37,6 +37,10 @@ public partial class SettingsShellViewModel : ViewModelBase
     // signed-in cashier's own row.
     public event Action? DatabaseWasReset;
 
+    private readonly UserRole _currentRole;
+    public bool CanAccessSecuritySettings => _currentRole == UserRole.Owner;
+    public bool CanAccessStaffSettings => _currentRole == UserRole.Owner;
+
     [ObservableProperty]
     private SettingsSection _selectedSection = SettingsSection.Business;
 
@@ -71,6 +75,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         string currentUsername,
         ITaxRateAdminService? taxRateAdmin = null)
     {
+        _currentRole = currentRole;
         Business = new BusinessInfoViewModel(shopContext, taxRateAdmin);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
         Payments = new PaymentSettingsViewModel(shopContext);
@@ -80,14 +85,14 @@ public partial class SettingsShellViewModel : ViewModelBase
         CashRegister = new CashRegisterViewModel(shiftAdmin, currentCashierId);
         SalesBehavior = new SalesBehaviorSettingsViewModel(shopContext);
         DataBackup = new DataBackupSettingsViewModel(
-            dataBackup, AppServices.ReportExport, cashierAdmin, currentRole, currentUsername);
+            dataBackup, shopContext, AppServices.ReportExport, cashierAdmin, currentCashierId, currentRole, currentUsername, AppServices.HistoricalSalesImport);
         Preferences = new PreferencesViewModel(shopContext);
         About = new AboutViewModel(aboutInfo);
 
-        Staff = new StaffPermissionsViewModel(cashierAdmin);
+        Staff = new StaffPermissionsViewModel(cashierAdmin, shopContext, currentRole);
         Staff.ManageCashiersRequested += () => ManageCashiersRequested?.Invoke();
 
-        Security = new SecuritySettingsViewModel(shopContext);
+        Security = new SecuritySettingsViewModel(shopContext, AppServices.AuditLog);
 
         DataBackup.DatabaseWasReset += () => DatabaseWasReset?.Invoke();
     }
@@ -98,12 +103,12 @@ public partial class SettingsShellViewModel : ViewModelBase
         await Receipts.LoadAsync();
         await Payments.LoadAsync();
         await Inventory.LoadAsync();
-        await Staff.LoadAsync();
+        if (CanAccessStaffSettings) await Staff.LoadAsync();
         await Hardware.LoadAsync();
         await Network.InitializeAsync();
         await CashRegister.LoadAsync();
         await SalesBehavior.LoadAsync();
-        await Security.LoadAsync();
+        if (CanAccessSecuritySettings) await Security.LoadAsync();
         await DataBackup.LoadAsync();
         await Preferences.LoadAsync();
         await About.LoadAsync();
@@ -133,7 +138,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         {
             _ = Inventory.LoadAsync();
         }
-        else if (value == SettingsSection.Staff)
+        else if (value == SettingsSection.Staff && CanAccessStaffSettings)
         {
             _ = Staff.LoadAsync();
         }
@@ -149,7 +154,7 @@ public partial class SettingsShellViewModel : ViewModelBase
         {
             _ = SalesBehavior.LoadAsync();
         }
-        else if (value == SettingsSection.Security)
+        else if (value == SettingsSection.Security && CanAccessSecuritySettings)
         {
             _ = Security.LoadAsync();
         }
@@ -168,5 +173,12 @@ public partial class SettingsShellViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SelectSection(SettingsSection section) => SelectedSection = section;
+    private void SelectSection(SettingsSection section)
+    {
+        if (section != SettingsSection.Security || CanAccessSecuritySettings)
+        {
+            if (section == SettingsSection.Staff && !CanAccessStaffSettings) return;
+            SelectedSection = section;
+        }
+    }
 }

@@ -10,6 +10,7 @@ namespace Cashere.Services;
 public record SaleListItem(
     int Id,
     string SaleNumber,
+    string OrderType,
     DateTime SaleDate,
     string CashierName,
     string? CustomerName,
@@ -26,6 +27,7 @@ public record RefundHistoryEntry(DateTime RefundDate, string ProcessedByName, de
 public record SaleDetail(
     int Id,
     string SaleNumber,
+    string OrderType,
     DateTime SaleDate,
     string CashierName,
     string? CustomerName,
@@ -61,7 +63,7 @@ public record SalesReportSummary(
 
 public interface ISalesReportService
 {
-    Task<List<SaleListItem>> GetSalesHistoryAsync(DateTime fromDate, DateTime toDate);
-    Task<SaleDetail?> GetSaleDetailAsync(int saleId);
+    Task<List<SaleListItem>> GetSalesHistoryAsync(DateTime fromDate, DateTime toDate, int? cashierId = null);
+    Task<SaleDetail?> GetSaleDetailAsync(int saleId, int? cashierId = null);
     Task<SalesReportSummary> GetSalesReportAsync(DateTime fromDate, DateTime toDate);
 }

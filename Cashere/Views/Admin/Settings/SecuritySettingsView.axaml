@@ -3,10 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:services="clr-namespace:Cashere.Services"
+             xmlns:converters="clr-namespace:Cashere.Converters"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="640"
              x:Class="Cashere.Views.Admin.Settings.SecuritySettingsView"
              x:DataType="vm:SecuritySettingsViewModel">
+  <UserControl.Resources>
+    <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+  </UserControl.Resources>
   <ScrollViewer>
     <StackPanel Margin="12" Spacing="12">
       <TextBlock Text="SECURITY" Classes="headline" FontSize="18"/>
@@ -47,9 +52,39 @@
       </StackPanel>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="RECENT ACTIVITY" Classes="eyebrow" VerticalAlignment="Center"/>
+        <Button Grid.Column="1" Classes="chip" Command="{Binding RefreshAuditCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <mi:MaterialIcon Kind="Refresh" Width="14" Height="14"/>
+            <TextBlock Text="REFRESH"/>
+          </StackPanel>
+        </Button>
+      </Grid>
+      <TextBlock Text="Audit history captures who changed key records and which fields changed. It stores no PINs or secret values." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+      <Border Classes="rule-thick"/>
+      <ItemsControl ItemsSource="{Binding RecentActivity}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="services:AuditLogEntry">
+            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,1" Padding="2,8">
+              <Grid ColumnDefinitions="130,*,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding OccurredAtUtc, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM HH:mm}'}" FontSize="10" Foreground="{StaticResource GrayBrush}" VerticalAlignment="Top"/>
+                <StackPanel Grid.Column="1" Spacing="2">
+                  <TextBlock Text="{Binding Summary}" FontSize="11" FontWeight="Bold" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding ActorName}" FontSize="10" Foreground="{StaticResource GrayBrush}"/>
+                </StackPanel>
+                <TextBlock Grid.Column="2" Text="{Binding EntityId}" FontSize="10" Foreground="{StaticResource GrayBrush}"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Text="No activity has been recorded yet." Foreground="{StaticResource GrayBrush}" FontSize="11" IsVisible="{Binding HasNoRecentActivity}"/>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="REMAINING SECURITY WORK" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Manager authorization for sensitive actions, an audit log of admin activity, and local database encryption aren't built yet."/>
+                 Text="Cashier refund and void requests require a Manager or Owner PIN, and key record changes are audited above. Other sensitive-action approvals and local database encryption remain; encryption needs a recovery-key plan so lost credentials cannot lock the shop out of its sales data."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

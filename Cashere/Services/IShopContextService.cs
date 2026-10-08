@@ -13,7 +13,10 @@ namespace Cashere.Services
         bool EdcEnabled,
         string? QrisAccountInfo,
         string? EdcAccountInfo,
-        bool RequireConfirmationForNonCash)
+        bool RequireConfirmationForNonCash,
+        decimal CashFeePercent,
+        decimal QrisFeePercent,
+        decimal EdcFeePercent)
     {
         public bool IsMethodEnabled(PaymentMethod method) => method switch
         {
@@ -29,14 +32,33 @@ namespace Cashere.Services
             PaymentMethod.Edc => EdcAccountInfo,
             _ => null
         };
+
+        // Settings -> Payments -> per-method fee. Used identically by
+        // CheckoutViewModel's live preview and SaleService's authoritative
+        // recomputation (never trusted from the client) to work out
+        // Payment.FeeAmount - see TaxCalculator-style "one function, two
+        // callers" split, just for payment fees instead of tax.
+        public decimal FeePercentFor(PaymentMethod method) => method switch
+        {
+            PaymentMethod.Cash => CashFeePercent,
+            PaymentMethod.Qris => QrisFeePercent,
+            PaymentMethod.Edc => EdcFeePercent,
+            _ => 0
+        };
+
+        // The one place a fee amount is computed - CheckoutViewModel calls
+        // it for the live preview and SaleService calls it to record the
+        // authoritative Payment.FeeAmount, so the two can never round
+        // differently.
+        public decimal ComputeFee(PaymentMethod method, decimal amount) =>
+            Math.Round(amount * (FeePercentFor(method) / 100m), 2, MidpointRounding.AwayFromZero);
     }
 
-    // Read by CheckoutViewModel/SaleService (RequireCustomerBeforeCheckout)
-    // and PosViewModel (AutoPrintReceiptAfterPayment) - see Settings ->
-    // Sales Behavior.
+    // Read by checkout, sales, and POS behavior configured in Sales Behavior.
     public record SalesBehaviorSettings(
         bool RequireCustomerBeforeCheckout,
-        bool AutoPrintReceiptAfterPayment);
+        bool AutoPrintReceiptAfterPayment,
+        bool EnableHeldOrders);
 
     // Read by RootViewModel right after login (to arm AutoLockService) and
     // by SecuritySettingsViewModel (to populate the toggle/picker) - see

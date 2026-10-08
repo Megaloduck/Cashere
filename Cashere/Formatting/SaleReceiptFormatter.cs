@@ -8,6 +8,13 @@ using Cashere.Services;
 namespace Cashere.Formatting;
 
 public record SaleReceiptLine(string Name, int Quantity, decimal Subtotal);
+public record SaleReceiptPayment(
+    string Method,
+    decimal Amount,
+    decimal FeeAmount,
+    string? ReferenceNumber,
+    decimal CashTendered,
+    decimal ChangeGiven);
 
 public record SaleReceiptContext(
     string ShopName,
@@ -16,6 +23,7 @@ public record SaleReceiptContext(
     string Currency,
     DateTime SaleDate,
     string SaleNumber,
+    string OrderType,
     string CashierName,
     IReadOnlyList<SaleReceiptLine> Lines,
     decimal Subtotal,
@@ -28,11 +36,8 @@ public record SaleReceiptContext(
     IReadOnlyList<(decimal RatePercent, decimal Amount)> TaxBreakdown,
     decimal RoundingAdjustment,
     decimal TotalAmount,
-    bool IsCashPayment,
-    string PaymentMethodLabel,
-    decimal AmountTendered,
+    IReadOnlyList<SaleReceiptPayment> Payments,
     decimal ChangeDue,
-    string? ReferenceNumber,
     string? FooterText);
 
 // Plain-text rendering of a completed sale, for the auto-print-after-payment
@@ -62,6 +67,7 @@ public static class SaleReceiptFormatter
         // (UTC) time on the till's own paper.
         var dateText = ClockPreferenceService.ToDisplay(ctx.SaleDate).ToString("dd MMM yyyy HH:mm");
         sb.AppendLine($"{dateText,-20}{ctx.SaleNumber,20}");
+        sb.AppendLine($"Order type: {ctx.OrderType}");
         sb.AppendLine($"Cashier: {ctx.CashierName}");
         sb.AppendLine(Divider);
 
@@ -91,19 +97,17 @@ public static class SaleReceiptFormatter
         sb.AppendLine($"{"TOTAL",-20}{$"{currency} {ctx.TotalAmount:N0}",20}");
         sb.AppendLine(Divider);
 
-        if (ctx.IsCashPayment)
+        foreach (var payment in ctx.Payments)
         {
-            sb.AppendLine($"{"CASH",-20}{$"{currency} {ctx.AmountTendered:N0}",20}");
-            sb.AppendLine($"{"CHANGE",-20}{$"{currency} {ctx.ChangeDue:N0}",20}");
-        }
-        else
-        {
-            sb.AppendLine($"Paid via {ctx.PaymentMethodLabel}");
-            if (!string.IsNullOrWhiteSpace(ctx.ReferenceNumber))
+            sb.AppendLine($"{payment.Method,-20}{$"{currency} {payment.Amount:N0}",20}");
+            if (payment.FeeAmount > 0)
             {
-                sb.AppendLine($"Ref: {ctx.ReferenceNumber}");
+                sb.AppendLine($"{"FEE",-20}{$"{currency} {payment.FeeAmount:N0}",20}");
             }
+            if (!string.IsNullOrWhiteSpace(payment.ReferenceNumber)) sb.AppendLine($"Ref: {payment.ReferenceNumber}");
+            if (payment.CashTendered > 0) sb.AppendLine($"Cash tendered: {currency} {payment.CashTendered:N0}");
         }
+        if (ctx.ChangeDue > 0) sb.AppendLine($"{"CHANGE",-20}{$"{currency} {ctx.ChangeDue:N0}",20}");
 
         if (!string.IsNullOrWhiteSpace(ctx.FooterText))
         {
@@ -121,4 +125,4 @@ public static class SaleReceiptFormatter
         return new string(' ', pad) + text;
     }
 }
-    
+

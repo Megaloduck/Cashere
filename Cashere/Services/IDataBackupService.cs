@@ -39,6 +39,7 @@ public interface IDataBackupService
 {
     Task<DatabaseStatusInfo> GetStatusAsync();
     Task<BackupFileInfo> CreateBackupAsync();
+    Task<BackupFileInfo> CreateScheduledBackupAsync(int retentionCount);
     Task<List<BackupFileInfo>> GetBackupsAsync();
     Task RestoreFromBackupAsync(string backupFilePath);
     Task DeleteBackupAsync(string backupFilePath);

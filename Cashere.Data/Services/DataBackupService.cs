@@ -33,7 +33,26 @@ public class DataBackupService : IDataBackupService
 
     public async Task<BackupFileInfo> CreateBackupAsync()
     {
-        var fileName = $"cashere-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
+        var fileName = $"cashere-backup-{DateTime.Now:yyyyMMdd-HHmmss-fff}.db";
+        return await CreateBackupFileAsync(fileName);
+    }
+
+    public async Task<BackupFileInfo> CreateScheduledBackupAsync(int retentionCount)
+    {
+        var fileName = $"cashere-auto-backup-{DateTime.Now:yyyyMMdd-HHmmss-fff}.db";
+        var created = await CreateBackupFileAsync(fileName);
+        var keep = Math.Clamp(retentionCount, 1, 365);
+        var oldBackups = Directory.GetFiles(_backupsFolder, "cashere-auto-backup-*.db")
+            .Select(path => new FileInfo(path))
+            .OrderByDescending(file => file.CreationTimeUtc)
+            .Skip(keep)
+            .ToList();
+        foreach (var backup in oldBackups) backup.Delete();
+        return created;
+    }
+
+    private async Task<BackupFileInfo> CreateBackupFileAsync(string fileName)
+    {
         var destinationPath = Path.Combine(_backupsFolder, fileName);
 
         // SQLite's online-backup API, not a raw file copy - safe to run

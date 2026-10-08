@@ -30,6 +30,34 @@
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoPrintReceiptAfterPayment}" VerticalAlignment="Center"/>
       </Grid>
 
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="ENABLE HELD ORDERS" FontWeight="Bold"/>
+          <TextBlock Text="Allow cashiers to save an unfinished order and resume it later. Held orders are stored on this register."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding EnableHeldOrders}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+      <TextBlock Text="SALE NUMBER FORMAT" Classes="eyebrow"/>
+      <Grid ColumnDefinitions="*,Auto,*">
+        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
+          <TextBlock Text="PREFIX" Classes="eyebrow"/>
+          <TextBox Text="{Binding SaleNumberPrefix}" Watermark="S"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Bottom" Margin="6,0">
+          <TextBlock Text="DATE" Classes="eyebrow"/>
+          <ToggleSwitch IsChecked="{Binding IncludeDateInSaleNumber}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Spacing="4" Margin="6,0,0,0">
+          <TextBlock Text="SEQUENCE DIGITS" Classes="eyebrow"/>
+          <TextBox Text="{Binding SaleNumberSequenceDigits}" Watermark="4"/>
+        </StackPanel>
+      </Grid>
+      <TextBlock Text="With date on, the format is PREFIX + YYYYMMDD + sequence. With date off, the sequence continues across all sales."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
 <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"
            FontWeight="Bold"
@@ -45,9 +73,9 @@
               Margin="0,8,0,4"/>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
-      <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Default order type, held/suspended orders, confirmation before void, and a configurable order numbering scheme don't have an underlying feature to gate yet."/>
+      <TextBlock Text="ORDER TYPES" Classes="eyebrow"/>
+      <TextBlock Text="Set the labels this shop uses. Separate them with commas; cashiers choose one for each order. Keep only “Sale” for a simple retail checkout." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+      <TextBox Text="{Binding OrderTypes}" Watermark="Sale, Dine-in, Takeaway, Delivery"/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -13,15 +13,15 @@
       <TextBlock Text="STAFF &amp; PERMISSIONS" Classes="headline" FontSize="18"/>
       <Border Classes="rule-thick"/>
 
-      <TextBlock Text="WHAT EACH ROLE CAN DO TODAY" Classes="eyebrow"/>
+      <TextBlock Text="ROLE ACCESS" Classes="eyebrow"/>
 
       <Border Classes="card" Padding="14">
         <StackPanel Spacing="10">
           <Grid ColumnDefinitions="Auto,*">
             <Border Grid.Column="0" Background="{StaticResource BlueBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3" VerticalAlignment="Top">
-              <TextBlock Text="OWNER / MANAGER" FontWeight="Black" FontSize="10" Foreground="White"/>
+              <TextBlock Text="OWNER" FontWeight="Black" FontSize="10" Foreground="White"/>
             </Border>
-            <TextBlock Grid.Column="1" Text="Full access: everything on this screen, plus every Admin section - create/edit/deactivate products, run purchases, manage suppliers, customers and cashiers, view reports, and change any setting."
+            <TextBlock Grid.Column="1" Text="Full access, including cashier account management, security settings, and reset."
                        TextWrapping="Wrap" Margin="10,0,0,0"/>
           </Grid>
           <Border Classes="rule-thick"/>
@@ -29,9 +29,44 @@
             <Border Grid.Column="0" Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3" VerticalAlignment="Top">
               <TextBlock Text="CASHIER" FontWeight="Black" FontSize="10" Foreground="Black"/>
             </Border>
-            <TextBlock Grid.Column="1" Text="Full POS access (ring up sales, checkout). In Admin, PRODUCTS is view-only - no add/edit/deactivate/photo controls are shown. Other Admin sections aren't role-gated yet; that's rolling out screen by screen."
+            <TextBlock Grid.Column="1" Text="Operational admin access for products, purchases, suppliers, customers, vouchers, sales history and reports, plus non-security settings. Cannot manage cashier accounts or security settings."
                        TextWrapping="Wrap" Margin="10,0,0,0"/>
           </Grid>
+          <Border Classes="rule-thick"/>
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusPill}" Padding="10,3" VerticalAlignment="Top">
+              <TextBlock Text="CASHIER" FontWeight="Black" FontSize="10" Foreground="Black"/>
+            </Border>
+            <TextBlock Grid.Column="1" Text="POS access and read-only product lookup. Admin management sections are hidden and blocked."
+                       TextWrapping="Wrap" Margin="10,0,0,0"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card" Padding="14">
+        <StackPanel Spacing="9">
+          <TextBlock Text="CASHIER POS PERMISSIONS" Classes="headline" FontSize="14"/>
+          <TextBlock Text="Refund and void requests always require an Owner or Manager PIN. Cashiers only see their own sales when sales history is enabled." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="View own sales history" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashierCanViewOwnSalesHistory}"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Request refunds (manager PIN required)" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashierCanRequestRefunds}"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Request voids (manager PIN required)" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashierCanRequestVoids}"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Apply active vouchers at checkout" VerticalAlignment="Center"/>
+            <ToggleSwitch Grid.Column="1" IsChecked="{Binding CashierCanApplyVouchers}"/>
+          </Grid>
+          <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BlueBrush}" FontWeight="Bold"
+                     IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          <Button Content="SAVE CASHIER PERMISSIONS" Classes="accent-blue" Command="{Binding SavePermissionsCommand}"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
         </StackPanel>
       </Border>
 
@@ -45,7 +80,7 @@
       </StackPanel>
           </StackPanel>
         
-        <Button Grid.Column="1" Classes="chip" Command="{Binding ManageCashiersCommand}">
+        <Button Grid.Column="1" Classes="chip" Command="{Binding ManageCashiersCommand}" IsVisible="{Binding CanManageCashierAccounts}">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <mi:MaterialIcon Kind="AccountTieOutline" Width="14" Height="14"/>
             <TextBlock Text="MANAGE CASHIERS"/>
@@ -70,9 +105,9 @@
       </ItemsControl>
 
       <Border Classes="rule-thick" Margin="0,8"/>
-      <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+      <TextBlock Text="PER ACTION PERMISSIONS" Classes="eyebrow"/>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="A real Owner-vs-Manager split (today they're treated identically), per-role toggles for void/refund, discounts and price overrides, cash-drawer authorization, and gating the remaining Admin sections (Suppliers, Purchases, Customers, Sales, Settings) for Cashier logins aren't built yet."/>
+                 Text="Voucher discounts, refunds and void requests have role controls above. Manual discount entry, per-item price overrides and cash-drawer access depend on those workflows and device support being added."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

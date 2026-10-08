@@ -28,6 +28,9 @@ public partial class InventorySettingsViewModel : ViewModelBase
     [ObservableProperty] private string _defaultLowStockThreshold = "5";
     [ObservableProperty] private bool _autoGenerateSku;
     [ObservableProperty] private bool _autoGenerateBarcode;
+    [ObservableProperty] private string _skuPrefix = "SKU";
+    [ObservableProperty] private string _skuNumberLength = "6";
+    [ObservableProperty] private string _internalBarcodePrefix = "20";
     [ObservableProperty] private string? _statusMessage;
 
     public bool ShowOutOfStockBehavior => TrackInventory;
@@ -47,6 +50,9 @@ public partial class InventorySettingsViewModel : ViewModelBase
         DefaultLowStockThreshold = settings.DefaultLowStockThreshold.ToString();
         AutoGenerateSku = settings.AutoGenerateSku;
         AutoGenerateBarcode = settings.AutoGenerateBarcode;
+        SkuPrefix = settings.SkuPrefix;
+        SkuNumberLength = settings.SkuNumberLength.ToString();
+        InternalBarcodePrefix = settings.InternalBarcodePrefix;
     }
 
     partial void OnTrackInventoryChanged(bool value) => OnPropertyChanged(nameof(ShowOutOfStockBehavior));
@@ -62,6 +68,26 @@ public partial class InventorySettingsViewModel : ViewModelBase
             return;
         }
 
+        var skuPrefix = SkuPrefix.Trim();
+        if (skuPrefix.Length is < 1 or > 12 || skuPrefix.Any(c => !char.IsAsciiLetterOrDigit(c) && c is not '-' and not '_'))
+        {
+            StatusMessage = "SKU prefix must be 1-12 characters using letters, numbers, hyphens or underscores.";
+            return;
+        }
+
+        if (!int.TryParse(SkuNumberLength, out var skuNumberLength) || skuNumberLength is < 4 or > 12)
+        {
+            StatusMessage = "SKU number length must be between 4 and 12 digits.";
+            return;
+        }
+
+        if (InternalBarcodePrefix.Length != 2 || !InternalBarcodePrefix.All(char.IsAsciiDigit) ||
+            !int.TryParse(InternalBarcodePrefix, out var barcodePrefix) || barcodePrefix is < 20 or > 29)
+        {
+            StatusMessage = "Generated barcode prefix must be an internal-use prefix from 20 to 29.";
+            return;
+        }
+
         var settings = await _shopContext.GetSettingsAsync() ?? new ReceiptAdmin();
 
         settings.TrackInventory = TrackInventory;
@@ -69,6 +95,9 @@ public partial class InventorySettingsViewModel : ViewModelBase
         settings.DefaultLowStockThreshold = threshold;
         settings.AutoGenerateSku = AutoGenerateSku;
         settings.AutoGenerateBarcode = AutoGenerateBarcode;
+        settings.SkuPrefix = skuPrefix;
+        settings.SkuNumberLength = skuNumberLength;
+        settings.InternalBarcodePrefix = InternalBarcodePrefix;
 
         await _shopContext.UpdateSettingsAsync(settings);
 

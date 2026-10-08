@@ -16,7 +16,9 @@ public record ProductInput(
     decimal CostPrice,
     decimal SellingPrice,
     int StockQuantity,
-    int LowStockThreshold);
+    int LowStockThreshold,
+    OutOfStockBehavior? OutOfStockBehaviorOverride = null,
+    decimal? TaxRateOverridePercent = null);
 
 public interface IProductAdminService
 {

@@ -9,6 +9,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
     public void Configure(EntityTypeBuilder<Sale> builder)
     {
         builder.Property(s => s.SaleNumber).IsRequired().HasMaxLength(32);
+        builder.Property(s => s.OrderType).IsRequired().HasMaxLength(32);
         builder.Property(s => s.Subtotal).HasPrecision(18, 2);
         builder.Property(s => s.DiscountAmount).HasPrecision(18, 2);
         builder.Property(s => s.TaxAmount).HasPrecision(18, 2);

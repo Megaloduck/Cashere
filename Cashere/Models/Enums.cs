@@ -53,6 +53,12 @@ public enum AppThemeMode
     System
 }
 
+public enum UiDensity
+{
+    Comfortable,
+    Compact
+}
+
 // Settings -> Business Info -> Rounding. Applied to Sale.TotalAmount only
 // (after discount and tax), never to individual lines - see
 // TaxCalculator.ApplyRounding, shared by CartViewModel's live preview and

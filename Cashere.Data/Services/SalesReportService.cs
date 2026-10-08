@@ -18,17 +18,19 @@ public class SalesReportService : ISalesReportService
         _dbContextFactory = dbContextFactory;
     }
 
-    public async Task<List<SaleListItem>> GetSalesHistoryAsync(DateTime fromDate, DateTime toDate)
+    public async Task<List<SaleListItem>> GetSalesHistoryAsync(DateTime fromDate, DateTime toDate, int? cashierId = null)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
         var (from, toExclusive) = NormalizeRange(fromDate, toDate);
 
         return await db.Sales
-            .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive)
+            .Where(s => s.SaleDate >= from && s.SaleDate < toExclusive &&
+                        (cashierId == null || s.CashierId == cashierId))
             .OrderByDescending(s => s.SaleDate)
             .Select(s => new SaleListItem(
                 s.Id,
                 s.SaleNumber,
+                s.OrderType,
                 s.SaleDate,
                 s.Cashier.DisplayName,
                 s.Customer != null ? s.Customer.Name : null,
@@ -38,7 +40,7 @@ public class SalesReportService : ISalesReportService
             .ToListAsync();
     }
 
-    public async Task<SaleDetail?> GetSaleDetailAsync(int saleId)
+    public async Task<SaleDetail?> GetSaleDetailAsync(int saleId, int? cashierId = null)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync();
 
@@ -49,13 +51,14 @@ public class SalesReportService : ISalesReportService
             .Include(s => s.Payments)
             .Include(s => s.Refunds).ThenInclude(r => r.ProcessedByCashier)
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Id == saleId);
+            .FirstOrDefaultAsync(s => s.Id == saleId && (cashierId == null || s.CashierId == cashierId));
 
         if (sale is null) return null;
 
         return new SaleDetail(
             sale.Id,
             sale.SaleNumber,
+            sale.OrderType,
             sale.SaleDate,
             sale.Cashier.DisplayName,
             sale.Customer?.Name,

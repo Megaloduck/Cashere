@@ -33,6 +33,12 @@ public partial class AdminViewModel : ViewModelBase
     [ObservableProperty]
     private AdminSection _selectedSection = AdminSection.Products;
 
+    private readonly UserRole _currentRole;
+    private readonly bool _cashierCanViewOwnSalesHistory;
+    public bool CanAccessAdminManagement => _currentRole != UserRole.Cashier;
+    public bool CanManageCashierAccounts => _currentRole == UserRole.Owner;
+    public bool CanAccessSalesHistory => _currentRole != UserRole.Cashier || _cashierCanViewOwnSalesHistory;
+
     public ViewModelBase CurrentSectionViewModel => SelectedSection switch
     {
         AdminSection.Products => Products,
@@ -81,21 +87,27 @@ public partial class AdminViewModel : ViewModelBase
     IReceiptPrinterService? receiptPrinter = null,
     IRefundService? refundService = null,
     IVoucherAdminService? voucherAdmin = null,
-    ITaxRateAdminService? taxRateAdmin = null)
+    ITaxRateAdminService? taxRateAdmin = null,
+    bool cashierCanViewOwnSalesHistory = false,
+    bool cashierCanRequestRefunds = false,
+    bool cashierCanRequestVoids = false)
     {
-        Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext);
+        _currentRole = currentRole;
+        _cashierCanViewOwnSalesHistory = cashierCanViewOwnSalesHistory;
+        Products = new ProductAdminViewModel(productAdmin, categoryAdmin, currentRole, shopContext, AppServices.ProductDataTransfer);
         Suppliers = new SupplierAdminViewModel(supplierAdmin);
         Purchases = new PurchaseAdminViewModel(purchaseAdmin, supplierAdmin, productCatalog, currentCashierId);
-        Cashiers = new CashierAdminViewModel(cashierAdmin);
+        Cashiers = new CashierAdminViewModel(cashierAdmin, currentRole);
         Customers = new CustomerAdminViewModel(customerAdmin);
-        SalesHistory = new SalesHistoryViewModel(salesReport, currentRole, currentCashierId, refundService);
+        SalesHistory = new SalesHistoryViewModel(salesReport, currentRole, currentCashierId, refundService,
+            cashierAdmin, cashierCanViewOwnSalesHistory, cashierCanRequestRefunds, cashierCanRequestVoids);
         SalesReport = new SalesReportViewModel(salesReport);
         Vouchers = new VoucherAdminViewModel(voucherAdmin, currentRole);
         Settings = new SettingsShellViewModel(
            shopContext, receiptPrinter, connectedDeviceService, shiftAdmin, dataBackup, aboutInfo,
            cashierAdmin, currentCashierId, currentRole, currentUsername, taxRateAdmin);
 
-        Settings.ManageCashiersRequested += () => SelectedSection = AdminSection.Cashiers;
+        Settings.ManageCashiersRequested += () => SelectSection(AdminSection.Cashiers);
         Settings.DatabaseWasReset += () => LogoutRequested?.Invoke();
     }
 
@@ -119,7 +131,13 @@ public partial class AdminViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SelectSection(AdminSection section) => SelectedSection = section;
+    private void SelectSection(AdminSection section)
+    {
+        if (section == AdminSection.Products || CanAccessAdminManagement && section != AdminSection.Cashiers ||
+            section == AdminSection.SalesHistory && CanAccessSalesHistory ||
+            section == AdminSection.Cashiers && CanManageCashierAccounts)
+            SelectedSection = section;
+    }
 
     [RelayCommand]
     private void Back() => BackRequested?.Invoke();

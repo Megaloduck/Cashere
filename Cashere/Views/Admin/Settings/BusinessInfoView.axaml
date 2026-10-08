@@ -83,7 +83,7 @@
 
       <TextBlock Text="TIMEZONE" Classes="eyebrow"/>
       <ComboBox ItemsSource="{Binding TimezoneOptions}" SelectedItem="{Binding Timezone}" HorizontalAlignment="Stretch"/>
-      <TextBlock Text="Reference only (e.g. for printed info) - doesn't change how times are displayed. Times always follow this device's own local clock."
+      <TextBlock Text="Used to evaluate business hours. Displayed timestamps still follow this device's own local clock."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
       <Border Classes="rule-thick" Margin="0,4"/>
@@ -101,7 +101,16 @@
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
-      <TextBlock Text="Times are HH:mm, 24-hour. Informational only, same as Timezone above - not enforced anywhere in the till yet."
+
+      <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="ENFORCE BUSINESS HOURS AT CHECKOUT" FontWeight="Bold"/>
+          <TextBlock Text="Block new sales outside the configured weekly schedule. Uses the shop timezone above."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding EnforceBusinessHoursAtCheckout}" VerticalAlignment="Center"/>
+      </Grid>
+      <TextBlock Text="Times use 24-hour format. When enforcement is enabled, new checkouts are blocked outside these hours."
                  Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
 
       <Border Classes="rule-thick" Margin="0,4"/>
@@ -212,10 +221,10 @@
 
       <StackPanel Orientation="Horizontal" Spacing="8">
         <mi:MaterialIcon Kind="ClockOutline" Width="14" Height="14" Foreground="{StaticResource GrayBrush}"/>
-        <TextBlock Text="COMING SOON" Classes="eyebrow"/>
+        <TextBlock Text="RECEIPT LOGO" Classes="eyebrow"/>
       </StackPanel>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12"
-                 Text="Per-product tax overrides (today it's per-category), enforcing business hours against checkout, and printing the logo on the physical receipt (it currently only shows on screen) aren't built yet."/>
+                 Text="The configured Windows printer now receives the saved logo as a centered image above the receipt text. Print a test receipt to confirm sizing and grayscale quality on your printer."/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
