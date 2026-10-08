@@ -10,5 +10,6 @@ public enum MobileSection
 {
     Pairing,
     Scanning,
+    Payment,
     Labeling
 }

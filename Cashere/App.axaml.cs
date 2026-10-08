@@ -65,7 +65,9 @@ public partial class App : Application
                     AppServices.RefundService,
                     AppServices.VoucherAdmin,
                     AppServices.TaxRateAdmin,
-                    AppServices.PosFeedback);
+                    AppServices.PosFeedback,
+                    AppServices.MobileCartBridge,
+                    AppServices.PaymentNotifier);
 
                 desktop.MainWindow = new MainWindow
                 {

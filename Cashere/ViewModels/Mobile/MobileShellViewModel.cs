@@ -17,6 +17,7 @@ public partial class MobileShellViewModel : ViewModelBase
 {
     public PairingViewModel Pairing { get; }
     public ScanningViewModel Scanning { get; }
+    public PaymentViewModel Payment { get; }
     public LabelingViewModel Labeling { get; }
 
     [ObservableProperty]
@@ -31,6 +32,7 @@ public partial class MobileShellViewModel : ViewModelBase
     {
         MobileSection.Pairing => Pairing,
         MobileSection.Scanning => Scanning,
+        MobileSection.Payment => Payment,
         MobileSection.Labeling => Labeling,
         _ => Pairing
     };
@@ -43,6 +45,7 @@ public partial class MobileShellViewModel : ViewModelBase
     {
         Pairing = new PairingViewModel(syncClient, scanner);
         Scanning = new ScanningViewModel(syncClient, scanner);
+        Payment = new PaymentViewModel(syncClient);
         Labeling = new LabelingViewModel(syncClient, photoCapture, productPhoto);
     }
 
@@ -66,6 +69,10 @@ public partial class MobileShellViewModel : ViewModelBase
         else if (value == MobileSection.Labeling)
         {
             _ = Labeling.RefreshAsync();
+        }
+        else if (value == MobileSection.Payment)
+        {
+            _ = Payment.RefreshAsync();
         }
     }
 

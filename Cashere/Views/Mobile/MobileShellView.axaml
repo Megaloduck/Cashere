@@ -84,6 +84,16 @@
           </StackPanel>
         </Button>
 
+        <Button Classes="rail-item"
+                Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Payment}"
+                Command="{Binding SelectSectionCommand}"
+                CommandParameter="{x:Static vm:MobileSection.Payment}">
+          <StackPanel Spacing="4" HorizontalAlignment="Center">
+            <mi:MaterialIcon Kind="CreditCardOutline" Width="22" Height="22" HorizontalAlignment="Center"/>
+            <TextBlock Text="PAY" Classes="rail-label" HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
         <Button Classes="rail-item" 
                 Classes.selected="{Binding SelectedSection, Converter={StaticResource EnumMatch}, ConverterParameter=Labeling}"
                 Command="{Binding SelectSectionCommand}" 
@@ -105,4 +115,4 @@
       </StackPanel>
     </Border>
   </Grid>
-</UserControl>  
+</UserControl>

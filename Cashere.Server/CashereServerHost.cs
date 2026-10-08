@@ -41,6 +41,8 @@ public class CashereServerHost
     // clients PosSyncHub currently has connected, without a network round
     // trip - both live in this same process.
     public IConnectedDeviceService? ConnectedDevices { get; private set; }
+    public IActiveCartBridge? MobileCartBridge { get; private set; }
+    public IPosPaymentNotifier? PaymentNotifier { get; private set; }
 
     public CashereServerHost(int port = 5177, string bindAddress = "0.0.0.0")
     {
@@ -60,6 +62,7 @@ public class CashereServerHost
         builder.Services.AddSignalR();
         builder.Services.AddSingleton<ActiveCartService>();
         builder.Services.AddSingleton<IProductCatalogChangeNotifier, SignalRProductCatalogChangeNotifier>();
+        builder.Services.AddSingleton<IPosPaymentNotifier, PosPaymentNotifier>();
 
         // Registered as both the concrete type (so PosSyncHub can call the
         // Register*/mutator methods) and the interface (so anything outside
@@ -79,6 +82,8 @@ public class CashereServerHost
 
         CatalogChangeNotifier = _app.Services.GetRequiredService<IProductCatalogChangeNotifier>();
         ConnectedDevices = _app.Services.GetRequiredService<IConnectedDeviceService>();
+        MobileCartBridge = _app.Services.GetRequiredService<ActiveCartService>();
+        PaymentNotifier = _app.Services.GetRequiredService<IPosPaymentNotifier>();
 
         _app.UseCors();
 

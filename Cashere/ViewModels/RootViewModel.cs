@@ -32,6 +32,8 @@ public partial class RootViewModel : ViewModelBase
     private readonly IRefundService? _refundService;
     private readonly IVoucherAdminService? _voucherAdmin;
     private readonly ITaxRateAdminService? _taxRateAdmin;
+    private readonly IActiveCartBridge? _mobileCartBridge;
+    private readonly IPosPaymentNotifier? _paymentNotifier;
 
     [ObservableProperty]
     private ViewModelBase _currentView = null!;
@@ -55,7 +57,9 @@ public partial class RootViewModel : ViewModelBase
         IRefundService? refundService,
         IVoucherAdminService? voucherAdmin,
         ITaxRateAdminService? taxRateAdmin = null,
-        IPosFeedbackService? posFeedback = null)
+        IPosFeedbackService? posFeedback = null,
+        IActiveCartBridge? mobileCartBridge = null,
+        IPosPaymentNotifier? paymentNotifier = null)
     {
         _productCatalog = productCatalog;
         _saleService = saleService;
@@ -76,6 +80,8 @@ public partial class RootViewModel : ViewModelBase
         _refundService = refundService;
         _voucherAdmin = voucherAdmin;
         _taxRateAdmin = taxRateAdmin;
+        _mobileCartBridge = mobileCartBridge;
+        _paymentNotifier = paymentNotifier;
 
         AutoLockService.LockTriggered += OnAutoLockTriggered;
     }
@@ -142,7 +148,9 @@ public partial class RootViewModel : ViewModelBase
             _receiptPrinter,
             _voucherAdmin,
             cashier.Role,
-            _posFeedback);
+            _posFeedback,
+            _mobileCartBridge,
+            _paymentNotifier);
 
         var adminViewModel = new AdminViewModel(
     _productAdmin, _categoryAdmin, _supplierAdmin, _purchaseAdmin, _cashierAdmin, _customerAdmin,

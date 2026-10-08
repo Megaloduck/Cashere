@@ -92,15 +92,15 @@ public partial class CartViewModel : ViewModelBase
         _voucherAdmin = voucherAdmin;
     }
 
-    public void AddProduct(Product product)
+    public void AddProduct(Product product, int quantity = 1)
     {
+        if (quantity <= 0) return;
         var existing = Lines.FirstOrDefault(l => l.ProductId == product.Id);
         if (existing is not null)
         {
-            if (!existing.EnforceStock || existing.Quantity < existing.StockAvailable)
-            {
-                existing.Quantity++;
-            }
+            if (existing.EnforceStock && existing.Quantity >= existing.StockAvailable) return;
+            var nextQuantity = existing.Quantity + quantity;
+            existing.Quantity = existing.EnforceStock ? Math.Min(nextQuantity, existing.StockAvailable) : nextQuantity;
             return;
         }
 
@@ -120,10 +120,27 @@ public partial class CartViewModel : ViewModelBase
             product.CostPrice,
             taxRatePercent,
             product.StockQuantity,
-            quantity: 1,
+            quantity: enforceStock ? Math.Min(quantity, product.StockQuantity) : quantity,
             onChanged: RaiseTotalsChanged,
             enforceStock: enforceStock));
 
+        RaiseTotalsChanged();
+    }
+
+    public void DecrementProduct(int productId)
+    {
+        var line = Lines.FirstOrDefault(l => l.ProductId == productId);
+        if (line is null) return;
+        if (line.Quantity <= 1) Lines.Remove(line);
+        else line.Quantity--;
+        RaiseTotalsChanged();
+    }
+
+    public void RemoveProduct(int productId)
+    {
+        var line = Lines.FirstOrDefault(l => l.ProductId == productId);
+        if (line is null) return;
+        Lines.Remove(line);
         RaiseTotalsChanged();
     }
 

@@ -58,14 +58,57 @@ public class PosSyncHub : Hub<IPosSyncClient>, IPosSyncHub
 
         if (product is null)
         {
-            return new ScanResultDto(false, null, "No product matches that barcode or Cashere QR identity.", null);
+            return new ScanResultDto(false, null, null, 0, "No product matches that barcode or Cashere QR identity.");
         }
 
-        var cart = _cart.AddItem(product.Id, product.Name, product.SellingPrice, request.Quantity);
-        await Clients.All.CartUpdated(cart);
+        return new ScanResultDto(true, product.Id, product.Name, product.SellingPrice, null);
+    }
 
-        return new ScanResultDto(true, product.Name, null, cart);
+    public async Task<CartMutationResultDto> AddProductToCart(int productId, int quantity)
+    {
+        if (quantity <= 0)
+            return new CartMutationResultDto(false, "Quantity must be greater than zero.", _cart.GetCart());
+
+        var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == productId && p.IsActive);
+        if (product is null)
+            return new CartMutationResultDto(false, "That product is no longer active.", _cart.GetCart());
+
+        var cart = _cart.AddItem(product.Id, product.Name, product.SellingPrice, quantity);
+        await Clients.All.CartUpdated(cart);
+        return new CartMutationResultDto(true, null, cart);
+    }
+
+    public async Task<CartMutationResultDto> DecrementCartItem(int productId)
+    {
+        var cart = _cart.DecrementItem(productId);
+        await Clients.All.CartUpdated(cart);
+        return new CartMutationResultDto(true, null, cart);
+    }
+
+    public async Task<CartMutationResultDto> RemoveCartItem(int productId)
+    {
+        var cart = _cart.RemoveItem(productId);
+        await Clients.All.CartUpdated(cart);
+        return new CartMutationResultDto(true, null, cart);
+    }
+
+    public async Task<CartMutationResultDto> ClearCart()
+    {
+        var cart = _cart.Clear();
+        await Clients.All.CartUpdated(cart);
+        return new CartMutationResultDto(true, null, cart);
     }
 
     public Task<CartDto> GetCurrentCart() => Task.FromResult(_cart.GetCart());
+
+    public async Task<PaymentOptionsDto> GetPaymentOptions()
+    {
+        var settings = await _db.ReceiptAdmin.AsNoTracking().FirstOrDefaultAsync();
+        return new PaymentOptionsDto(
+            settings?.CashEnabled ?? true,
+            settings?.QrisEnabled ?? true,
+            settings?.EdcEnabled ?? true,
+            settings?.QrisAccountInfo,
+            settings?.EdcAccountInfo);
+    }
 }

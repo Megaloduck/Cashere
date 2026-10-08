@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Cashere.ViewModels.Mobile"
+             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="720"
+             x:Class="Cashere.Views.Mobile.PaymentView"
+             x:DataType="vm:PaymentViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="14">
+      <StackPanel Spacing="4">
+        <TextBlock Text="PAYMENT" Classes="headline" FontSize="20"/>
+        <TextBlock Text="Payment methods and checkout updates from the desktop till."
+                   Foreground="{StaticResource GrayBrush}" TextWrapping="Wrap"/>
+      </StackPanel>
+
+      <StackPanel Spacing="10" IsVisible="{Binding !IsConnected}">
+        <Border Classes="card" Padding="16">
+          <TextBlock Text="Connect to a till in PAIR to load payment methods and receive payment notifications."
+                     TextWrapping="Wrap"/>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12" IsVisible="{Binding IsConnected}">
+        <Border Background="{StaticResource YellowBrush}" CornerRadius="{StaticResource RadiusMedium}" Padding="12,10">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0" Text="CURRENT CART SUBTOTAL" FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+            <TextBlock Grid.Column="1" Text="{Binding CartSubtotal, StringFormat='Rp {0:N0}'}"
+                       FontWeight="Black" Foreground="{StaticResource InkBrush}"/>
+          </Grid>
+        </Border>
+
+        <Border Classes="card" Padding="14" IsVisible="{Binding CashEnabled}">
+          <StackPanel Spacing="4">
+            <TextBlock Text="CASH" Classes="eyebrow"/>
+            <TextBlock Text="Pay the cashier at the desktop till." TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" Padding="14" IsVisible="{Binding QrisEnabled}">
+          <StackPanel Spacing="6">
+            <TextBlock Text="QRIS" Classes="eyebrow"/>
+            <TextBlock Text="Dynamic QRIS payment" FontWeight="Bold"/>
+            <TextBlock Text="A provider connection is required to create an amount-specific QR and confirm payment automatically."
+                       TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}"/>
+            <TextBlock Text="{Binding QrisAccountInfo, StringFormat='Provider: {0}'}"
+                       IsVisible="{Binding HasQrisAccountInfo}" TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" Padding="14" IsVisible="{Binding EdcEnabled}">
+          <StackPanel Spacing="4">
+            <TextBlock Text="CARD / EDC" Classes="eyebrow"/>
+            <TextBlock Text="Complete the card payment on the paired terminal."
+                       TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding EdcAccountInfo, StringFormat='Provider: {0}'}"
+                       IsVisible="{Binding HasEdcAccountInfo}" TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" Padding="14" IsVisible="{Binding HasPaymentNotification}">
+          <StackPanel Spacing="6">
+            <TextBlock Text="PAYMENT NOTIFICATION" Classes="eyebrow"/>
+            <TextBlock Text="{Binding LastPaymentNotification.SaleNumber, StringFormat='Sale {0} completed'}"
+                       FontWeight="Bold" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding LastPaymentNotification.Amount, StringFormat='Rp {0:N0}'}" FontSize="20" FontWeight="Black"/>
+            <TextBlock Text="{Binding LastPaymentNotification.PaidAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                       Foreground="{StaticResource GrayBrush}"/>
+          </StackPanel>
+        </Border>
+
+        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource RedBrush}"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

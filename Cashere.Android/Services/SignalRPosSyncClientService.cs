@@ -27,6 +27,7 @@ public class SignalRPosSyncClientService : IPosSyncClientService
 
     public event Action<SyncConnectionState>? StateChanged;
     public event Action<SyncCartSnapshot>? CartUpdated;
+    public event Action<SyncPaymentNotification>? PaymentNotificationReceived;
     public event Action? ProductCatalogChanged;
     public event Action<string>? Kicked;
 
@@ -60,6 +61,9 @@ public class SignalRPosSyncClientService : IPosSyncClientService
                 .Build();
 
             _connection.On<CartDto>("CartUpdated", dto => CartUpdated?.Invoke(MapCart(dto)));
+            _connection.On<PaymentNotificationDto>("PaymentNotification", dto =>
+                Dispatcher.UIThread.Post(() => PaymentNotificationReceived?.Invoke(
+                    new SyncPaymentNotification(dto.SaleNumber, dto.Amount, dto.PaidAt))));
 
             _connection.On("ProductCatalogChanged", () =>
                 Dispatcher.UIThread.Post(() => ProductCatalogChanged?.Invoke()));
@@ -112,19 +116,46 @@ public class SignalRPosSyncClientService : IPosSyncClientService
         SetState(SyncConnectionState.Disconnected);
     }
 
-    public async Task<BarcodeScanOutcome> ScanBarcodeAsync(string barcode, int quantity = 1)
+    public async Task<BarcodeScanOutcome> ScanBarcodeAsync(string barcode)
     {
         if (_connection is null)
         {
-            return new BarcodeScanOutcome(false, null, "Not connected to a till.", null);
+            return new BarcodeScanOutcome(false, null, null, 0, "Not connected to a till.");
         }
 
         var result = await _connection.InvokeAsync<ScanResultDto>(
-            "ScanBarcode", new ScanBarcodeRequest(barcode, quantity));
+            "ScanBarcode", new ScanBarcodeRequest(barcode));
 
         return new BarcodeScanOutcome(
-            result.Found, result.ProductName, result.Message,
-            result.Cart is null ? null : MapCart(result.Cart));
+            result.Found, result.ProductId, result.ProductName, result.UnitPrice, result.Message);
+    }
+
+    public Task<CartMutationOutcome> AddProductToCartAsync(int productId, int quantity) =>
+        InvokeCartMutationAsync(() => _connection!.InvokeAsync<CartMutationResultDto>(
+            "AddProductToCart", productId, quantity));
+
+    public Task<CartMutationOutcome> DecrementCartItemAsync(int productId) =>
+        InvokeCartMutationAsync(() => _connection!.InvokeAsync<CartMutationResultDto>(
+            "DecrementCartItem", productId));
+
+    public Task<CartMutationOutcome> RemoveCartItemAsync(int productId) =>
+        InvokeCartMutationAsync(() => _connection!.InvokeAsync<CartMutationResultDto>(
+            "RemoveCartItem", productId));
+
+    public Task<CartMutationOutcome> ClearCartAsync() =>
+        InvokeCartMutationAsync(() => _connection!.InvokeAsync<CartMutationResultDto>("ClearCart"));
+
+    private async Task<CartMutationOutcome> InvokeCartMutationAsync(
+        Func<Task<CartMutationResultDto>> invoke)
+    {
+        if (_connection is null)
+        {
+            var currentCart = await GetCurrentCartAsync();
+            return new CartMutationOutcome(false, "Not connected to a till.", currentCart);
+        }
+
+        var result = await invoke();
+        return new CartMutationOutcome(result.Success, result.Message, MapCart(result.Cart));
     }
 
     public async Task<SyncCartSnapshot> GetCurrentCartAsync()
@@ -136,6 +167,16 @@ public class SignalRPosSyncClientService : IPosSyncClientService
 
         var cart = await _connection.InvokeAsync<CartDto>("GetCurrentCart");
         return MapCart(cart);
+    }
+
+    public async Task<SyncPaymentOptions> GetPaymentOptionsAsync()
+    {
+        if (_connection is null)
+            return new SyncPaymentOptions(false, false, false, null, null);
+
+        var options = await _connection.InvokeAsync<PaymentOptionsDto>("GetPaymentOptions");
+        return new SyncPaymentOptions(options.CashEnabled, options.QrisEnabled, options.EdcEnabled,
+            options.QrisAccountInfo, options.EdcAccountInfo);
     }
 
     public async Task<ShopEndpoint?> LoadLastEndpointAsync()

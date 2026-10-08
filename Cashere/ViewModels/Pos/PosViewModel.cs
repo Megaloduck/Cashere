@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using Cashere.Formatting;
+using Avalonia.Threading;
 
 namespace Cashere.ViewModels.Pos;
 
@@ -21,6 +22,8 @@ public partial class PosViewModel : ViewModelBase
     private readonly UserRole _cashierRole;
     private readonly IReceiptPrinterService? _receiptPrinter;
     private readonly IPosFeedbackService? _posFeedback;
+    private readonly IActiveCartBridge? _mobileCartBridge;
+    private readonly IPosPaymentNotifier? _paymentNotifier;
     private readonly HeldOrderStore _heldOrderStore = new();
 
     private PaymentSettings _paymentSettings = new(true, true, true, null, null, false, 0, 0, 0);
@@ -77,7 +80,9 @@ public partial class PosViewModel : ViewModelBase
         IReceiptPrinterService? receiptPrinter = null,
         IVoucherAdminService? voucherAdmin = null,
         UserRole cashierRole = UserRole.Cashier,
-        IPosFeedbackService? posFeedback = null)
+        IPosFeedbackService? posFeedback = null,
+        IActiveCartBridge? mobileCartBridge = null,
+        IPosPaymentNotifier? paymentNotifier = null)
     {
         _catalog = catalog;
         _saleService = saleService;
@@ -85,12 +90,16 @@ public partial class PosViewModel : ViewModelBase
         _customerAdmin = customerAdmin;
         _receiptPrinter = receiptPrinter;
         _posFeedback = posFeedback;
+        _mobileCartBridge = mobileCartBridge;
+        _paymentNotifier = paymentNotifier;
         _cashierRole = cashierRole;
         CurrentCashierId = cashierId;
         CurrentCashierName = cashierName;
 
         ProductPicker = new ProductPickerViewModel(catalog);
         ProductPicker.ProductSelected += OnProductSelected;
+        if (_mobileCartBridge is not null)
+            _mobileCartBridge.MobileCartChanged += OnMobileCartChanged;
 
         Cart = new CartViewModel(voucherAdmin)
         {
@@ -188,6 +197,46 @@ public partial class PosViewModel : ViewModelBase
     {
         Cart.AddProduct(product);
     }
+
+    private void OnMobileCartChanged(MobileCartMutation mutation)
+    {
+        if (mutation.Kind == MobileCartMutationKind.Add)
+        {
+            _ = AddMobileProductAsync(mutation.ProductId, mutation.Quantity);
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            switch (mutation.Kind)
+            {
+                case MobileCartMutationKind.Decrement:
+                    Cart.DecrementProduct(mutation.ProductId);
+                    break;
+                case MobileCartMutationKind.Remove:
+                    Cart.RemoveProduct(mutation.ProductId);
+                    break;
+                case MobileCartMutationKind.Clear:
+                    Cart.Clear();
+                    break;
+            }
+        });
+    }
+
+    private async Task AddMobileProductAsync(int productId, int quantity)
+    {
+        try
+        {
+            var product = (await _catalog.GetActiveProductsAsync()).FirstOrDefault(p => p.Id == productId);
+            if (product is not null)
+                Dispatcher.UIThread.Post(() => Cart.AddProduct(product, quantity));
+        }
+        catch
+        {
+            // The desktop POS remains usable if a mobile cart update cannot be resolved.
+        }
+    }
+
 
     private void ApplyOrderTypes(string? configuredTypes)
     {
@@ -304,6 +353,12 @@ public partial class PosViewModel : ViewModelBase
 
     private async void OnSaleCompleted(CompletedSaleResult result)
     {
+        if (_paymentNotifier is not null)
+        {
+            try { await _paymentNotifier.NotifySaleCompletedAsync(result.SaleNumber, result.TotalAmount); }
+            catch { }
+        }
+
         var completedCheckout = Checkout;
         if (PosSoundsEnabled)
             _posFeedback?.Play(PosSoundEvent.SaleCompleted);

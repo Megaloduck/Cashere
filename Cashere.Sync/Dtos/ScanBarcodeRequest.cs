@@ -1,5 +1,5 @@
 namespace Cashere.Sync.Dtos;
 
-public record ScanBarcodeRequest(string Barcode, int Quantity = 1);
+public record ScanBarcodeRequest(string Barcode);
 
-public record ScanResultDto(bool Found, string? ProductName, string? Message, CartDto? Cart);
+public record ScanResultDto(bool Found, int? ProductId, string? ProductName, decimal UnitPrice, string? Message);

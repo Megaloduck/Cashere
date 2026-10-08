@@ -53,6 +53,8 @@ sealed class Program
         AppServices.ReportExport = new ReportExportService(dbPath, AppServices.SalesReport, dbContextFactory);
         AppServices.HistoricalSalesImport = new HistoricalSalesImportService(dbContextFactory, passwordHasher);
         AppServices.ConnectedDevices = serverHost.ConnectedDevices;
+        AppServices.MobileCartBridge = serverHost.MobileCartBridge;
+        AppServices.PaymentNotifier = serverHost.PaymentNotifier;
         AppServices.ReceiptPrinter = new WindowsReceiptPrinterService(shopContextService);
         AppServices.PosFeedback = new WindowsPosFeedbackService();
         AppServices.ShiftAdmin = new ShiftAdminService(dbContextFactory);

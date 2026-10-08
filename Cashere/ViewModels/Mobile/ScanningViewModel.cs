@@ -27,6 +27,7 @@ public partial class ScanningViewModel : ViewModelBase
     public IBarcodeScannerService? Scanner => _scanner;
 
     public ObservableCollection<SyncCartLine> CartLines { get; } = new();
+    public bool HasCartLines => CartLines.Count > 0;
 
     // Raised whenever ShowCameraPreview flips, so the View knows to
     // attach/detach the native preview control.
@@ -52,6 +53,23 @@ public partial class ScanningViewModel : ViewModelBase
 
     [ObservableProperty]
     private int _scanQuantity = 1;
+
+    [ObservableProperty]
+    private int? _scannedProductId;
+
+    [ObservableProperty]
+    private string? _scannedProductName;
+
+    [ObservableProperty]
+    private decimal _scannedProductUnitPrice;
+
+    [ObservableProperty]
+    private int _scannedProductQuantity;
+
+    [ObservableProperty]
+    private bool _isSendingToCart;
+
+    public bool HasScannedProduct => ScannedProductId.HasValue;
 
     // ---- Derived state -----------------------------------------------------
 
@@ -88,6 +106,18 @@ public partial class ScanningViewModel : ViewModelBase
     private void QuickQuantity10() => ScanQuantity = 10;
 
     [RelayCommand]
+    private void IncrementScannedProductQuantity()
+    {
+        if (HasScannedProduct) ScannedProductQuantity++;
+    }
+
+    [RelayCommand]
+    private void DecrementScannedProductQuantity()
+    {
+        if (HasScannedProduct && ScannedProductQuantity > 1) ScannedProductQuantity--;
+    }
+
+    [RelayCommand]
     private async Task EnableCamera()
     {
         if (_scanner is null) return;
@@ -107,6 +137,79 @@ public partial class ScanningViewModel : ViewModelBase
         var barcode = ManualBarcode.Trim();
         ManualBarcode = string.Empty;
         await ProcessScanAsync(barcode);
+    }
+
+    [RelayCommand]
+    private async Task SendToCart()
+    {
+        if (ScannedProductId is not int productId || ScannedProductQuantity <= 0 || IsSendingToCart) return;
+
+        IsSendingToCart = true;
+        try
+        {
+            var outcome = await _syncClient.AddProductToCartAsync(productId, ScannedProductQuantity);
+            HandleCartUpdated(outcome.Cart);
+            if (outcome.Success)
+            {
+                LastScanMessage = $"Sent to desktop cart: {ScannedProductName} x{ScannedProductQuantity}";
+                ClearScannedProduct();
+            }
+            else
+            {
+                LastScanMessage = outcome.Message ?? "Could not send this product to the cart.";
+            }
+        }
+        catch (Exception ex)
+        {
+            LastScanMessage = $"Could not send to cart: {ex.Message}";
+        }
+        finally
+        {
+            IsSendingToCart = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DecrementCartItem(SyncCartLine? line)
+    {
+        if (line is null) return;
+        await ApplyCartMutationAsync(() => _syncClient.DecrementCartItemAsync(line.ProductId));
+    }
+
+    [RelayCommand]
+    private async Task ClearCartItem(SyncCartLine? line)
+    {
+        if (line is null) return;
+        await ApplyCartMutationAsync(() => _syncClient.RemoveCartItemAsync(line.ProductId));
+    }
+
+    [RelayCommand]
+    private async Task ClearCart()
+    {
+        await ApplyCartMutationAsync(_syncClient.ClearCartAsync);
+    }
+
+    private async Task ApplyCartMutationAsync(Func<Task<CartMutationOutcome>> mutate)
+    {
+        try
+        {
+            var outcome = await mutate();
+            HandleCartUpdated(outcome.Cart);
+            if (!outcome.Success) LastScanMessage = outcome.Message ?? "Cart update failed.";
+        }
+        catch (Exception ex)
+        {
+            LastScanMessage = $"Cart update failed: {ex.Message}";
+        }
+    }
+
+    private void ClearScannedProduct()
+    {
+        ScannedProductId = null;
+        ScannedProductName = null;
+        ScannedProductUnitPrice = 0;
+        ScannedProductQuantity = 0;
+        OnPropertyChanged(nameof(HasScannedProduct));
     }
 
     // ---- Construction ------------------------------------------------------
@@ -185,8 +288,11 @@ public partial class ScanningViewModel : ViewModelBase
         {
             CartLines.Add(line);
         }
+        OnPropertyChanged(nameof(HasCartLines));
         CartSubtotal = cart.Subtotal;
     }
+
+    partial void OnScannedProductIdChanged(int? value) => OnPropertyChanged(nameof(HasScannedProduct));
 
     // Camera path feeds into the exact same scan handling as manual entry -
     // the till has no way to tell the two apart, by design.
@@ -223,18 +329,17 @@ public partial class ScanningViewModel : ViewModelBase
         var quantity = ScanQuantity;
         try
         {
-            var outcome = await _syncClient.ScanBarcodeAsync(barcode, quantity);
+            var outcome = await _syncClient.ScanBarcodeAsync(barcode);
             LastScanMessage = outcome.Found
-                ? $"Added: {outcome.ProductName} x{quantity}"
+                ? $"Ready to send: {outcome.ProductName} x{quantity}"
                 : outcome.Message ?? "No product matches that barcode.";
 
-            if (outcome.Cart is not null)
+            if (outcome.Found && outcome.ProductId is int productId)
             {
-                HandleCartUpdated(outcome.Cart);
-            }
-
-            if (outcome.Found)
-            {
+                ScannedProductId = productId;
+                ScannedProductName = outcome.ProductName;
+                ScannedProductUnitPrice = outcome.UnitPrice;
+                ScannedProductQuantity = quantity;
                 ScanQuantity = 1;
             }
         }
