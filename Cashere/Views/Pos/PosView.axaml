@@ -75,7 +75,7 @@
             <Grid ColumnDefinitions="*,*">
               <Button Grid.Column="0" Content="HOLD ORDER" Classes="accent-yellow" HorizontalAlignment="Stretch" Margin="0,0,4,0"
                       IsVisible="{Binding IsHeldOrdersEnabled}"
-                      Command="{Binding HoldOrderCommand}" IsEnabled="{Binding Cart.HasItems}"/>
+                      Command="{Binding HoldOrderCommand}" IsEnabled="{Binding Cart.HasItems}" IsVisible=""/>
               <Button Grid.Column="1" Content="CHECKOUT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="4,0,0,0"
                       Padding="0,16" FontSize="18" FontWeight="Bold"
                       Command="{Binding OpenCheckoutCommand}" IsEnabled="{Binding Cart.HasItems}"/>

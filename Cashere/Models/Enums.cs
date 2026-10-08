@@ -59,7 +59,7 @@ public enum UiDensity
     Compact
 }
 
-// Settings -> Business Info -> Rounding. Applied to Sale.TotalAmount only
+// Settings -> Payments -> Rounding. Applied to Sale.TotalAmount only
 // (after discount and tax), never to individual lines - see
 // TaxCalculator.ApplyRounding, shared by CartViewModel's live preview and
 // SaleService's authoritative total so the two can never disagree.

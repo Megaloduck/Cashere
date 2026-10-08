@@ -23,7 +23,7 @@ public partial class CartViewModel : ViewModelBase
 
     public ObservableCollection<CartLineViewModel> Lines { get; } = new();
 
-    // The shop-wide default rate (Settings -> Business Info -> Tax Rates) -
+    // The shop-wide default rate (Settings -> Payments -> Tax Rates) -
     // used to resolve a new line's rate in AddProduct when its product has
     // no category, or its category has no TaxRate assigned. Already-added
     // lines keep whatever rate they resolved to at add-time; see
@@ -31,11 +31,11 @@ public partial class CartViewModel : ViewModelBase
     [ObservableProperty]
     private decimal _taxRatePercent;
 
-    // Settings -> Business Info -> "Prices include tax". See TaxCalculator.
+    // Settings -> Payments -> "Prices include tax". See TaxCalculator.
     [ObservableProperty]
     private bool _pricesIncludeTax;
 
-    // Settings -> Business Info -> Rounding. See TaxCalculator.ApplyRounding.
+    // Settings -> Payments -> Rounding. See TaxCalculator.ApplyRounding.
     [ObservableProperty]
     private RoundingMode _roundingMode = RoundingMode.None;
 

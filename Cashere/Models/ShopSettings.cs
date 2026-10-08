@@ -12,7 +12,7 @@ public class ReceiptAdmin
     public string Currency { get; set; } = "IDR";
     // The shop-wide default tax rate - used for any product whose Category
     // has no TaxRate assigned (or has no Category at all). See
-    // Settings -> Business Info -> Tax Rates and TaxCalculator.
+    // Settings -> Payments -> Tax Rates and TaxCalculator.
     public decimal TaxRatePercent { get; set; }
     public string? ReceiptFooterText { get; set; }
 
@@ -35,7 +35,7 @@ public class ReceiptAdmin
     public string? BusinessHoursJson { get; set; }
     public bool EnforceBusinessHoursAtCheckout { get; set; }
 
-    // Settings -> Business Info -> Rounding: rounds Sale.TotalAmount (after
+    // Settings -> Payments -> Rounding: rounds Sale.TotalAmount (after
     // discount and tax) to the nearest RoundingIncrement, e.g. 100, so cash
     // change never needs odd small denominations. RoundingIncrement <= 0 or
     // RoundingMode.None both mean "no rounding" - see
@@ -44,7 +44,7 @@ public class ReceiptAdmin
     public RoundingMode RoundingMode { get; set; } = RoundingMode.None;
     public decimal RoundingIncrement { get; set; }
 
-    // Settings -> Business Info: when true, Product.SellingPrice already has
+    // Settings -> Payments: when true, Product.SellingPrice already has
     // tax baked into it and TaxCalculator backs the tax amount out of the
     // price instead of adding it on top. See TaxCalculator.Calculate.
     public bool PricesIncludeTax { get; set; }

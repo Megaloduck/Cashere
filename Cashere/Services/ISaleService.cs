@@ -52,7 +52,7 @@ namespace Cashere.Services
         decimal Subtotal,
         decimal DiscountAmount,
         decimal TaxAmount,
-        // How much Settings -> Business Info -> Rounding changed the total
+        // How much Settings -> Payments -> Rounding changed the total
         // by - zero whenever rounding is off. See TaxCalculator.ApplyRounding.
         decimal RoundingAdjustment,
         decimal TotalAmount,

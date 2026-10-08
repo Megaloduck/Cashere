@@ -62,7 +62,7 @@
 
     <StackPanel Orientation="Horizontal" Spacing="8">
       <mi:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="{StaticResource BlueBrush}"/>
-      <TextBlock Text="Shop name, address, phone, tax ID, currency and tax rate are live under Settings → Business Info."
+      <TextBlock Text="Shop name, address, phone, tax ID and currency are live under Settings → Business Info; tax configuration is under Settings → Payments."
                  TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
     </StackPanel>
 

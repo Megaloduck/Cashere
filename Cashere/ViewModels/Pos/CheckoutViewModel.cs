@@ -65,7 +65,7 @@ public partial class CheckoutViewModel : ViewModelBase
     [ObservableProperty]
     private string? _pendingReferenceNumber;
 
-    // TotalDue already reflects Settings -> Business Info -> Rounding - see
+    // TotalDue already reflects Settings -> Payments -> Rounding - see
     // CartViewModel.TotalAmount / TaxCalculator.ApplyRounding.
     public decimal TotalDue => _cart.TotalAmount;
 

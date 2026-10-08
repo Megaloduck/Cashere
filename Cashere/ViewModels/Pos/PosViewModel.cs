@@ -166,7 +166,7 @@ public partial class PosViewModel : ViewModelBase
         ApplyOrderTypes(settings?.OrderTypes);
     }
 
-    // Picks up any Settings -> Business Info change (default rate, rounding,
+    // Picks up any Settings -> Payments change (default rate, rounding,
     // tax-inclusive toggle) the moment the cashier returns to the till - same
     // "refresh on ShowPos" pattern as RefreshPaymentSettingsAsync above.
     // Lines already sitting in an open cart keep whatever rate they resolved

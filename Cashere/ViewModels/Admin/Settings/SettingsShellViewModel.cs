@@ -76,9 +76,9 @@ public partial class SettingsShellViewModel : ViewModelBase
         ITaxRateAdminService? taxRateAdmin = null)
     {
         _currentRole = currentRole;
-        Business = new BusinessInfoViewModel(shopContext, taxRateAdmin);
+        Business = new BusinessInfoViewModel(shopContext);
         Receipts = new ReceiptAdminViewModel(shopContext, receiptPrinter);
-        Payments = new PaymentSettingsViewModel(shopContext);
+        Payments = new PaymentSettingsViewModel(shopContext, taxRateAdmin);
         Inventory = new InventorySettingsViewModel(shopContext);
         Hardware = new HardwareSettingsViewModel(shopContext, receiptPrinter);
         Network = new NetworkSettingsViewModel(shopContext, connectedDevices, AppServices.PairingQrCode);

@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Cashere.ViewModels.Admin.Settings;
 
-// One row in the Business Info "Categories" tax-rate assignment grid - picks
+// One row in the Payments "Categories" tax-rate assignment grid - picks
 // which TaxRate (if any) a Category resolves to. Saves on selection change
 // rather than needing its own Save button, same "toggle flips, write
 // happens" feel as ToggleSwitch-backed settings elsewhere in this app.

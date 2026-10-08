@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Cashere.ViewModels.Admin.Settings"
+             xmlns:models="clr-namespace:Cashere.Models"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="720"
              x:Class="Cashere.Views.Admin.Settings.PaymentSettingsView"
              x:DataType="vm:PaymentSettingsViewModel">
@@ -52,6 +54,92 @@
         </StackPanel>
         <ToggleSwitch Grid.Column="1" IsChecked="{Binding RequireConfirmationForNonCash}" VerticalAlignment="Center"/>
       </Grid>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="TAXATION" Classes="eyebrow"/>
+
+      <TextBlock Text="DEFAULT TAX RATE (%)" Classes="eyebrow" FontSize="9"/>
+      <TextBox Text="{Binding TaxRatePercent}"/>
+      <TextBlock Text="Used for products whose category has no tax rate assigned."
+                 Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="PRICES INCLUDE TAX" FontWeight="Bold"/>
+          <TextBlock Text="When on, a product's selling price already has tax baked in, and the tax amount is backed out of it instead of added on top at checkout."
+                     Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding PricesIncludeTax}" VerticalAlignment="Center"/>
+      </Grid>
+
+      <TextBlock Text="ROUNDING" Classes="eyebrow" FontSize="9"/>
+      <ComboBox ItemsSource="{Binding RoundingModes}" SelectedItem="{Binding RoundingMode}" HorizontalAlignment="Stretch"/>
+      <StackPanel Spacing="4" IsVisible="{Binding ShowRoundingIncrement}">
+        <TextBlock Text="ROUND TO NEAREST" Classes="eyebrow" FontSize="9"/>
+        <TextBox Text="{Binding RoundingIncrement}" Watermark="e.g. 100"/>
+        <TextBlock Text="Applied to the final total only, after discount and tax - a cash sale of Rp 23,430 rounds to Rp 23,500 with 'Nearest' at 100."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,4"/>
+      <TextBlock Text="TAX RATES" Classes="eyebrow"/>
+      <StackPanel Spacing="10" IsVisible="{Binding IsTaxRateServiceAvailable}">
+        <ItemsControl ItemsSource="{Binding TaxRates}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:TaxRate">
+              <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,2" Padding="0,8">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="1" Text="{Binding RatePercent, StringFormat='{}{0}%'}" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                  <Button Grid.Column="2" Classes="ghost"
+                          Command="{Binding $parent[UserControl].((vm:PaymentSettingsViewModel)DataContext).DeleteTaxRateCommand}"
+                          CommandParameter="{Binding}" ToolTip.Tip="Delete">
+                    <mi:MaterialIcon Kind="TrashCanOutline" Width="16" Height="16"/>
+                  </Button>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Grid ColumnDefinitions="*,100,Auto">
+          <TextBox Grid.Column="0" Text="{Binding NewTaxRateName}" Watermark="e.g. Reduced" Margin="0,0,8,0"/>
+          <TextBox Grid.Column="1" Text="{Binding NewTaxRateValue}" Watermark="5" Margin="0,0,8,0"/>
+          <Button Grid.Column="2" Classes="accent-yellow" Command="{Binding AddTaxRateCommand}">
+            <mi:MaterialIcon Kind="Plus" Width="16" Height="16"/>
+          </Button>
+        </Grid>
+        <TextBlock Text="{Binding TaxRateErrorMessage}" Foreground="{StaticResource RedBrush}" FontWeight="Bold" TextWrapping="Wrap"
+                   IsVisible="{Binding TaxRateErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        <Border Classes="rule-thick" Margin="0,4"/>
+        <TextBlock Text="ASSIGN RATES TO CATEGORIES" Classes="eyebrow"/>
+        <TextBlock Text="A category left on DEFAULT uses the shop-wide default tax rate above."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        <ItemsControl ItemsSource="{Binding CategoryAssignments}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:CategoryTaxAssignmentItem">
+              <Grid ColumnDefinitions="*,140,Auto" Margin="0,4">
+                <TextBlock Grid.Column="0" Text="{Binding CategoryName}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableTaxRates}" SelectedItem="{Binding SelectedTaxRate}"
+                          PlaceholderText="DEFAULT" HorizontalAlignment="Stretch">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:TaxRate">
+                      <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="2" Classes="ghost" Command="{Binding ClearTaxRateCommand}"
+                        ToolTip.Tip="Use default" Margin="4,0,0,0">
+                  <mi:MaterialIcon Kind="CloseCircleOutline" Width="14" Height="14"/>
+                </Button>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+      <StackPanel Spacing="8" IsVisible="{Binding !IsTaxRateServiceAvailable}">
+        <mi:MaterialIcon Kind="AlertCircleOutline" Width="20" Height="20" Foreground="{StaticResource RedBrush}"/>
+        <TextBlock Text="TAX RATE MANAGEMENT UNAVAILABLE IN THIS BUILD" Classes="eyebrow"/>
+      </StackPanel>
 
 <TextBlock Text="{Binding StatusMessage}"
            Foreground="{StaticResource BlueBrush}"

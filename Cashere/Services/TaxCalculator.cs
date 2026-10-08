@@ -18,7 +18,7 @@ public static class TaxCalculator
 
     // Resolves the tax rate a product's line should use: a product override,
     // then its category's assigned TaxRate, then the shop-wide default from
-    // Settings -> Business Info.
+    // Settings -> Payments.
     public static decimal ResolveRatePercent(
         decimal? productOverridePercent, Category? category, decimal defaultRatePercent) =>
         productOverridePercent ?? category?.TaxRate?.RatePercent ?? defaultRatePercent;
@@ -26,7 +26,7 @@ public static class TaxCalculator
     // Splits a cart-level discount across lines pro-rata by subtotal share,
     // then computes each line's tax at its own rate - exclusive (added on
     // top of the price) or inclusive (backed out of a price that already
-    // contains it), per Settings -> Business Info -> "Prices include tax".
+    // contains it), per Settings -> Payments -> "Prices include tax".
     public static CalculationResult Calculate(
         IReadOnlyList<LineInput> lines, decimal discountAmount, bool pricesIncludeTax)
     {
@@ -51,7 +51,7 @@ public static class TaxCalculator
         return new CalculationResult(results, totalTax);
     }
 
-    // Rounds a final total per Settings -> Business Info -> Rounding. A
+    // Rounds a final total per Settings -> Payments -> Rounding. A
     // RoundingIncrement <= 0 or RoundingMode.None both mean "leave it
     // alone" - callers don't need to special-case either.
     public static decimal ApplyRounding(decimal amount, RoundingMode mode, decimal increment)

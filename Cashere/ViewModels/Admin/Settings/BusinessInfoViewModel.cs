@@ -13,7 +13,7 @@ using Avalonia.Media.Imaging;
 namespace Cashere.ViewModels.Admin.Settings;
 
 // Owns the store-identity fields that used to be editable on
-// ReceiptAdminViewModel (ShopName, Address, Phone, Currency, TaxRatePercent),
+// ReceiptAdminViewModel (ShopName, Address, Phone, Currency),
 // plus Email/TaxId/Timezone, and now also: the shop logo and weekly business
 // hours. Tax configuration is managed under Payments settings. Save()
 // re-fetches the row fresh rather than trusting a possibly-stale
@@ -28,8 +28,6 @@ public partial class BusinessInfoViewModel : ViewModelBase
     private readonly IShopContextService _shopContext;
 
     public IReadOnlyList<TimezoneOption> TimezoneOptions { get; } = TimezonePresets.FixedOffsets;
-    public IReadOnlyList<RoundingMode> RoundingModes { get; } = Enum.GetValues<RoundingMode>();
-
     [ObservableProperty] private string _shopName = string.Empty;
     [ObservableProperty] private string _address = string.Empty;
     [ObservableProperty] private string _phone = string.Empty;
