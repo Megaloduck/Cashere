@@ -117,6 +117,8 @@ public partial class RootViewModel : ViewModelBase
 
         var security = await _shopContext.GetSecuritySettingsAsync();
         AutoLockService.Configure(security.AutoLockEnabled, security.AutoLockTimeoutMinutes);
+        if (AppServices.AuditLog is not null)
+            await AppServices.AuditLog.GetRecentAsync(1); // Runs the configured audit-retention cleanup at sign-in.
 
         // No clock/timezone configuration needed here anymore - Cashere runs
         // as a single local install, so every timestamp always displays in

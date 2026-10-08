@@ -11,7 +11,16 @@
              x:DataType="vm:SecuritySettingsViewModel">
   <UserControl.Resources>
     <converters:UtcToDisplayTimeConverter x:Key="UtcToDisplay"/>
+
+    <!-- Single shared column spec for the activity table (header + rows).
+         96  = WHEN
+         *   = EVENT (flexible)
+         120 = ACTOR
+         96  = REF
+         84  = ACTIONS -->
+    <x:String x:Key="ActivityColumns">96,*,120,96,84</x:String>
   </UserControl.Resources>
+
   <ScrollViewer>
     <StackPanel Margin="12" Spacing="12">
       <TextBlock Text="SECURITY" Classes="headline" FontSize="18"/>
@@ -29,6 +38,21 @@
       <StackPanel Spacing="4" IsVisible="{Binding AutoLockEnabled}">
         <TextBlock Text="TIMEOUT (MINUTES)" Classes="eyebrow"/>
         <ComboBox ItemsSource="{Binding TimeoutOptions}" SelectedItem="{Binding AutoLockTimeoutMinutes}" HorizontalAlignment="Stretch"/>
+      </StackPanel>
+
+      <Border Classes="rule-thick" Margin="0,8"/>
+      <TextBlock Text="AUDIT RETENTION" Classes="eyebrow"/>
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="AUTO-DELETE OLD ACTIVITY" FontWeight="Bold"/>
+          <TextBlock Text="Automatically removes audit entries older than the selected interval." Foreground="{StaticResource GrayBrush}" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+        <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoDeleteAuditEnabled}" VerticalAlignment="Center"/>
+      </Grid>
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding AutoDeleteAuditEnabled}">
+        <TextBlock Text="DELETE AFTER" Classes="eyebrow" VerticalAlignment="Center"/>
+        <ComboBox ItemsSource="{Binding AuditRetentionOptions}" SelectedItem="{Binding AuditRetentionMonths}" Width="92"/>
+        <TextBlock Text="month(s)" VerticalAlignment="Center" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
       </StackPanel>
 
       <TextBlock Text="{Binding StatusMessage}"
@@ -51,35 +75,142 @@
                    TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="12" VerticalAlignment="Center"/>
       </StackPanel>
 
+      <!-- ============ ACTIVITY LOG ============ -->
       <Border Classes="rule-thick" Margin="0,8"/>
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="RECENT ACTIVITY" Classes="eyebrow" VerticalAlignment="Center"/>
-        <Button Grid.Column="1" Classes="chip" Command="{Binding RefreshAuditCommand}">
+
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock Text="ACTIVITY LOG" FontWeight="Bold" VerticalAlignment="Center"/>
+        <ComboBox Grid.Column="1" ItemsSource="{Binding ActivityDays}" SelectedItem="{Binding SelectedActivityDay}" Width="190" Margin="0,0,8,0">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:ActivityDayOption">
+              <TextBlock Text="{Binding DisplayName}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Grid.Column="2" Classes="chip" Command="{Binding RefreshAuditCommand}">
           <StackPanel Orientation="Horizontal" Spacing="5">
             <mi:MaterialIcon Kind="Refresh" Width="14" Height="14"/>
             <TextBlock Text="REFRESH"/>
           </StackPanel>
         </Button>
       </Grid>
-      <TextBlock Text="Audit history captures who changed key records and which fields changed. It stores no PINs or secret values." TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
-      <Border Classes="rule-thick"/>
-      <ItemsControl ItemsSource="{Binding RecentActivity}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="services:AuditLogEntry">
-            <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,0,0,1" Padding="2,8">
-              <Grid ColumnDefinitions="130,*,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding OccurredAtUtc, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM HH:mm}'}" FontSize="10" Foreground="{StaticResource GrayBrush}" VerticalAlignment="Top"/>
-                <StackPanel Grid.Column="1" Spacing="2">
-                  <TextBlock Text="{Binding Summary}" FontSize="11" FontWeight="Bold" TextWrapping="Wrap"/>
-                  <TextBlock Text="{Binding ActorName}" FontSize="10" Foreground="{StaticResource GrayBrush}"/>
-                </StackPanel>
-                <TextBlock Grid.Column="2" Text="{Binding EntityId}" FontSize="10" Foreground="{StaticResource GrayBrush}"/>
-              </Grid>
-            </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-      <TextBlock Text="No activity has been recorded yet." Foreground="{StaticResource GrayBrush}" FontSize="11" IsVisible="{Binding HasNoRecentActivity}"/>
+
+      <TextBlock Text="Reverses the latest supported edit. Existing history without saved snapshots cannot be reversed."
+                 TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="10"/>
+      <TextBlock Text="Audit history captures who changed key records and which fields changed. It stores no PINs or secret values."
+                 TextWrapping="Wrap" Foreground="{StaticResource GrayBrush}" FontSize="11"/>
+
+      <!-- Empty state -->
+      <Border IsVisible="{Binding HasNoRecentActivity}"
+              Padding="12" Margin="0,8,0,0"
+              BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="1"
+              CornerRadius="4">
+        <TextBlock Text="No activity has been recorded yet."
+                   Foreground="{StaticResource GrayBrush}" FontSize="11"
+                   HorizontalAlignment="Center"/>
+      </Border>
+
+      <!-- Table -->
+      <Border IsVisible="{Binding !HasNoRecentActivity}"
+              BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="1"
+              CornerRadius="4" Margin="0,8,0,0" ClipToBounds="True">
+        <StackPanel>
+          <!-- Header row -->
+          <Border Background="{StaticResource GrayLightBrush}" Padding="12,7">
+            <Grid ColumnDefinitions="1*,3*,1*,1*,1*">
+              <TextBlock Grid.Column="0" Text="WHEN"
+                         FontSize="9" FontWeight="Bold"
+                         Foreground="{StaticResource GrayBrush}"
+                         VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1" Text="EVENT"
+                         FontSize="9" FontWeight="Bold"
+                         Foreground="{StaticResource GrayBrush}"
+                         VerticalAlignment="Center" Margin="12,0"/>
+              <TextBlock Grid.Column="2" Text="ACTOR"
+                         FontSize="9" FontWeight="Bold"
+                         Foreground="{StaticResource GrayBrush}"
+                         VerticalAlignment="Center" Margin="0,0,12,0"/>
+              <TextBlock Grid.Column="3" Text="REF"
+                         FontSize="9" FontWeight="Bold"
+                         Foreground="{StaticResource GrayBrush}"
+                         VerticalAlignment="Center" Margin="0,0,12,0"/>
+              <TextBlock Grid.Column="4" Text="ACTIONS"
+                         FontSize="9" FontWeight="Bold"
+                         Foreground="{StaticResource GrayBrush}"
+                         VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </Grid>
+          </Border>
+
+          <!-- Entries count strip -->
+          <Border Background="Transparent" Padding="12,4">
+            <TextBlock Text="{Binding RecentActivity.Count, StringFormat='{}{0} entries'}"
+                       FontSize="9" Foreground="{StaticResource GrayBrush}"
+                       HorizontalAlignment="Right"/>
+          </Border>
+
+          <!-- Rows -->
+          <ItemsControl ItemsSource="{Binding RecentActivity}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="services:AuditLogEntry">
+                <Border BorderBrush="{StaticResource GrayLightBrush}" BorderThickness="0,1,0,0"
+                        Padding="12,8" Background="Transparent">
+                  <Grid ColumnDefinitions="1*,3*,1*,1*,1*">
+                    <!-- WHEN -->
+                    <StackPanel Grid.Column="0" Spacing="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding OccurredAtUtc, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:dd MMM}'}"
+                                 FontSize="10" FontWeight="Bold"/>
+                      <TextBlock Text="{Binding OccurredAtUtc, Converter={StaticResource UtcToDisplay}, StringFormat='{}{0:HH:mm}'}"
+                                 FontSize="9" Foreground="{StaticResource GrayBrush}"/>
+                    </StackPanel>
+
+                    <!-- EVENT -->
+                    <TextBlock Grid.Column="1" Text="{Binding Summary}"
+                               FontSize="11" FontWeight="Bold" TextWrapping="Wrap"
+                               VerticalAlignment="Center" Margin="12,0"/>
+
+                    <!-- ACTOR -->
+                    <TextBlock Grid.Column="2" Text="{Binding ActorName}"
+                               FontSize="10" Foreground="{StaticResource GrayBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" Margin="0,0,12,0"/>
+
+                    <!-- REF chip -->
+                    <Border Grid.Column="3"
+                            Background="{StaticResource GrayLightBrush}"
+                            CornerRadius="3" Padding="6,2"
+                            VerticalAlignment="Center" Margin="0,0,12,0"
+                            HorizontalAlignment="Left">
+                      <TextBlock Text="{Binding EntityId}" FontSize="9"
+                                 Foreground="{StaticResource GrayBrush}"
+                                 FontFamily="Consolas,monospace"
+                                 TextTrimming="CharacterEllipsis"/>
+                    </Border>
+
+                    <!-- ACTIONS (icon-only, right-aligned) -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4"
+                                VerticalAlignment="Center" HorizontalAlignment="Right">
+                      <Button Classes="chip" Padding="6"
+                              Command="{Binding $parent[UserControl].((vm:SecuritySettingsViewModel)DataContext).UndoCommand}"
+                              CommandParameter="{Binding}"
+                              IsVisible="{Binding CanUndo}"
+                              ToolTip.Tip="Undo this change">
+                        <mi:MaterialIcon Kind="Undo" Width="14" Height="14"/>
+                      </Button>
+                      <Button Classes="chip" Padding="6"
+                              Command="{Binding $parent[UserControl].((vm:SecuritySettingsViewModel)DataContext).RedoCommand}"
+                              CommandParameter="{Binding}"
+                              IsVisible="{Binding CanRedo}"
+                              ToolTip.Tip="Redo this change">
+                        <mi:MaterialIcon Kind="Redo" Width="14" Height="14"/>
+                      </Button>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
 
       <Border Classes="rule-thick" Margin="0,8"/>
       <TextBlock Text="REMAINING SECURITY WORK" Classes="eyebrow"/>

@@ -107,6 +107,8 @@ public class ReceiptAdmin
     // "takes effect immediately" feel as ThemeMode below.
     public bool AutoLockEnabled { get; set; }
     public int AutoLockTimeoutMinutes { get; set; } = 15;
+    public bool AutoDeleteAuditEnabled { get; set; } = true;
+    public int AuditRetentionMonths { get; set; } = 1;
 
     // Read by ThemeApplier at startup (desktop only - Android doesn't wire
     // IShopContextService, so the mobile app always renders Light,

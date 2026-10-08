@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Cashere.Data;
 
 public class CashereDbContext : DbContext
 {
+    public bool SuppressAuditEvents { get; set; }
     public CashereDbContext(DbContextOptions<CashereDbContext> options) : base(options)
     {
     }
@@ -56,6 +58,7 @@ public class CashereDbContext : DbContext
 
     private void AddAuditEvents()
     {
+        if (SuppressAuditEvents) return;
         var auditableTypes = new HashSet<string>(StringComparer.Ordinal)
         {
             nameof(Cashier), nameof(Category), nameof(Customer), nameof(InventoryMovement), nameof(Product),
@@ -84,6 +87,13 @@ public class CashereDbContext : DbContext
             var changedFields = entry.State == EntityState.Modified
                 ? string.Join(", ", entry.Properties.Where(property => property.IsModified).Select(property => property.Metadata.Name))
                 : string.Empty;
+            var reversibleChanges = entry.State == EntityState.Modified
+                ? entry.Properties
+                    .Where(property => property.IsModified
+                        && !Equals(property.OriginalValue, property.CurrentValue)
+                        && IsSafeToReverse(property.Metadata.Name))
+                    .ToList()
+                : new List<Microsoft.EntityFrameworkCore.ChangeTracking.PropertyEntry>();
             AuditEvents.Add(new AuditEvent
             {
                 OccurredAtUtc = DateTime.UtcNow,
@@ -92,9 +102,27 @@ public class CashereDbContext : DbContext
                 Action = action,
                 EntityType = entry.Metadata.ClrType.Name,
                 EntityId = keyValue is null || Convert.ToInt64(keyValue) == 0 ? null : Convert.ToString(keyValue, System.Globalization.CultureInfo.InvariantCulture),
-                Summary = changedFields.Length == 0 ? $"{action} {entry.Metadata.ClrType.Name}" : $"{action} {entry.Metadata.ClrType.Name}: {changedFields}"
+                Summary = changedFields.Length == 0 ? $"{action} {entry.Metadata.ClrType.Name}" : $"{action} {entry.Metadata.ClrType.Name}: {changedFields}",
+                BeforeValuesJson = reversibleChanges.Count == 0 ? null : JsonSerializer.Serialize(reversibleChanges.ToDictionary(property => property.Metadata.Name, property => property.OriginalValue)),
+                AfterValuesJson = reversibleChanges.Count == 0 ? null : JsonSerializer.Serialize(reversibleChanges.ToDictionary(property => property.Metadata.Name, property => property.CurrentValue)),
+                IsReversible = changes.Count == 1 && entry.State == EntityState.Modified && reversibleChanges.Count > 0
             });
         }
+    }
+
+    private static bool IsSafeToReverse(string propertyName)
+    {
+        var name = propertyName;
+        return !name.Contains("pin", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("password", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("secret", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("token", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("credential", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("account", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("email", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("phone", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("address", StringComparison.OrdinalIgnoreCase)
+            && !name.Contains("taxid", StringComparison.OrdinalIgnoreCase);
     }
 
     public static string GetDefaultDbPath()

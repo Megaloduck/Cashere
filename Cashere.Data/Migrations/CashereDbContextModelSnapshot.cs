@@ -31,6 +31,12 @@ namespace Cashere.Data.Migrations
                     b.Property<int?>("ActorCashierId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BeforeValuesJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AfterValuesJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ActorName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -52,6 +58,12 @@ namespace Cashere.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUndone")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsReversible")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -406,6 +418,12 @@ namespace Cashere.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AutoLockTimeoutMinutes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoDeleteAuditEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AuditRetentionMonths")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("AutoPrintReceiptAfterPayment")

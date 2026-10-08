@@ -13,4 +13,8 @@ public sealed class AuditEvent
     public string EntityType { get; set; } = string.Empty;
     public string? EntityId { get; set; }
     public string Summary { get; set; } = string.Empty;
+    public string? BeforeValuesJson { get; set; }
+    public string? AfterValuesJson { get; set; }
+    public bool IsUndone { get; set; }
+    public bool IsReversible { get; set; }
 }

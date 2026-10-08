@@ -63,7 +63,7 @@ namespace Cashere.Services
     // Read by RootViewModel right after login (to arm AutoLockService) and
     // by SecuritySettingsViewModel (to populate the toggle/picker) - see
     // Settings -> Security.
-    public record SecuritySettings(bool AutoLockEnabled, int AutoLockTimeoutMinutes);
+    public record SecuritySettings(bool AutoLockEnabled, int AutoLockTimeoutMinutes, bool AutoDeleteAuditEnabled, int AuditRetentionMonths);
 
     // Read by RootViewModel right after login (to arm HeaderClockService)
     // and by PreferencesViewModel (to populate the toggles) - see

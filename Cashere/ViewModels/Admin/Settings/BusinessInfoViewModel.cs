@@ -14,9 +14,8 @@ namespace Cashere.ViewModels.Admin.Settings;
 
 // Owns the store-identity fields that used to be editable on
 // ReceiptAdminViewModel (ShopName, Address, Phone, Currency, TaxRatePercent),
-// plus Email/TaxId/Timezone, and now also: the shop logo, weekly business
-// hours, rounding rules, the "prices include tax" toggle, and the
-// TaxRate/Category assignment grid (the "multiple tax rates" feature). Save()
+// plus Email/TaxId/Timezone, and now also: the shop logo and weekly business
+// hours. Tax configuration is managed under Payments settings. Save()
 // re-fetches the row fresh rather than trusting a possibly-stale
 // _loadedSettings snapshot, since several screens can write to this same
 // row in one admin session; that avoids clobbering whatever Receipts or
@@ -27,7 +26,6 @@ namespace Cashere.ViewModels.Admin.Settings;
 public partial class BusinessInfoViewModel : ViewModelBase
 {
     private readonly IShopContextService _shopContext;
-    private readonly ITaxRateAdminService? _taxRateAdmin;
 
     public IReadOnlyList<TimezoneOption> TimezoneOptions { get; } = TimezonePresets.FixedOffsets;
     public IReadOnlyList<RoundingMode> RoundingModes { get; } = Enum.GetValues<RoundingMode>();
@@ -39,7 +37,6 @@ public partial class BusinessInfoViewModel : ViewModelBase
     [ObservableProperty] private string _taxId = string.Empty;
     [ObservableProperty] private string _currency = "IDR";
     [ObservableProperty] private TimezoneOption? _timezone;
-    [ObservableProperty] private string _taxRatePercent = "0";
     [ObservableProperty] private string? _statusMessage;
 
     // ---- Logo -------------------------------------------------------------
@@ -57,29 +54,9 @@ public partial class BusinessInfoViewModel : ViewModelBase
     public ObservableCollection<BusinessDayFormItem> BusinessHours { get; } = new();
     [ObservableProperty] private bool _enforceBusinessHoursAtCheckout;
 
-    // ---- Rounding & tax-inclusive pricing -----------------------------------
-
-    [ObservableProperty] private RoundingMode _roundingMode = RoundingMode.None;
-    [ObservableProperty] private string _roundingIncrement = "0";
-    [ObservableProperty] private bool _pricesIncludeTax;
-
-    public bool ShowRoundingIncrement => RoundingMode != RoundingMode.None;
-
-    // ---- Tax rates & category assignment ------------------------------------
-
-    public bool IsTaxRateServiceAvailable => _taxRateAdmin is not null;
-
-    public ObservableCollection<TaxRate> TaxRates { get; } = new();
-    public ObservableCollection<CategoryTaxAssignmentItem> CategoryAssignments { get; } = new();
-
-    [ObservableProperty] private string _newTaxRateName = string.Empty;
-    [ObservableProperty] private string _newTaxRateValue = "0";
-    [ObservableProperty] private string? _taxRateErrorMessage;
-
-    public BusinessInfoViewModel(IShopContextService shopContext, ITaxRateAdminService? taxRateAdmin = null)
+    public BusinessInfoViewModel(IShopContextService shopContext)
     {
         _shopContext = shopContext;
-        _taxRateAdmin = taxRateAdmin;
     }
 
     public async Task LoadAsync()
@@ -93,7 +70,6 @@ public partial class BusinessInfoViewModel : ViewModelBase
             Email = settings.Email ?? string.Empty;
             TaxId = settings.TaxId ?? string.Empty;
             Currency = settings.Currency;
-            TaxRatePercent = settings.TaxRatePercent.ToString();
             Timezone = TimezonePresets.FindByLabel(settings.Timezone);
 
             LogoPath = settings.LogoPath;
@@ -106,27 +82,8 @@ public partial class BusinessInfoViewModel : ViewModelBase
             }
             EnforceBusinessHoursAtCheckout = settings.EnforceBusinessHoursAtCheckout;
 
-            RoundingMode = settings.RoundingMode;
-            RoundingIncrement = settings.RoundingIncrement.ToString();
-            PricesIncludeTax = settings.PricesIncludeTax;
-        }
-
-        if (_taxRateAdmin is not null)
-        {
-            var rates = await _taxRateAdmin.GetAllTaxRatesAsync();
-            TaxRates.Clear();
-            foreach (var rate in rates) TaxRates.Add(rate);
-
-            var categories = await _taxRateAdmin.GetCategoriesWithTaxRatesAsync();
-            CategoryAssignments.Clear();
-            foreach (var category in categories)
-            {
-                CategoryAssignments.Add(new CategoryTaxAssignmentItem(category, TaxRates, SaveCategoryTaxRateAsync));
-            }
         }
     }
-
-    partial void OnRoundingModeChanged(RoundingMode value) => OnPropertyChanged(nameof(ShowRoundingIncrement));
 
     [RelayCommand]
     private void PickLogo() => PickLogoRequested?.Invoke();
@@ -168,57 +125,6 @@ public partial class BusinessInfoViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private async Task AddTaxRate()
-    {
-        if (_taxRateAdmin is null) return;
-
-        TaxRateErrorMessage = null;
-
-        if (string.IsNullOrWhiteSpace(NewTaxRateName))
-        {
-            TaxRateErrorMessage = "Enter a name for the tax rate.";
-            return;
-        }
-
-        if (!decimal.TryParse(NewTaxRateValue, out var rateValue) || rateValue < 0)
-        {
-            TaxRateErrorMessage = "Rate must be zero or a positive number.";
-            return;
-        }
-
-        try
-        {
-            var created = await _taxRateAdmin.CreateTaxRateAsync(new TaxRateInput(NewTaxRateName, rateValue));
-            TaxRates.Add(created);
-            NewTaxRateName = string.Empty;
-            NewTaxRateValue = "0";
-        }
-        catch (AdminValidationException ex)
-        {
-            TaxRateErrorMessage = ex.Message;
-        }
-    }
-
-    [RelayCommand]
-    private async Task DeleteTaxRate(TaxRate? taxRate)
-    {
-        if (_taxRateAdmin is null || taxRate is null) return;
-
-        await _taxRateAdmin.DeleteTaxRateAsync(taxRate.Id);
-        TaxRates.Remove(taxRate);
-
-        // Any category pointing at the deleted rate now falls back to the
-        // shop-wide default - reload assignments so the grid reflects that
-        // immediately rather than showing a stale selection.
-        await LoadAsync();
-    }
-
-    private async Task SaveCategoryTaxRateAsync(int categoryId, int? taxRateId)
-    {
-        if (_taxRateAdmin is null) return;
-        await _taxRateAdmin.AssignCategoryTaxRateAsync(categoryId, taxRateId);
-    }
 
     [RelayCommand]
     private async Task Save()
@@ -231,18 +137,6 @@ public partial class BusinessInfoViewModel : ViewModelBase
             return;
         }
 
-        if (!decimal.TryParse(TaxRatePercent, out var taxRate) || taxRate < 0)
-        {
-            StatusMessage = "Tax rate must be zero or a positive number.";
-            return;
-        }
-
-        if (!decimal.TryParse(RoundingIncrement, out var roundingIncrement) || roundingIncrement < 0)
-        {
-            StatusMessage = "Rounding increment must be zero or a positive number.";
-            return;
-        }
-
         var settings = await _shopContext.GetSettingsAsync() ?? new ReceiptAdmin();
 
         settings.ShopName = ShopName.Trim();
@@ -252,15 +146,10 @@ public partial class BusinessInfoViewModel : ViewModelBase
         settings.TaxId = string.IsNullOrWhiteSpace(TaxId) ? null : TaxId.Trim();
         settings.Currency = Currency.Trim();
         settings.Timezone = Timezone?.Label;
-        settings.TaxRatePercent = taxRate;
 
         settings.LogoPath = LogoPath;
         settings.BusinessHoursJson = BusinessHoursSerializer.Serialize(BusinessHours.Select(d => d.ToModel()));
         settings.EnforceBusinessHoursAtCheckout = EnforceBusinessHoursAtCheckout;
-        settings.RoundingMode = RoundingMode;
-        settings.RoundingIncrement = roundingIncrement;
-        settings.PricesIncludeTax = PricesIncludeTax;
-
         await _shopContext.UpdateSettingsAsync(settings);
 
         StatusMessage = "Saved.";

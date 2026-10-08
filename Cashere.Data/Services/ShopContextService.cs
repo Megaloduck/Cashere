@@ -55,7 +55,14 @@ public class ShopContextService : IShopContextService
         }
         else
         {
-            db.ReceiptAdmin.Update(settings);
+            // Load the persisted row first so EF retains its real original
+            // values. Attaching a detached instance with Update() marks every
+            // field modified and makes before/after audit snapshots unusable.
+            var existing = await db.ReceiptAdmin.FirstOrDefaultAsync(row => row.Id == settings.Id);
+            if (existing is null)
+                db.ReceiptAdmin.Add(settings);
+            else
+                db.Entry(existing).CurrentValues.SetValues(settings);
         }
 
         await db.SaveChangesAsync();
@@ -97,7 +104,14 @@ public class ShopContextService : IShopContextService
         var timeoutMinutes = settings?.AutoLockTimeoutMinutes ?? 15;
         if (timeoutMinutes <= 0) timeoutMinutes = 15;
 
-        return new SecuritySettings(settings?.AutoLockEnabled ?? false, timeoutMinutes);
+        var retentionMonths = settings?.AuditRetentionMonths ?? 1;
+        if (retentionMonths <= 0) retentionMonths = 1;
+
+        return new SecuritySettings(
+            settings?.AutoLockEnabled ?? false,
+            timeoutMinutes,
+            settings?.AutoDeleteAuditEnabled ?? true,
+            retentionMonths);
     }
     public async Task<HeaderClockSettings> GetHeaderClockSettingsAsync()
     {
