@@ -72,14 +72,17 @@
           <StackPanel Grid.Row="2" Spacing="10" Margin="0,14,0,0">
             <TextBlock Text="{Binding LastReceiptSummary}" TextWrapping="Wrap" Foreground="{StaticResource BlueBrush}" FontWeight="Bold"
                        IsVisible="{Binding LastReceiptSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-            <Grid ColumnDefinitions="*,*">
+            <Grid ColumnDefinitions="*,*" IsVisible="{Binding IsHeldOrdersEnabled}">
               <Button Grid.Column="0" Content="HOLD ORDER" Classes="accent-yellow" HorizontalAlignment="Stretch" Margin="0,0,4,0"
-                      IsVisible="{Binding IsHeldOrdersEnabled}"
-                      Command="{Binding HoldOrderCommand}" IsEnabled="{Binding Cart.HasItems}" IsVisible=""/>
+                      Command="{Binding HoldOrderCommand}" IsEnabled="{Binding Cart.HasItems}"/>
               <Button Grid.Column="1" Content="CHECKOUT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="4,0,0,0"
                       Padding="0,16" FontSize="18" FontWeight="Bold"
                       Command="{Binding OpenCheckoutCommand}" IsEnabled="{Binding Cart.HasItems}"/>
             </Grid>
+            <Button Content="CHECKOUT" Classes="accent-blue" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Padding="0,16" FontSize="18" FontWeight="Bold"
+                    Command="{Binding OpenCheckoutCommand}" IsEnabled="{Binding Cart.HasItems}"
+                    IsVisible="{Binding !IsHeldOrdersEnabled}"/>
           </StackPanel>
           <Border Grid.Row="3" Classes="card" Padding="10" Margin="0,8,0,0"
                   IsVisible="{Binding ShowHeldOrders}" MaxHeight="150">
